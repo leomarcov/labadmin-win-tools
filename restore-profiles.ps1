@@ -18,7 +18,7 @@ foreach(user in $restore_users) {
   echo d | robocopy "${user_backup}\Appdata\Local\Google\Chrome" "${user_profile}\AppData\Local\Google\Chrome" /MIR /XJ /COPYALL 
   echo d | robocopy "${user_backup}\Appdata\Local\Mozilla\Firefox" "${user_profile}\AppData\Local\Mozilla\Firefox" /MIR /XJ /COPYALL 
 
-  $user_conf = Get-Content $b| ConvertFrom-StringData
+  $user_conf = Get-Content "${user_backup}\${restore_cache_filename}"| ConvertFrom-StringData
   $user_restore_conf
   # Scheduled restore
 
