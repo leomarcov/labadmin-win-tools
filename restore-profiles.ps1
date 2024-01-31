@@ -1,25 +1,28 @@
 # CONFIG VARIABLES
-$restore_users="alumno","pepe"
+$users="alumno","pepe"
 $backups_path="C:\Users\restore-profile\"
-$restore_cache_filename="restore-profile.conf"
-$default_restore_days="1"
 
 # CREATE BACKUP
-foreach(user in $resore_users) {
-  robocopy "C:\Users\${u}" "${backups_path}\${u}" /MIR /XJ /COPYALL
+foreach(user in $users) {
+  $user_profile="C:\Users\${u}"
+  $user_backup="${backups_path}\${u}"
+
+  robocopy $user_profile $user_backup /MIR /XJ /COPYALL
 }
 
+
 # RESTORE
-foreach(user in $restore_users) {
+foreach(u in $users) {
   $user_profile="C:\Users\${u}"
   $user_backup="${backups_path}\${u}"
   
-  # Each call restore
+  # Resotre every call
   echo d | robocopy "${user_backup}\Appdata\Local\Google\Chrome" "${user_profile}\AppData\Local\Google\Chrome" /MIR /XJ /COPYALL 
   echo d | robocopy "${user_backup}\Appdata\Local\Mozilla\Firefox" "${user_profile}\AppData\Local\Mozilla\Firefox" /MIR /XJ /COPYALL 
 
-  $user_conf = Get-Content "${user_backup}\${restore_cache_filename}"| ConvertFrom-StringData
-  $user_restore_conf
   # Scheduled restore
+  $user_conf = Get-Content "${user_backup}\restore-profile.conf"| ConvertFrom-StringData
+  $user_restore_conf
 
+  echo d | robocopy "${user_backup}\" "${user_profile}" /MIR /XJ /COPYALL 
 }
