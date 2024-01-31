@@ -8,37 +8,47 @@ $backups_path="C:\Users\restore-profile\"
 #### PARAMETERS
 ###################################################################
 Param(
-  [switch]$backup,        # Backup profiles
-  [switch]$restore        # Restore profiles
-  [String]$users          # List of users to backup/restore instead of $fixed_users
+  [switch]$CreatepProfilesBackup,    # Backup profiles instead of restore
+  [String]$users                     # List of users to backup/restore instead of $fixed_users
 )
 
 if(!$users) { $users=$fixed_users }
 
+
 ###################################################################
-#### CREATE BACKUP
+#### CREATE PROFILE BACKUP
 ###################################################################
-foreach(user in $users) {
-  $user_profile="C:\Users\${u}"
-  $user_backup="${backups_path}\${u}"
-  
-  New-Item -ItemType Directory -Force -Path $bachups_path
-  robocopy $user_profile $user_backup /MIR /XJ /COPYALL
+if($CreateBackup) {
+  New-Item -ItemType Directory -Force -Path $backups_path    # Create backups path if no exists
+  foreach(user in $users) {
+    $user_profile="C:\Users\${u}"
+    $user_backup="${backups_path}\${u}"
+    
+    robocopy $user_profile $user_backup /MIR /XJ /COPYALL
+  }
+  exit
 }
 
 
-# RESTORE
+###################################################################
+#### RESTORE PROFILE BACKUP
+###################################################################
 foreach(u in $users) {
   $user_profile="C:\Users\${u}"
   $user_backup="${backups_path}\${u}"
   
-  # Resotre every call
+  # Every call restore:
   echo d | robocopy "${user_backup}\Appdata\Local\Google\Chrome" "${user_profile}\AppData\Local\Google\Chrome" /MIR /XJ /COPYALL 
   echo d | robocopy "${user_backup}\Appdata\Local\Mozilla\Firefox" "${user_profile}\AppData\Local\Mozilla\Firefox" /MIR /XJ /COPYALL 
 
-  # Scheduled restore
+  # Scheduled restore:
+  $user_conf = Get-Content "${user_backup}\restore-profile.conf"| ConvertFrom-StringData
+
+  
   $user_conf = Get-Content "${user_backup}\restore-profile.conf"| ConvertFrom-StringData
   $user_restore_conf
 
-  echo d | robocopy "${user_backup}\" "${user_profile}" /MIR /XJ /COPYALL 
+  if((New-TimeSpan -Start $user_conf.lastRestore -End (Get-Date)).Days) -ge 1) {
+    echo d | robocopy "${user_backup}\" "${user_profile}" /MIR /XJ /COPYALL 
+  }
 }
