@@ -2,7 +2,7 @@
 $restore_users="alumno","pepe"
 $backup_folder="C:\Users\profiles-backup\"
 $restore_days_file="restore-days.conf"
-
+$default_restore_days="1"
 
 # CREATE BACKUP
 foreach(user in $resore_users) {
