@@ -11,5 +11,5 @@ foreach(user in $resore_users) {
 
 # RESTORE
 foreach(user in $resore_users) {
-  echo d | robocopy "${backup_folder}\${u}" "C:\Users\${u}" /MIR /XJ /COPYALL /XD "${backup_folder}\${u}\Desktop" /XD "${backup_folder}\${u}\Downloads" /XD "${backup_folder}\${u}\Documents"
+  echo d | robocopy "${backup_folder}\${u}" "C:\Users\${u}" /MIR /XJ /COPYALL /XD "${backup_folder}\${u}\Desktop" /XF "${backup_folder}\${u}\${restore_days_file}" /XD "${backup_folder}\${u}\Downloads" /XD "${backup_folder}\${u}\Documents"
 }
