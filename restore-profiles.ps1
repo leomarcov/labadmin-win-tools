@@ -1,16 +1,17 @@
 ###################################################################
-#### CONFIG VARIABLES
-###################################################################
-$fixed_users="alumno","pepe"
-$backups_path="C:\Users\restore-profile\"
-
-###################################################################
 #### PARAMETERS
 ###################################################################
 Param(
-  [switch]$CreatepProfilesBackup,    # Backup profiles instead of restore
-  [String]$users                     # List of users to backup/restore instead of $fixed_users
+  [Switch]$CreateBackup,    # Backup profiles instead of restore
+  [String[]]$users                     # List of users to backup/restore instead of $fixed_users
 )
+
+
+###################################################################
+#### CONFIG VARIABLES
+###################################################################
+$fixed_users="alumno","pepe"
+$backups_path="C:\Users\restore-profile"
 
 if(!$users) { $users=$fixed_users }
 
@@ -19,13 +20,14 @@ if(!$users) { $users=$fixed_users }
 #### CREATE PROFILE BACKUP
 ###################################################################
 if($CreateBackup) {
-  New-Item -ItemType Directory -Force -Path $backups_path    # Create backups path if no exists
-  foreach(user in $users) {
+  New-Item -ItemType Directory -Force -Path $backups_path | Out-Null   # Create backups path if no exists
+  foreach($u in $users) {
     $user_profile="C:\Users\${u}"
     $user_backup="${backups_path}\${u}"
     
     robocopy $user_profile $user_backup /MIR /XJ /COPYALL
   }
+
   exit
 }
 
@@ -33,7 +35,7 @@ if($CreateBackup) {
 ###################################################################
 #### RESTORE PROFILE BACKUP
 ###################################################################
-foreach(u in $users) {
+foreach($u in $users) {
   $user_profile="C:\Users\${u}"
   $user_backup="${backups_path}\${u}"
   
@@ -48,7 +50,7 @@ foreach(u in $users) {
   $user_conf = Get-Content "${user_backup}\restore-profile.conf"| ConvertFrom-StringData
   $user_restore_conf
 
-  if((New-TimeSpan -Start $user_conf.lastRestore -End (Get-Date)).Days) -ge 1) {
+  if((New-TimeSpan -Start ([DateTime]$user_conf.lastRestore) -End (Get-Date)).Days -ge 1) {
     echo d | robocopy "${user_backup}\" "${user_profile}" /MIR /XJ /COPYALL 
   }
 }
