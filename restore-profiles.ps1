@@ -4,8 +4,10 @@ $backup_folder="C:\Users\profiles-backup\"
 $restore_days_file="restore-days.conf"
 
 
-robocopy c:\users\pepe c:\users\pepe_bak /mir /xj /copyall
-
+# CREATE BACKUP
+foreach(user in $resore_users) {
+  robocopy "C:\Users\${u}" "${backup_folder}\${u}" /MIR /XJ /COPYALL
+}
 
 # RESTORE
 foreach(user in $resore_users) {
