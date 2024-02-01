@@ -1,24 +1,20 @@
-###################################################################
-#### PARAMETERS
-###################################################################
+#Requires -RunAsAdministrator
+
+#### PARAMETERS ##################################################
 Param(
   [Switch]$CreateBackup,    # Backup profiles instead of restore
   [String[]]$users                     # List of users to backup/restore instead of $fixed_users
 )
 
+#### CONFIG VARIABLES ############################################
 
-###################################################################
-#### CONFIG VARIABLES
-###################################################################
 $fixed_users="alumno","pepe"
 $backups_path="C:\Users\restore-profile"
 
 if(!$users) { $users=$fixed_users }
 
 
-###################################################################
-#### CREATE PROFILE BACKUP
-###################################################################
+#### CREATE PROFILE BACKUP #######################################
 if($CreateBackup) {
   New-Item -ItemType Directory -Force -Path $backups_path | Out-Null   # Create backups path if no exists
   foreach($u in $users) {
@@ -32,9 +28,7 @@ if($CreateBackup) {
 }
 
 
-###################################################################
-#### RESTORE PROFILE BACKUP
-###################################################################
+#### RESTORE PROFILE BACKUP #######################################
 foreach($u in $users) {
   $user_profile="C:\Users\${u}"
   $user_backup="${backups_path}\${u}"
