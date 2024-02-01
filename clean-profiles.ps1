@@ -2,12 +2,11 @@
 
 #### PARAMETERS ##################################################
 Param(
-  [Switch]$CreateBackup,    # Backup profiles instead of restore
-  [String[]]$users                     # List of users to backup/restore instead of $fixed_users
+  [Switch]$CreateBackup,        # Backup profiles instead of restore
+  [String[]]$users              # Optional list of users to backup/restore instead of $fixed_users
 )
 
 #### CONFIG VARIABLES ############################################
-
 $fixed_users="alumno","pepe"
 $backups_path="C:\Users\restore-profile"
 
