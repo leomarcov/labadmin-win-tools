@@ -1,5 +1,22 @@
 #Requires -RunAsAdministrator
 
+<#
+.SYNOPSIS
+    A brief description of the function or script. This keyword can be used
+    only once in each topic.
+.DESCRIPTION
+    A detailed description of the function or script. This keyword can be
+    used only once in each topic.
+.NOTES
+    File Name      : xxxx.ps1
+    Author         : Leonardo Marco
+.EXAMPLE
+    clean-profiles.ps1 -CreateBackup
+.EXAMPLE
+    clean-profiles.ps1 
+#>
+
+
 #### PARAMETERS ##################################################
 Param(
   [Switch]$CreateBackup,        # Backup profiles instead of restore
