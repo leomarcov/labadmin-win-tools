@@ -54,10 +54,9 @@ if($CreateBackup) {
     # Copy profile
     robocopy $user_profile $user_backup /MIR /XJ /COPYALL /NFL /NDL
     
-    # Copy default user config file
-    $default_conf=@{ cleanAfterDays=1; lastClean=(Get-Date -Format "yyy-MM-dd") }  # Create deault hashtable
-    $default_conf=foreach($i in $default_conf) { foreach ($e in $i.GetEnumerator()) { "{0}={1}" -f $e.Key, $e.Value }}  # Convert hashtable to string key=value
-    $default_conf | Out-File "${user_backup}\profiles-cleaner.conf"  # Save to file
+    # Save default user config file in profile backup
+    $default_conf="cleanAfterDays=1`nlastClean="+(Get-Date -Format "yyy-MM-dd")
+    $default_conf | Out-File "${user_backup}\profiles-cleaner.conf"  
   }
   exit
 }
@@ -78,9 +77,9 @@ foreach($u in $users) {
 
   # SCHEDULED RESTORE
   $user_conf = Get-Content "${user_backup}\profiles-cleaner.conf"| ConvertFrom-StringData
-  if((New-TimeSpan -Start ([DateTime]$user_conf.lastClean) -End (Get-Date)).Days -ge $user_conf.cleanAfterDays) {
+  if(!$user_conf -OR (New-TimeSpan -Start ([DateTime]$user_conf.lastClean) -End (Get-Date)).Days -ge $user_conf.cleanAfterDays) {
     #echo d | robocopy ${user_backup} ${user_profile} /MIR /XJ /COPYALL /NFL /NDL /XF "${user_backup}\profiles-cleaner.conf"
     echo "robocopy bla bla bla"
-    @{ cleanAfterDays=$user_conf.cleanAfterDays; lastClean=(Get-Date -Format "yyyy-MM-dd")} | Out-File "${user_backup}\profiles-cleaner.conf"  # Save to file
+    "cleanAfterDays="+$user_conf.cleanAfterDays+"`nlastClean="+(Get-Date -Format "yyy-MM-dd") | Out-File "${user_backup}\profiles-cleaner.conf"  # Update lastClean date
   }
 }
