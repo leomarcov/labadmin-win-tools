@@ -23,8 +23,8 @@ Param(
 if($disable) {
   Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\USBSTOR\" -Name "start" -Value 4
 
-# ENABLE
-} elseif($enable) 
+# ENABLE 
+} elseif($enable) {
   Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\USBSTOR\" -Name "start" -Value 3
 
 # SHOW CURRENT STATUS
@@ -32,4 +32,3 @@ if($disable) {
   if ((Get-ItemPropertyValue -Path 'HKLM:\SYSTEM\CurrentControlSet\Services\USBSTOR\' -Name "start") -eq 4) { Write-Output "Disabled" } 
   else { Write-Output "Enabled" }
 }
-
