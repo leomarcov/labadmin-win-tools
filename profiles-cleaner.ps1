@@ -11,9 +11,9 @@
     File Name      : xxxx.ps1
     Author         : Leonardo Marco
 .EXAMPLE
-    profiles-cleaner.ps1 -CreateBackup
+    clean-profiles.ps1 -CreateBackup
 .EXAMPLE
-    profiles-cleaner.ps1 
+    clean-profiles.ps1 
 #>
 
 
@@ -25,7 +25,7 @@ Param(
 
 #### CONFIG VARIABLES ############################################
 $fixed_users="alumno","pepe","manolo"
-$backups_path="C:\Users\profiles-backup"
+$backups_path="C:\Users\clean-profiles"
 
 if(!$users) { $users=$fixed_users }
 
@@ -43,7 +43,7 @@ if($CreateBackup) {
     $acl.SetAccessRule($accessRule)
     $acl | Set-Acl $backups_path
   }
-  º
+
   foreach($u in $users) {
     $user_profile="C:\Users\${u}"
     $user_backup="${backups_path}\${u}"
@@ -55,12 +55,14 @@ if($CreateBackup) {
     robocopy $user_profile $user_backup /MIR /XJ /COPYALL /NFL /NDL
     
     # Copy default user config file
-    $default_conf=@{ cleanAfterDays=1; lastClean=(Get-Date -Format "yyy-MM-dd") }
+    $default_conf=@{ cleanAfterDays=1; lastClean=(Get-Date -Format "yyy-MM-dd") }  # Create deault hashtable
+    $default_conf=foreach($i in $default_conf) { foreach ($e in $i.GetEnumerator()) { "{0}={1}" -f $e.Key, $e.Value }}  # Convert hashtable to string key=value
+    $default_conf | Out-File "${user_backup}\restore-profile.conf"  # Save to file
   }
   exit
 }
 
-exit
+
 
 #### RESTORE PROFILE BACKUP #######################################
 foreach($u in $users) {
