@@ -11,9 +11,9 @@
     File Name      : xxxx.ps1
     Author         : Leonardo Marco
 .EXAMPLE
-    clean-profiles.ps1 -CreateBackup
+    profiles-cleaner.ps1 -CreateBackup
 .EXAMPLE
-    clean-profiles.ps1 
+    profiles-cleaner.ps1 
 #>
 
 
@@ -25,7 +25,7 @@ Param(
 
 #### CONFIG VARIABLES ############################################
 $fixed_users="alumno","pepe","manolo"
-$backups_path="C:\Users\clean-profiles"
+$backups_path="C:\Users\profiles-backup"
 
 if(!$users) { $users=$fixed_users }
 
