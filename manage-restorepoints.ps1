@@ -6,27 +6,32 @@ Param(
   [Switch]$Create,           # Create RP
   [Switch]$DeleteAll,        # Delete ALL restore points
   [Switch]$Restore           # Restore RP
+  [Switch]$List              # List RPs
 )
 
 
 #### ACTION ENABLE ###############################################
-} if($enable) {
+if($enable) {
     Enable-ComputerRestore -Drive c:
     vssadmin resize shadowstorage /for=C: /on=C: /maxsize=5GB
+}
 
 #### ACTION CREATE ###############################################
-elseif$($create) {
+if$($create) {
     Checkpoint-Computer -Description "labadmin-freezer-main"
+}
 
 #### ACTION DELETE ###############################################
-} elseif($deleteall) {
+if($deleteall) {
   vssadmin delete shadows /all
+}
 
 #### ACTION RESTORE ###############################################
-} elseif($restore) {
+if($restore) {
     Restore-Computer -RestorePoint 1
+}
 
 #### ACTION LIST ##################################################
-} else {
+if($LIST) {
    Get-ComputerRestorePoint
 }
