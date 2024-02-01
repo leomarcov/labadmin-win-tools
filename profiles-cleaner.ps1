@@ -11,9 +11,9 @@
     File Name      : xxxx.ps1
     Author         : Leonardo Marco
 .EXAMPLE
-    clean-profiles.ps1 -CreateBackup
+    profiles-cleaner.ps1 -CreateBackup
 .EXAMPLE
-    clean-profiles.ps1 
+    profiles-cleaner.ps1 
 #>
 
 
@@ -25,7 +25,7 @@ Param(
 
 #### CONFIG VARIABLES ############################################
 $fixed_users="alumno","pepe","manolo"
-$backups_path="C:\Users\clean-profiles"
+$backups_path="C:\Users\profiles-cleaner"
 
 if(!$users) { $users=$fixed_users }
 
@@ -69,20 +69,18 @@ foreach($u in $users) {
   $user_profile="C:\Users\${u}"
   $user_backup="${backups_path}\${u}"
 
-  if(!Test-Path $user_profile) { Write-Output "WARNING! Folder $user_profile not exists. Skipping user $u"; continue }
-  if(!Test-Path $user_backup)  { Write-Output "WARNING! Folder $user_profile not exists. Skipping user $u"; continue }
+  if(!(Test-Path $user_profile)) { Write-Output "WARNING! Folder $user_profile not exists. Skipping user $u"; continue }
+  if(!(Test-Path $user_backup))  { Write-Output "WARNING! Folder $user_profile not exists. Skipping user $u"; continue }
   
   # RESTORE ON EVERY CALL
-  echo d | robocopy "${user_backup}\Appdata\Local\Google\Chrome" "${user_profile}\AppData\Local\Google\Chrome" /MIR /XJ /COPYALL /NFL /NDL
-  echo d | robocopy "${user_backup}\Appdata\Local\Mozilla\Firefox" "${user_profile}\AppData\Local\Mozilla\Firefox" /MIR /XJ /COPYALL /NFL /NDL
+  if((Test-Path "${user_backup}\Appdata\Local\Google\Chrome")) { echo d | robocopy "${user_backup}\Appdata\Local\Google\Chrome" "${user_profile}\AppData\Local\Google\Chrome" /MIR /XJ /COPYALL /NFL /NDL }
+  if((Test-Path "${user_backup}\Appdata\Local\Mozilla\Firefox")) { echo d | robocopy "${user_backup}\Appdata\Local\Mozilla\Firefox" "${user_profile}\AppData\Local\Mozilla\Firefox" /MIR /XJ /COPYALL /NFL /NDL }
 
   # SCHEDULED RESTORE
-  $user_conf = Get-Content "${user_backup}\profiles-clenar.conf"| ConvertFrom-StringData
-
-  $user_restore_conf
-
-  if((New-TimeSpan -Start ([DateTime]$user_conf.lastRestore) -End (Get-Date)).Days -ge 1) {
-    echo d | robocopy ${user_backup} ${user_profile} /MIR /XJ /COPYALL /NFL /NDL /XF "${user_backup}\clean-profile.conf"
-    $user_conf.last=Get-Date -Format "yyyy-MM-dd"
+  $user_conf = Get-Content "${user_backup}\profiles-cleaner.conf"| ConvertFrom-StringData
+  if((New-TimeSpan -Start ([DateTime]$user_conf.lastClean) -End (Get-Date)).Days -ge $user_conf.cleanAfterDays) {
+    #echo d | robocopy ${user_backup} ${user_profile} /MIR /XJ /COPYALL /NFL /NDL /XF "${user_backup}\profiles-cleaner.conf"
+    echo "robocopy bla bla bla"
+    $user_conf.lastClean=Get-Date -Format "yyyy-MM-dd"
   }
 }
