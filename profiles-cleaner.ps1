@@ -57,7 +57,7 @@ if($CreateBackup) {
     # Copy default user config file
     $default_conf=@{ cleanAfterDays=1; lastClean=(Get-Date -Format "yyy-MM-dd") }  # Create deault hashtable
     $default_conf=foreach($i in $default_conf) { foreach ($e in $i.GetEnumerator()) { "{0}={1}" -f $e.Key, $e.Value }}  # Convert hashtable to string key=value
-    $default_conf | Out-File "${user_backup}\restore-profile.conf"  # Save to file
+    $default_conf | Out-File "${user_backup}\profiles-cleaner.conf"  # Save to file
   }
   exit
 }
@@ -69,18 +69,16 @@ foreach($u in $users) {
   $user_profile="C:\Users\${u}"
   $user_backup="${backups_path}\${u}"
 
-  if(!Test-Path $user_profile) { Write-Output "Folder $user_profile not exists. Skipping user $u"; continue }
-  if(!Test-Path $user_backup)  { Write-Output "Folder $user_profile not exists. Skipping user $u"; continue }
+  if(!Test-Path $user_profile) { Write-Output "WARNING! Folder $user_profile not exists. Skipping user $u"; continue }
+  if(!Test-Path $user_backup)  { Write-Output "WARNING! Folder $user_profile not exists. Skipping user $u"; continue }
   
-  # RESTORE EVERY CALL
+  # RESTORE ON EVERY CALL
   echo d | robocopy "${user_backup}\Appdata\Local\Google\Chrome" "${user_profile}\AppData\Local\Google\Chrome" /MIR /XJ /COPYALL /NFL /NDL
   echo d | robocopy "${user_backup}\Appdata\Local\Mozilla\Firefox" "${user_profile}\AppData\Local\Mozilla\Firefox" /MIR /XJ /COPYALL /NFL /NDL
 
   # SCHEDULED RESTORE
-  $user_conf = Get-Content "${user_backup}\clean-profile.conf"| ConvertFrom-StringData
-  $hashtable.GetEnumerator()|select name,value|convertto-csv | out-file file.csv
+  $user_conf = Get-Content "${user_backup}\profiles-clenar.conf"| ConvertFrom-StringData
 
-  $user_conf = Get-Content "${user_backup}\clean-profile.conf"| ConvertFrom-StringData
   $user_restore_conf
 
   if((New-TimeSpan -Start ([DateTime]$user_conf.lastRestore) -End (Get-Date)).Days -ge 1) {
