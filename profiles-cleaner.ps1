@@ -81,6 +81,6 @@ foreach($u in $users) {
   if((New-TimeSpan -Start ([DateTime]$user_conf.lastClean) -End (Get-Date)).Days -ge $user_conf.cleanAfterDays) {
     #echo d | robocopy ${user_backup} ${user_profile} /MIR /XJ /COPYALL /NFL /NDL /XF "${user_backup}\profiles-cleaner.conf"
     echo "robocopy bla bla bla"
-    $user_conf.lastClean=Get-Date -Format "yyyy-MM-dd"
+    @{ cleanAfterDays=$user_conf.cleanAfterDays; lastClean=(Get-Date -Format "yyyy-MM-dd")} | Out-File "${user_backup}\profiles-cleaner.conf"  # Save to file
   }
 }
