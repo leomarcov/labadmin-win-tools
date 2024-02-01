@@ -36,10 +36,8 @@ if($CreateBackup) {
   foreach($u in $users) {
     $user_profile="C:\Users\${u}"
     $user_backup="${backups_path}\${u}"
-    
     robocopy $user_profile $user_backup /MIR /XJ /COPYALL
   }
-
   exit
 }
 
@@ -48,6 +46,11 @@ if($CreateBackup) {
 foreach($u in $users) {
   $user_profile="C:\Users\${u}"
   $user_backup="${backups_path}\${u}"
+
+  if(!Test-Path $user_profile) {
+    Write-Output "Folder $user_profile not exists. Skipping user $u"
+    continue
+  }
   
   # Every call restore:
   echo d | robocopy "${user_backup}\Appdata\Local\Google\Chrome" "${user_profile}\AppData\Local\Google\Chrome" /MIR /XJ /COPYALL 
@@ -64,3 +67,5 @@ foreach($u in $users) {
     echo d | robocopy "${user_backup}\" "${user_profile}" /MIR /XJ /COPYALL 
   }
 }
+
+
