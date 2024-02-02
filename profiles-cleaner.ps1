@@ -19,17 +19,16 @@
 
 #### PARAMETERS ##################################################
 Param(
-  [Switch]$CreateBackup,        # Backup profiles instead of restore
-  [String[]]$users,             # Optional list of users to backup or restore instead of .config files
-  [Switch]$Force                # Force restore instead of config file dates
+  [Switch]$CreateBackup,            # Backup profiles instead of restore
+  [String[]]$users,                 # Optional list of users to backup or restore instead of .config files
+  [Switch]$Force                    # Force restore instead of config file dates
 )
 
 #### CONFIG VARIABLES ############################################
 $backups_path="C:\Users\profiles-cleaner"
 
 
-
-#### CREATE PROFILE BACKUP #######################################
+#### CREATE PROFILES BACKUP #######################################
 if($CreateBackup) {
   if(!$users) { Write-Output "Please, specific users parameter"; exit 1 }
 
@@ -49,6 +48,7 @@ if($CreateBackup) {
     Write-Output "`n`n###############################################################################`n#### BACKUP USER: $u `n###############################################################################"
     $user_profile="C:\Users\${u}"
     $user_backup="${backups_path}\${u}"
+    $user_conf_file="${backups_path}\$u.conf"
 
     if(!(Test-Path $user_profile)) { Write-Output "WARNING! Folder $user_profile not exists. Skipping user $u"; continue }
     if(Test-Path $user_backup) { Remove-Item -Recurse -Force $user_backup -ErrorAction SilentlyContinue }
@@ -57,19 +57,15 @@ if($CreateBackup) {
     robocopy $user_profile $user_backup /MIR /XJ /COPYALL /NFL /NDL
     
     # Save default user config file in backups path
-    if(!(Test-Path "${backups_path}\$u.conf")) {
-        $default_conf="cleanAfterDays=1`r`nlastClean="+(Get-Date -Format "yyy-MM-dd")+"`r`nskip=false"
-        $default_conf | Out-File "${backups_path}\$u.conf" 
-    }
+    if(!(Test-Path $user_conf_file)) { "cleanAfterDays=1`r`nlastClean="+(Get-Date -Format "yyy-MM-dd")+"`r`nskip=false" | Out-File $user_conf_file }
   }
-  
   exit
 }
 
 
 
 #### RESTORE PROFILE BACKUP #######################################
-# If no users param get users from each .conf file in backups dir
+# If no users param get all users from each .conf file in backups dir
 if(!$users) { $users=foreach($f in Get-ChildItem $backups_path -filter *.conf) {$f.basename } }
 
 foreach($u in $users) {
@@ -96,7 +92,6 @@ foreach($u in $users) {
   if($Force -OR (New-TimeSpan -Start ([DateTime]$user_conf.lastClean) -End (Get-Date)).Days -ge $user_conf.cleanAfterDays) {
     echo d | robocopy ${user_backup} ${user_profile} /MIR /XJ /COPYALL /NFL /NDL
     "cleanAfterDays="+$user_conf.cleanAfterDays+"`r`nlastClean="+(Get-Date -Format "yyy-MM-dd")+"`r`nskip=false" | Out-File $user_conf_file  # Update lastClean date
-
 
   # RESTORE ON EVERY CALL
   } else {
