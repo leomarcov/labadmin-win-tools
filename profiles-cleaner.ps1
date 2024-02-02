@@ -2,7 +2,7 @@
 
 <#
 .SYNOPSIS
-    Automated user profiles clenarer
+    Automated user profiles cleaner
 .DESCRIPTION
     Automated user profiles cleaner for backup and restore at logon predefined user folder profiles.
     Each profile is backup in c:\users\profiles-cleaner\ and a username.conf file is generated.
