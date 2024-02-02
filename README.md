@@ -6,7 +6,8 @@ Labadmin freezer is a collection of PowerShell scripts for manage Windows system
 
 
 ## Install
-Instal this PowerShell command with admin privileges:
+* Download and copy files:
 ```
 Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/leomarcov/labadmin-freezer/main/install.ps1'))
 ```
+* Create first backup for each user
