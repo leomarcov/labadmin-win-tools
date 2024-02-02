@@ -2,25 +2,37 @@
 
 <#
 .SYNOPSIS
-    A brief description of the function or script. This keyword can be used
-    only once in each topic.
+    Automated user profiles clenarer
 .DESCRIPTION
-    A detailed description of the function or script. This keyword can be
-    used only once in each topic.
+    Automated user profiles cleaner for backup and restore at logon predefined user folder profiles.
+    Each profile is backup in c:\users\profiles-cleaner\ and a username.conf file is generated.
+    Config file syntax is:
+        cleanAfterDays=1                # Number of days until autoclean
+        lastClean=2024-02-02            # Last date clean was performed
+        skip=false                      # Skip autoclean for this user
+
+.PARAMETER CreateBackup
+    Backup given users profiles in c:\users\profiles-cleaner or update if exists
+    -users must be given
+.PARAMETER Users
+    List of users to backup or optional to restore (instead of config file names)
+.PARAMETER Force
 .NOTES
-    File Name      : xxxx.ps1
+    File Name      : profiles-cleaner.ps1
     Author         : Leonardo Marco
 .EXAMPLE
-    profiles-cleaner.ps1 -CreateBackup
+    profiles-cleaner.ps1 -CreateBackup -Users user1,user2,user3
 .EXAMPLE
-    profiles-cleaner.ps1 
+    profiles-cleaner.ps1
+    profiles-cleaner.ps1 -Users user1
+    profiles-cleaner.ps1 -Force
 #>
 
 
 #### PARAMETERS ##################################################
 Param(
   [Switch]$CreateBackup,            # Backup profiles instead of restore
-  [String[]]$users,                 # Optional list of users to backup or restore instead of .config files
+  [String[]]$Users,                 # Optional list of users to backup or restore instead of .config files
   [Switch]$Force                    # Force restore instead of config file dates
 )
 
