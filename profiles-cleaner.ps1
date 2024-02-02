@@ -20,19 +20,19 @@
 #### PARAMETERS ##################################################
 Param(
   [Switch]$CreateBackup,        # Backup profiles instead of restore
-  [String[]]$users              # Optional list of users to backup/restore instead of $fixed_users
+  [String[]]$users,             # Optional list of users to backup or restore instead of .config files
+  [Switch]$Force                # Force restore instead of config file dates
 )
 
 #### CONFIG VARIABLES ############################################
-$fixed_users="alumno","pepe","manolo"
 $backups_path="C:\Users\profiles-cleaner"
-
-if(!$users) { $users=$fixed_users }
 
 
 
 #### CREATE PROFILE BACKUP #######################################
 if($CreateBackup) {
+  if(!$users) { Write-Output "Please, specific users parameter"; exit 1 }
+
   # Create backups folder and set permissions
   if(!(Test-Path $backups_path)) {
     New-Item -ItemType Directory -Force -Path $backups_path | Out-Null   
@@ -46,41 +46,62 @@ if($CreateBackup) {
   }
 
   foreach($u in $users) {
+    Write-Output "`n`n###############################################################################`n#### BACKUP USER: $u `n###############################################################################"
     $user_profile="C:\Users\${u}"
     $user_backup="${backups_path}\${u}"
 
     if(!(Test-Path $user_profile)) { Write-Output "WARNING! Folder $user_profile not exists. Skipping user $u"; continue }
-    if(Test-Path $user_backup) { Remove-Item -Recurse -Force $user_backup }
+    if(Test-Path $user_backup) { Remove-Item -Recurse -Force $user_backup -ErrorAction SilentlyContinue }
     
     # Copy profile
     robocopy $user_profile $user_backup /MIR /XJ /COPYALL /NFL /NDL
     
-    # Save default user config file in profile backup
-    $default_conf="cleanAfterDays=1`nlastClean="+(Get-Date -Format "yyy-MM-dd")
-    $default_conf | Out-File "${user_backup}\profiles-cleaner.conf"  
+    # Save default user config file in backups path
+    if(!(Test-Path "${backups_path}\$u.conf")) {
+        $default_conf="cleanAfterDays=1`r`nlastClean="+(Get-Date -Format "yyy-MM-dd")+"`r`nskip=false"
+        $default_conf | Out-File "${backups_path}\$u.conf" 
+    }
   }
+  
   exit
 }
 
 
 
 #### RESTORE PROFILE BACKUP #######################################
+# If no users param get users from each .conf file in backups dir
+if(!$users) { $users=foreach($f in Get-ChildItem $backups_path -filter *.conf) {$f.basename } }
+
 foreach($u in $users) {
+  Write-Output "`n`n###############################################################################`n#### CLEAN USER: $u `n###############################################################################"
   $user_profile="C:\Users\${u}"
   $user_backup="${backups_path}\${u}"
+  $user_conf_file="${backups_path}\$u.conf"
 
+  # CHECK FOLDER
   if(!(Test-Path $user_profile)) { Write-Output "WARNING! Folder $user_profile not exists. Skipping user $u"; continue }
   if(!(Test-Path $user_backup))  { Write-Output "WARNING! Folder $user_profile not exists. Skipping user $u"; continue }
-  
-  # RESTORE ON EVERY CALL
-  if((Test-Path "${user_backup}\Appdata\Local\Google\Chrome")) { echo d | robocopy "${user_backup}\Appdata\Local\Google\Chrome" "${user_profile}\AppData\Local\Google\Chrome" /MIR /XJ /COPYALL /NFL /NDL }
-  if((Test-Path "${user_backup}\Appdata\Local\Mozilla\Firefox")) { echo d | robocopy "${user_backup}\Appdata\Local\Mozilla\Firefox" "${user_profile}\AppData\Local\Mozilla\Firefox" /MIR /XJ /COPYALL /NFL /NDL }
+
+  # GET USER CONFIG
+  $user_conf=Get-Content "$user_conf_file"| ConvertFrom-StringData
+  if(!$user_conf -OR !$user_conf.cleanAfterDays -OR !$user_conf.lastClean -OR !$user_conf.skip) {
+    Write-Output "WARNING! Invalid config file ${user_conf_file}. Skipping user ${u}"; continue
+  }
+
+  # SKIP USER (only if no force)
+  if(!$Force -AND $user_conf.skip -eq "true") { Write-Output "Skipping user $u for config file"; continue }
+
 
   # SCHEDULED RESTORE
-  $user_conf = Get-Content "${user_backup}\profiles-cleaner.conf"| ConvertFrom-StringData
-  if(!$user_conf -OR (New-TimeSpan -Start ([DateTime]$user_conf.lastClean) -End (Get-Date)).Days -ge $user_conf.cleanAfterDays) {
-    #echo d | robocopy ${user_backup} ${user_profile} /MIR /XJ /COPYALL /NFL /NDL /XF "${user_backup}\profiles-cleaner.conf"
-    echo "robocopy bla bla bla"
-    "cleanAfterDays="+$user_conf.cleanAfterDays+"`nlastClean="+(Get-Date -Format "yyy-MM-dd") | Out-File "${user_backup}\profiles-cleaner.conf"  # Update lastClean date
+  if($Force -OR (New-TimeSpan -Start ([DateTime]$user_conf.lastClean) -End (Get-Date)).Days -ge $user_conf.cleanAfterDays) {
+    echo d | robocopy ${user_backup} ${user_profile} /MIR /XJ /COPYALL /NFL /NDL
+    "cleanAfterDays="+$user_conf.cleanAfterDays+"`r`nlastClean="+(Get-Date -Format "yyy-MM-dd")+"`r`nskip=false" | Out-File $user_conf_file  # Update lastClean date
+
+
+  # RESTORE ON EVERY CALL
+  } else {
+      if((Test-Path "${user_backup}\Appdata\Local\Google\Chrome")) { echo d | robocopy "${user_backup}\Appdata\Local\Google\Chrome" "${user_profile}\AppData\Local\Google\Chrome" /MIR /XJ /COPYALL /NFL /NDL }
+      if((Test-Path "${user_backup}\Appdata\Local\Mozilla\Firefox")) { echo d | robocopy "${user_backup}\Appdata\Local\Mozilla\Firefox" "${user_profile}\AppData\Local\Mozilla\Firefox" /MIR /XJ /COPYALL /NFL /NDL }
   }
+
 }
