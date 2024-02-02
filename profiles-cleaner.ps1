@@ -36,6 +36,7 @@ if($CreateBackup) {
   # Create backups folder and set permissions
   if(!(Test-Path $backups_path)) {
     New-Item -ItemType Directory -Force -Path $backups_path | Out-Null   
+    attrib +h $backups_path
     $acl = Get-Acl $backups_path
     $accessRule = New-Object System.Security.AccessControl.FileSystemAccessRule($acl.owner,"FullControl","Allow")
     $acl.SetOwner((New-Object System.Security.Principal.Ntaccount($acl.owner)))
