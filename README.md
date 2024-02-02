@@ -16,3 +16,4 @@ Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManage
 ```
 * Config Group Policy (`gpedit.msc`) startup script:
   * `Computer Configuracion > Windows Settings > Scripts > Startup > PowerShell Scripts`
+  * Script to exec: `C:\Program Files\labadmin\labadmin-freezer\profiles-cleaner.ps1`
