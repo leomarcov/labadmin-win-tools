@@ -58,6 +58,8 @@ if($CreateBackup) {
     $acl.SetAccessRuleProtection($true,$false)
     $acl.SetAccessRule($accessRule)
     $acl | Set-Acl $backups_path
+
+    (New-Object System.Security.Principal.SecurityIdentifier 'S-1-5-32-544').Translate([type]'System.Security.Principal.NTAccount').value
   }
 
   foreach($u in $users) {
