@@ -4,19 +4,23 @@
 .SYNOPSIS
     Automated user profiles cleaner
 .DESCRIPTION
-    Automated user profiles cleaner for backup and restore at logon predefined user folder profiles.
-    Each profile is backup in c:\users\profiles-cleaner\ and a username.conf file is generated.
-    Config file syntax is:
+    Automated user profiles cleaner for backup and restore at startup 
+    Each profile is backup in c:\users\profiles-cleaner\ and a username.conf file is generated
+    Profile config file syntax is:
         cleanAfterDays=1                # Number of days until autoclean
-        lastClean=2024-02-02            # Last date clean was performed
+        lastClean=2024-02-02            # Date when last clean was performed
         skip=false                      # Skip autoclean for this user
-
 .PARAMETER CreateBackup
-    Backup given users profiles in c:\users\profiles-cleaner or update if exists
-    -users must be given
+    Backup (or update backup if previos backup exists) current users profiles to c:\users\profiles-cleaner\
+    If no use this parameter, instead of backup, profile restore (clean) is done
+    Parameter -users must be given with list of users to backup
+    For new backups default username.conf file is generated
 .PARAMETER Users
-    List of users to backup or optional to restore (instead of config file names)
+    List of users to backup/restore
+    With -CreateBackup this parameter is mandatory
+    When restore is optional. If no given all backup profiles stored are used
 .PARAMETER Force
+    Force profile clean and ommits skip user config
 .NOTES
     File Name      : profiles-cleaner.ps1
     Author         : Leonardo Marco
