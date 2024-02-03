@@ -118,6 +118,7 @@ function RestoreProfiles {
       } else {
           foreach($d in $clean_allways.split(" ")) { 
               if(!(Test-Path "${user_backup}\$d")) { continue }
+              Remove-Item -Recurso -Force "${user_profile}\${d}"
               echo d | robocopy "${user_backup}\${d}" "${user_profile}\${d}" /MIR /XJ /COPYALL /NFL /NDL
           }
       }
