@@ -2,6 +2,10 @@
 
 $install_path=$ENV:ProgramFiles+"\labadmin\labadmin-freezer\"
 
+if ((New-Object Security.Principal.WindowsPrincipal $([Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator) -eq $false) {
+    Start-Process powershell.exe -Verb RunAs -ArgumentList ('-noprofile -noexit -file "{0}" -elevated' -f ($myinvocation.MyCommand.Definition))
+}
+
 # Create folder and close permissions to admin
 if(!(Test-Path $install_path)) {
   New-Item -ItemType Directory -Force -Path $install_path | Out-Null   
