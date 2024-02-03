@@ -96,7 +96,6 @@ function RestoreProfiles {
       $user_conf_file="${backups_path}\$u.cfg"
 
       # CHECK FOLDER
-      if(!(Test-Path $user_profile)) { Write-Output "WARNING! Folder $user_profile not exists. Skipping user $u"; continue }
       if(!(Test-Path $user_backup))  { Write-Output "WARNING! Folder $user_backup not exists. Skipping user $u"; continue }
 
       # GET USER CONFIG
@@ -111,6 +110,7 @@ function RestoreProfiles {
 
       # SCHEDULED RESTORE
       if($Force -OR (New-TimeSpan -Start ([DateTime]$user_conf.lastClean) -End (Get-Date)).Days -ge $user_conf.cleanAfterDays) {
+        Remove-Item -Recurse -Force $user_profile -ErrorAction SilentlyContinue
         echo d | robocopy ${user_backup} ${user_profile} /MIR /XJ /COPYALL /NFL /NDL 
         "cleanAfterDays="+$user_conf.cleanAfterDays+"`r`nlastClean="+(Get-Date -Format "yyy-MM-dd")+"`r`nskip=false" | Out-File $user_conf_file  # Update lastClean date
 
