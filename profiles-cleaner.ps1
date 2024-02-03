@@ -5,7 +5,7 @@
     Automated user profiles cleaner
 .DESCRIPTION
     Automated user profiles cleaner for backup and restore at startup 
-    Each profile is backup in c:\users\profiles-cleaner\ and a username.conf file is generated
+    Each profile is backup in c:\users\profiles-cleaner\ and a username.cfg file is generated
     Profile config file syntax is:
         cleanAfterDays=1                # Number of days until autoclean
         lastClean=2024-02-02            # Date when last clean was performed
@@ -14,7 +14,7 @@
     Backup (or update backup if previos backup exists) current users profiles to c:\users\profiles-cleaner\
     If no use this parameter, instead of backup, profile restore (clean) is done
     Parameter -users must be given with list of users to backup
-    For new backups default username.conf file is generated
+    For new backups default username.cfg file is generated
 .PARAMETER Users
     List of users to backup/restore
     With -CreateBackup this parameter is mandatory
@@ -36,7 +36,7 @@
 #### PARAMETERS ##################################################
 Param(
   [Switch]$CreateBackup,            # Backup profiles instead of restore
-  [String[]]$Users,                 # Optional list of users to backup or restore instead of .config files
+  [String[]]$Users,                 # Optional list of users to backup or restore instead of .cfg files
   [Switch]$Force                    # Force restore instead of config file dates
 )
 
@@ -65,7 +65,7 @@ if($CreateBackup) {
     Write-Output "`n`n###############################################################################`n#### BACKUP USER: $u `n###############################################################################"
     $user_profile="C:\Users\${u}"
     $user_backup="${backups_path}\${u}"
-    $user_conf_file="${backups_path}\$u.conf"
+    $user_conf_file="${backups_path}\$u.cfg"
 
     if(!(Test-Path $user_profile)) { Write-Output "WARNING! Folder $user_profile not exists. Skipping user $u"; continue }
     if(Test-Path $user_backup) { Remove-Item -Recurse -Force $user_backup -ErrorAction SilentlyContinue }
@@ -82,14 +82,14 @@ if($CreateBackup) {
 
 
 #### RESTORE PROFILE BACKUP #######################################
-# If no users param get all users from each .conf file in backups dir
-if(!$users) { $users=foreach($f in Get-ChildItem $backups_path -filter *.conf) {$f.basename } }
+# If no users param get all users from each .cfg file in backups dir
+if(!$users) { $users=foreach($f in Get-ChildItem $backups_path -filter *.cfg) {$f.basename } }
 
 foreach($u in $users) {
   Write-Output "`n`n###############################################################################`n#### CLEAN USER: $u `n###############################################################################"
   $user_profile="C:\Users\${u}"
   $user_backup="${backups_path}\${u}"
-  $user_conf_file="${backups_path}\$u.conf"
+  $user_conf_file="${backups_path}\$u.cfg"
 
   # CHECK FOLDER
   if(!(Test-Path $user_profile)) { Write-Output "WARNING! Folder $user_profile not exists. Skipping user $u"; continue }
