@@ -20,6 +20,7 @@ Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManage
 * Config Group Policies in `gpedit.msc`:
   * `Computer Configuracion > Windows Settings > Scripts > Startup > PowerShell Scripts`
     * Script to exec: `C:\Program Files\labadmin\labadmin-freezer\profiles-cleaner.ps1`
+    * Param: `-Log` (save logs in `c:\users\profiles-clenaer\logs.txt`
   * `Computer Configuration > Administrative Templates > System > Scripts > Run startup scripts asynchronously`
     * Set to **Disabled**
  
