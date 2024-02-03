@@ -14,7 +14,7 @@ Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManage
 ```
 & 'C:\Program Files\labadmin\labadmin-freezer\profiles-cleaner.ps1' -CreateBackup -Users user1,user2
 ```
-* Config Group Policies in `gpedit.msc`):
+* Config Group Policies in `gpedit.msc`:
   * `Computer Configuracion > Windows Settings > Scripts > Startup > PowerShell Scripts`
     * Script to exec: `C:\Program Files\labadmin\labadmin-freezer\profiles-cleaner.ps1`
   * `Computer Configuration > Administrative Templates > System > Scripts > Run startup scripts asynchronously`
