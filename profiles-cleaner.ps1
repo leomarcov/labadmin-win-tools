@@ -58,6 +58,7 @@ if($CreateBackup) {
     $acl.SetOwner((New-Object System.Security.Principal.Ntaccount($adminsgrp_name)))
     $acl.SetAccessRule((New-Object System.Security.AccessControl.FileSystemAccessRule($adminsgrp_name,"FullControl","Allow")))
     Set-Acl -Path $backups_path -AclObject $acl
+    
   }
 
   foreach($u in $users) {
