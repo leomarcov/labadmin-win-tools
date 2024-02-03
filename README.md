@@ -19,6 +19,6 @@ Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManage
   * `Computer Configuracion > Windows Settings > Scripts > Startup > PowerShell Scripts`
     * Script to exec: `C:\Program Files\labadmin\labadmin-freezer\profiles-cleaner.ps1`
   * `Computer Configuration > Administrative Templates > System > Scripts > Run startup scripts asynchronously`
-    * Set to **disabled**
+    * Set to **Disabled**
  
 * Config frecuency in days and skip users in each `username.conf` file in `C:\Users\profiles-cleaner\` hidden folder.
