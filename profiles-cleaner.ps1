@@ -46,7 +46,13 @@ Param(
 #### CONFIG VARIABLES ############################################
 $backups_path="C:\Users\profiles-cleaner"                                                # Path to save backups and configs
 $log_path="${backups_path}\log.txt"                                                      # Path to save logs
-$clean_allways="\Appdata\Local\Google\Chrome \Appdata\Local\Mozilla\Firefox"             # List of items inside profile to clean on every call (space separated)
+$default_config=@{
+    cleanAfterDays=1                                                                     # Days after spend to exec a new profile autoclean
+    lastClean=(Get-Date -Format "yyy-MM-dd")                                             # Date of last autoclean executed
+    skipUser=$false                                                                      # Skip this user of autoclean
+    cleanAllways=@("\Appdata\Local\Google\Chrome","\Appdata\Local\Mozilla\Firefox")     # Items inside profile user to clean on every call
+}
+
 
 
 #### FUNCTION CreateBackup #######################################
@@ -78,7 +84,7 @@ function CreateBackups {
     robocopy $user_profile $user_backup /MIR /XJ /COPYALL /NFL /NDL
     
     # Save default user config file in backups path
-    if(!(Test-Path $user_conf_file)) { "cleanAfterDays=1`r`nlastClean="+(Get-Date -Format "yyy-MM-dd")+"`r`nskip=false" | Out-File $user_conf_file }
+    if(!(Test-Path $user_conf_file)) { $default_config | ConvertTo-Json | Out-File $user_conf_file }
   }
 }
 
@@ -99,24 +105,28 @@ function RestoreProfiles {
       if(!(Test-Path $user_backup))  { Write-Output "WARNING! Folder $user_backup not exists. Skipping user $u"; continue }
 
       # GET USER CONFIG
-      $user_conf=Get-Content "$user_conf_file"| ConvertFrom-StringData
-      if(!$user_conf -OR !$user_conf.cleanAfterDays -OR !$user_conf.lastClean -OR !$user_conf.skip) {
-        Write-Output "WARNING! Invalid config file ${user_conf_file}. Skipping user ${u}"; continue
+      $user_conf=@{}; (Get-Content $user_conf_file | ConvertFrom-Json).psobject.properties | Foreach { $user_conf[$_.Name] = $_.Value }
+      if($user_conf.cleanAfterDays -isnot [int] -OR !$user_conf.lastClean) {
+        Write-Output "WARNING! Invalid config file ${user_conf_file}. Skipping user ${u}"
+        continue
       }
 
       # SKIP USER (only if no force)
-      if(!$Force -AND $user_conf.skip -eq "true") { Write-Output "Skipping user $u for config file"; continue }
+      if(!$Force -AND $user_conf.skipUser -eq "true") { Write-Output "Skipping user $u for config file"; continue }
 
       # SCHEDULED RESTORE
       if($Force -OR (New-TimeSpan -Start ([DateTime]$user_conf.lastClean) -End (Get-Date)).Days -ge $user_conf.cleanAfterDays) {
         Write-Output "Removing user $u profile folder..."
         Remove-Item -Recurse -Force $user_profile
         echo d | robocopy ${user_backup} ${user_profile} /MIR /XJ /COPYALL /NFL /NDL 
-        "cleanAfterDays="+$user_conf.cleanAfterDays+"`r`nlastClean="+(Get-Date -Format "yyy-MM-dd")+"`r`nskip=false" | Out-File $user_conf_file  # Update lastClean date
+        
+        # Update lastClean date
+        $user_conf.lastClean=Get-Date -Format "yyy-MM-dd"
+        $user_conf | ConvertTo-Json | Out-File $user_conf_file
 
       # RESTORE ON EVERY CALL
       } else {
-          foreach($d in $clean_allways.split(" ")) { 
+          foreach($d in $user_conf.cleanAllways) { 
               if(!(Test-Path "${user_backup}\$d")) { continue }
               Remove-Item -Recurse -Force "${user_profile}\${d}"
               echo d | robocopy "${user_backup}\${d}" "${user_profile}\${d}" /MIR /XJ /COPYALL /NFL /NDL
@@ -128,8 +138,8 @@ function RestoreProfiles {
 
 #### FUNCTION main
 function main {
-    if($CreateBackups) { CreateBackups }
-    else { RestoreProfiles }
+    if($CreateBackups) {  CreateBackups  }
+    else               { RestoreProfiles }
 }
 
 # Exec 
