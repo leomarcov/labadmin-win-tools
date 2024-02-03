@@ -18,7 +18,7 @@ if($enable) {
 
 #### ACTION CREATE ###############################################
 if($create) {
-    Checkpoint-Computer -Description "labadmin-freezer-main"
+    Checkpoint-Computer -Description "labadmin-main"
 }
 
 #### ACTION DELETE ###############################################
