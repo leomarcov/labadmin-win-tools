@@ -7,7 +7,7 @@ Labadmin freezer is a collection of PowerShell scripts to manage Windows 10 syst
 <br>
 
 ## Install
-* Download and copy scripts files:
+* Download and copy scripts files to `Program Files` folder:
 ```
 Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/leomarcov/labadmin-freezer/main/install.ps1'))
 ```
