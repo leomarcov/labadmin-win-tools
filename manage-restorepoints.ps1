@@ -32,6 +32,6 @@ if($restore) {
 }
 
 #### ACTION LIST ##################################################
-if($LIST) {
+if($list) {
    Get-ComputerRestorePoint
 }
