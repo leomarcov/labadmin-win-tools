@@ -28,7 +28,8 @@ if($deleteall) {
 
 #### ACTION RESTORE ###############################################
 if($restore) {
-    Restore-Computer -RestorePoint 1
+  $labadmin_rpn=(Get-ComputerRestorePoint | where-object { $_.Description -eq "labadmin-freezer-main" }).SequenceNumber
+  Restore-Computer -RestorePoint $labadmin_rpn
 }
 
 #### ACTION LIST ##################################################
