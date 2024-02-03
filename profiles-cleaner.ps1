@@ -45,8 +45,8 @@ Param(
 
 #### CONFIG VARIABLES ############################################
 $backups_path="C:\Users\profiles-cleaner"                                                # Path to save backups and configs
-$clean_allways="\Appdata\Local\Google\Chrome \Appdata\Local\Mozilla\Firefox"             # List of items inside profile to clean on every call (space separated)
 $log_path="${backups_path}\log.txt"                                                      # Path to save logs
+$clean_allways="\Appdata\Local\Google\Chrome \Appdata\Local\Mozilla\Firefox"             # List of items inside profile to clean on every call (space separated)
 
 
 #### FUNCTION CreateBackup #######################################
@@ -128,8 +128,8 @@ function RestoreProfiles {
 
 #### FUNCTION main
 function main {
-    if($CreateBackups) {  CreateBackups  }
-    else               { RestoreProfiles }
+    if($CreateBackups) { CreateBackups }
+    else { RestoreProfiles }
 }
 
 # Exec 
