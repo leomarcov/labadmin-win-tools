@@ -44,8 +44,9 @@ Param(
 )
 
 #### CONFIG VARIABLES ############################################
-$backups_path="C:\Users\profiles-cleaner"
-$log_path="${backups_path}\log.txt"
+$backups_path="C:\Users\profiles-cleaner"                                                # Path to save backups and configs
+$clean_allways="\Appdata\Local\Google\Chrome \Appdata\Local\Mozilla\Firefox"             # List of items inside profile to clean on every call (space separated)
+$log_path="${backups_path}\log.txt"                                                      # Path to save logs
 
 
 #### FUNCTION CreateBackup #######################################
@@ -106,7 +107,6 @@ function RestoreProfiles {
       # SKIP USER (only if no force)
       if(!$Force -AND $user_conf.skip -eq "true") { Write-Output "Skipping user $u for config file"; continue }
 
-
       # SCHEDULED RESTORE
       if($Force -OR (New-TimeSpan -Start ([DateTime]$user_conf.lastClean) -End (Get-Date)).Days -ge $user_conf.cleanAfterDays) {
         Write-Output "Removing user $u profile folder..."
@@ -116,12 +116,12 @@ function RestoreProfiles {
 
       # RESTORE ON EVERY CALL
       } else {
-          if((Test-Path "${user_backup}\Appdata\Local\Google\Chrome")) { echo d | robocopy "${user_backup}\Appdata\Local\Google\Chrome" "${user_profile}\AppData\Local\Google\Chrome" /MIR /XJ /COPYALL /NFL /NDL }
-          if((Test-Path "${user_backup}\Appdata\Local\Mozilla\Firefox")) { echo d | robocopy "${user_backup}\Appdata\Local\Mozilla\Firefox" "${user_profile}\AppData\Local\Mozilla\Firefox" /MIR /XJ /COPYALL /NFL /NDL }
+          foreach($d in $clean_allways.split(" ")) { 
+              if(!(Test-Path "${user_backup}\$d")) { continue }
+              echo d | robocopy "${user_backup}\${d}" "${user_profile}\${d}" /MIR /XJ /COPYALL /NFL /NDL
+          }
       }
-
     }
-
 }
 
 
