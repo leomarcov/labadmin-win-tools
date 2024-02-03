@@ -5,7 +5,7 @@ Param(
   [Switch]$Enable,           # Enable RPs
   [Switch]$Create,           # Create RP
   [Switch]$DeleteAll,        # Delete ALL restore points
-  [Switch]$Restore           # Restore RP 1
+  [Switch]$Restore,          # Restore RP 1
   [Switch]$List              # List RPs
 )
 
