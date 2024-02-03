@@ -2,10 +2,8 @@
 
 $install_path=$ENV:ProgramFiles+"\labadmin\labadmin-freezer\"
 
-
-
-# Create folder and close permissions to admin
-if(!(Test-Path $install_path)) { New-Item -ItemType Directory -Force -Path $install_path | Out-Null }
+# Create folder
+New-Item -ItemType Directory -Force -Path $install_path | Out-Null
 
 # Download files
 $url="https://raw.githubusercontent.com/leomarcov/labadmin-freezer/main/"
