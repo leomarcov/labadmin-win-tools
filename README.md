@@ -12,7 +12,8 @@ Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManage
 ```
 * Create first backup for each user:
 ```
-& 'C:\Program Files\labadmin\labadmin-freezer\profiles-cleaner.ps1' -CreateBackup -Users  user1,user2,user3
+$users="user1,user2,user3"
+& 'C:\Program Files\labadmin\labadmin-freezer\profiles-cleaner.ps1' -CreateBackup -Users  $users
 ```
 * Config Group Policy (`gpedit.msc`) startup script:
   * `Computer Configuracion > Windows Settings > Scripts > Startup > PowerShell Scripts`
