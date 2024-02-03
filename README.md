@@ -4,8 +4,7 @@ Labadmin freezer is a collection of PowerShell scripts for manage Windows 10 sys
 <br>
 <br>
 <br>
-<br>
-<br>
+
 
 ## Install
 * Download and copy scripts files:
