@@ -93,7 +93,7 @@ foreach($u in $users) {
 
   # CHECK FOLDER
   if(!(Test-Path $user_profile)) { Write-Output "WARNING! Folder $user_profile not exists. Skipping user $u"; continue }
-  if(!(Test-Path $user_backup))  { Write-Output "WARNING! Folder $user_profile not exists. Skipping user $u"; continue }
+  if(!(Test-Path $user_backup))  { Write-Output "WARNING! Folder $user_backup not exists. Skipping user $u"; continue }
 
   # GET USER CONFIG
   $user_conf=Get-Content "$user_conf_file"| ConvertFrom-StringData
