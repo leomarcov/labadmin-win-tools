@@ -23,7 +23,7 @@ if($create) {
 
 #### ACTION DELETE ###############################################
 if($deleteall) {
-  vssadmin delete shadows /all
+  vssadmin delete shadows /all /quiet
 }
 
 #### ACTION RESTORE ###############################################
