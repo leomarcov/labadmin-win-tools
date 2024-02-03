@@ -10,7 +10,7 @@ if(!(Test-Path $install_path)) {
   $adminsgrp_name=(New-Object System.Security.Principal.SecurityIdentifier 'S-1-5-32-544').Translate([type]'System.Security.Principal.NTAccount').value
   $acl.SetOwner((New-Object System.Security.Principal.Ntaccount($adminsgrp_name)))
   $acl.SetAccessRule((New-Object System.Security.AccessControl.FileSystemAccessRule($adminsgrp_name,"FullControl","Allow")))
-  Set-Acl -Path $backups_path -AclObject $acl
+  Set-Acl -Path $install_path -AclObject $acl
 }
 
 
