@@ -54,7 +54,7 @@ profiles-cleaner.ps1 -Users user1                   # Try clean user1 only
 ## config-usbstorage.ps1
 Enable/disable USB storage ports for all users
 ```
+& 'C:\Program Files\labadmin\labadmin-freezer\config-usbstorage.ps1'             #Show status
 & 'C:\Program Files\labadmin\labadmin-freezer\config-usbstorage.ps1' -Enable
 & 'C:\Program Files\labadmin\labadmin-freezer\config-usbstorage.ps1' -Diasble
-& 'C:\Program Files\labadmin\labadmin-freezer\config-usbstorage.ps1'            #Show
 ```
