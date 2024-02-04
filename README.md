@@ -40,8 +40,8 @@ Each user can be config editting **`<username>.cfg`** file in `C:\Users\profiles
   * `cleanAllways`: array of realtive profile paths to clean on every reboot.
   * `lastClean`: date where last clean was executed.
 
-## Usage
+### Usage
 ```
 profiles-cleaner.sp1 -CreateBackup -Users user1,user2        # Create or updates profile backup of users user1 and user2 (stored in c:\users\profiles-backup\)
 
-``
+```
