@@ -58,7 +58,7 @@ Param(
 
 
 #### CONFIG VARIABLES ############################################
-$backups_path="C:\Users\profiles-cleaner"                                                # Path to save backups and configs
+$backups_path="${ENV:SystemDrive}\Users\profiles-cleaner"                                # Path to save backups and configs
 $log_path="${backups_path}\log.txt"                                                      # Path to save logs
 $default_config=@{
     cleanAfterDays=1                                                                     # Days after spend to exec a new profile autoclean
@@ -85,7 +85,7 @@ function BackupProfiles {
 
   foreach($u in $users) {
     Write-Output "`n`n###############################################################################`n#### BACKUP USER: $u `n###############################################################################"
-    $user_profile="C:\Users\${u}"
+    $user_profile="${ENV:SystemDrive}\Users\${u}"
     $user_backup="${backups_path}\${u}"
     $user_conf_file="${backups_path}\$u.cfg"
 
@@ -109,7 +109,7 @@ function RestoreProfiles {
 
     foreach($u in $users) {
       Write-Output "`n`n###############################################################################`n#### CLEAN USER: $u `n###############################################################################"
-      $user_profile="C:\Users\${u}"
+      $user_profile="${ENV:SystemDrive}\Users\${u}"
       $user_backup="${backups_path}\${u}"
       $user_conf_file="${backups_path}\$u.cfg"
 
