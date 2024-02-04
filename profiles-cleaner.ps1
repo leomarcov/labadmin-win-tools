@@ -8,8 +8,8 @@
     Automated user profiles cleaner for backup and autorestore at startup according scheduled rules
     Each profile is backup in c:\users\profiles-cleaner\ and a username.cfg file is generated
     Profile config file syntax is:
-        cleanAfterDays                      # Number of days until autoclean
-        skipUser                            # Skip autoclean for this user
+        cleanAfterDays                      # Number of days from last clean to next autoclean (0 clean in each reboot, 1 clean every day, etc)
+        skipUser                            # Boolean to skip this user from autoclean (skips cleanAfterDays and cleanAllways)
         cleanAlways                         # Array of relative paths to clean on every call
         lastClean                           # Date when last clean was performed
 
@@ -41,7 +41,7 @@
 #### PARAMETERS ##################################################
 Param(
   [parameter(Mandatory=$true, ParameterSetName="create")]
-  [Switch]$CreateBackups,
+  [Switch]$BackupProfiles,
   
   [parameter(Mandatory=$true, ParameterSetName="restore")]
   [Switch]$RestoreProfiles,
@@ -69,8 +69,8 @@ $default_config=@{
 
 
 
-#### FUNCTION CreateBackup #######################################
-function CreateBackups {
+
+function BackupProfiles {
   # Create backups folder and set Administrator permissions
   if(!(Test-Path $backups_path)) {
     New-Item -ItemType Directory -Force -Path $backups_path | Out-Null   
@@ -102,7 +102,7 @@ function CreateBackups {
 
 
 
-#### FUNCTION RestoreProfiles ######################################
+
 function RestoreProfiles {
     # If no users param get all users from each .cfg file in backups dir
     if(!$users) { $users=foreach($f in Get-ChildItem $backups_path -filter *.cfg) {$f.basename } }
@@ -113,11 +113,8 @@ function RestoreProfiles {
       $user_backup="${backups_path}\${u}"
       $user_conf_file="${backups_path}\$u.cfg"
 
-      # CHECK FOLDER
+      # CHECK BACKUP FOLDER
       if(!(Test-Path $user_backup))  { Write-Output "WARNING! Folder $user_backup not exists. Skipping user $u"; continue }
-      
-      # SKIP USER (only if no force)
-      if(!$Force -AND $user_conf.skipUser -eq "true") { Write-Output "Skipping user $u for config file"; continue }
       
       # GET USER CONFIG
       $user_conf=@{}; (Get-Content $user_conf_file | ConvertFrom-Json).psobject.properties | Foreach { $user_conf[$_.Name] = $_.Value }
@@ -125,6 +122,9 @@ function RestoreProfiles {
         Write-Output "WARNING! Invalid config file ${user_conf_file}. Skipping user ${u}"
         continue
       }
+
+      # SKIP USER (only if no force)
+      if(!$Force -AND $user_conf.skipUser -eq "true") { Write-Output "Skipping user $u (skipUser config file)"; continue }
 
       # SCHEDULED RESTORE
       if($Force -OR (New-TimeSpan -Start ([DateTime]$user_conf.lastClean) -End (Get-Date)).Days -ge $user_conf.cleanAfterDays) {
@@ -149,9 +149,9 @@ function RestoreProfiles {
 
 
 
-#### FUNCTION MAIN
+
 function main {
-    if($CreateBackups)       { CreateBackups  }
+    if($BackupProfiles)      { BackupProfiles  }
     elseif($RestoreProfiles) { RestoreProfiles }
 }
 
@@ -159,7 +159,7 @@ function main {
 # Exec 
 if(!$Log) { main }
 
-# Exec > log.txt
+# Exec and redirect to log.txt
 else {
     if((Get-ChildItem $logs_path | % {[int]($_.length / 1kb)}) -gt 8) { Remove-Item -Path $log_path }  # Delete log if size > 4kb
     &{ Write-Output "`n`n#########################################################################################################"(Get-Date).toString()"#########################################################################################################"; main } 2>&1 | Out-File -FilePath $log_path -Append 
