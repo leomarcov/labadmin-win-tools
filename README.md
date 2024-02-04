@@ -37,16 +37,19 @@ Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManage
 ### Configuration
 Each user can be config in **`<username>.cfg`** JSON file in `C:\Users\profiles-cleaner\`:
   * `cleanAfterDays`: number of days from last clean to next autoclean (0 clean in each reboot, 1 clean every day, etc).
-  * `skipUserp`: boolean value to skip this user from autoclean (skips `cleanAfterDays`).
+  * `skipUserp`: boolean to skip this user from autoclean (skips cleanAfterDays and cleanAllways).
   * `cleanAllways`: array of realtive profile paths to clean on every call.
   * `lastClean`: date where last clean was executed.
 
 ### Usage
 ```
-profiles-cleaner.ps1 -BackupProfiles -Users u1,u2     # Create or update backup profile folder for u1 and u2
-profiles-cleaner.ps1                                # Try clean all users with saved backup according his config file
-profiles-cleaner.ps1 -Force                         # Force clean of all users with saved bakcup
-profiles-cleaner.ps1 -Users user1                   # Try clean user1 only
+profiles-cleaner.ps1 -BackupProfiles -Users <String[]> [-Log] [<CommonParameters>]
+profiles-cleaner.ps1 -RestoreProfiles [-Users <String[]>] [-Force] [-Log] [<CommonParameters>]
+
+profiles-cleaner.ps1 -BackupProfiles -Users u1,u2   # Create or update backup profile folder for u1 and u2
+profiles-cleaner.ps1 -RestoreProfiles               # Clean all users with saved backup according his config file
+profiles-cleaner.ps1 -RestoreProfiles -Force        # Force clean of all users with saved bakcup
+profiles-cleaner.ps1 -RestoreProfiles -Users u1     # Try clean user u1 only
 ```
 
 <br>
