@@ -19,7 +19,7 @@ Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManage
   * Some folders of user profile are restored on each reboot (userfull for browser history).
   * 
 
-## Install 
+### Install 
 * Create first backup for each user:
 ```
 & 'C:\Program Files\labadmin\labadmin-freezer\profiles-cleaner.ps1' -CreateBackup -Users user1,user2
