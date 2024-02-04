@@ -161,7 +161,7 @@ if(!$Log) { main }
 
 # Exec and redirect to log.txt
 else {
-    if((Get-ChildItem $logs_path | % {[int]($_.length / 1kb)}) -gt 8) { Remove-Item -Path $log_path }  # Delete log if size > 4kb
+    if((Get-ChildItem $logs_path | % {[int]($_.length / 1kb)}) -gt 8) { Remove-Item -Path $log_path }  # Delete log if size > 8kb
     &{ Write-Output "`n`n#########################################################################################################"(Get-Date).toString()"#########################################################################################################"; main } 2>&1 | Out-File -FilePath $log_path -Append 
 }
 
