@@ -1,6 +1,6 @@
 # Labadmin Freezer
 <img align="right" src="https://www.iconfinder.com/icons/8610360/download/png/128">
-Labadmin freezer is a collection of PowerShell scripts to manage Windows 10 systems in a lab school environment. Inclues functions to autoclean user profiles, disable USB storage, manage Windows Restoration Points, etc.
+Labadmin freezer is a collection of PowerShell scripts to manage Windows 10 systems in a lab school environment. Includes functions to autoclean user profiles, disable USB storage, manage Windows Restoration Points, etc.
 <br>
 <br>
 <br>
@@ -18,7 +18,7 @@ Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManage
   * User profiles are backup in a secure place and are autorestored periodically (each reboot, once a day, once in some days, etc.).
   * Each user has is own autorestore settings.
   * Some folders in user profile can be restored on each reboot (userfull for browser history).
-  * Restore con be forced programatically.
+  * Restore can be forced programatically.
 
 ### Install 
 * Create first backup for each user:
@@ -44,8 +44,8 @@ Each user can be config in **`<username>.cfg`** JSON file in `C:\Users\profiles-
 ### Usage
 ```
 SYNTAX
-profiles-cleaner.ps1 -BackupProfiles -Users <String[]> [-Log] [<CommonParameters>]
-profiles-cleaner.ps1 -RestoreProfiles [-Users <String[]>] [-Force] [-Log] [<CommonParameters>]
+profiles-cleaner.ps1 -BackupProfiles -Users <String[]> [-Log] 
+profiles-cleaner.ps1 -RestoreProfiles [-Users <String[]>] [-Force] [-Log] 
 
 EXAMPLES
 profiles-cleaner.ps1 -BackupProfiles -Users u1,u2   # Create or update backup profile folder for u1 and u2
