@@ -7,9 +7,10 @@
     Automated user profiles cleaner for backup and restore at startup 
     Each profile is backup in c:\users\profiles-cleaner\ and a username.cfg file is generated
     Profile config file syntax is:
-        cleanAfterDays=1                # Number of days until autoclean
-        lastClean=2024-02-02            # Date when last clean was performed
-        skip=false                      # Skip autoclean for this user
+        cleanAfterDays                      # Number of days until autoclean
+        skip                                # Skip autoclean for this user
+        cleanAlways                         # Array of relative paths to clean on every call
+        lastClean                           # Date when last clean was performed
 .PARAMETER CreateBackup
     Backup (or update backup if previos backup exists) current users profiles to c:\users\profiles-cleaner\
     If no use this parameter, instead of backup, profile restore (clean) is done
