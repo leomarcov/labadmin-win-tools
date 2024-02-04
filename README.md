@@ -26,4 +26,8 @@ Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManage
     * `Computer Configuration > Administrative Templates > System > Scripts > Run startup scripts asynchronously`
     * Set to **Disabled**
  
-* Config frecuency in days and skip users in each `username.conf` file in `C:\Users\profiles-cleaner\` hidden folder.
+* Config each user config editting **`<username>.cfg`** file in `C:\Users\profiles-cleaner\`:
+  * `cleanAfterDays`: number of days from last clean to next autoclean. 0 clean in each reboot. 1 clean every day.
+  * `skipUserp`: boolean value to skip this user from autoclean.
+  * `cleanAllways`: array of realtive profile paths to clean on every reboot.
+  * `lastClean`: date where last clean was executed.
