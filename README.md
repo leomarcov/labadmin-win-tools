@@ -23,7 +23,7 @@ Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManage
 ### Install 
 * Create first backup for each user:
 ```
-& 'C:\Program Files\labadmin\labadmin-freezer\profiles-cleaner.ps1' -CreateBackup -Users user1,user2
+& 'C:\Program Files\labadmin\labadmin-freezer\profiles-cleaner.ps1' -BackupProfiles -Users user1,user2
 ```
 * Config Group Policies in `gpedit.msc`:
   * **Exec script at startup**
@@ -43,7 +43,7 @@ Each user can be config in **`<username>.cfg`** JSON file in `C:\Users\profiles-
 
 ### Usage
 ```
-profiles-cleaner.ps1 -CreateBackup -Users u1,u2     # Create or update backup profile folder for u1 and u2
+profiles-cleaner.ps1 -BackupProfiles -Users u1,u2     # Create or update backup profile folder for u1 and u2
 profiles-cleaner.ps1                                # Try clean all users with saved backup according his config file
 profiles-cleaner.ps1 -Force                         # Force clean of all users with saved bakcup
 profiles-cleaner.ps1 -Users user1                   # Try clean user1 only
