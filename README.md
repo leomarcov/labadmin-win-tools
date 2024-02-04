@@ -59,6 +59,8 @@ Enable/disable USB storage ports for all users
 & 'C:\Program Files\labadmin\labadmin-freezer\config-usbstorage.ps1' -Diasble
 ```
 
+<br>
+
 ## manage-restorepoints.ps1
 Manage Windows Restore Points programatically.
 ```
