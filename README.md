@@ -40,3 +40,11 @@ Each user can be config in **`<username>.cfg`** JSON file in `C:\Users\profiles-
   * `skipUserp`: boolean value to skip this user from autoclean (skips `cleanAfterDays`).
   * `cleanAllways`: array of realtive profile paths to clean on every call.
   * `lastClean`: date where last clean was executed.
+
+### Usage
+```
+profiles-cleaner.ps1 -CreateBackup -Users user1,user2         # Create or update backup profile folder for users1 and 2
+profiles-cleaner.ps1                                          # Autoclean (restore) for all users with saves backup
+profiles-cleaner.ps1 -Force
+profiles-cleaner.ps1 -Users user1                             # Autoclean only user1
+```
