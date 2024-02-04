@@ -48,3 +48,10 @@ profiles-cleaner.ps1                                # Try clean all users with s
 profiles-cleaner.ps1 -Force                         # Force clean of all users with saved bakcup
 profiles-cleaner.ps1 -Users user1                   # Try clean user1 only
 ```
+
+## config-usbstorage.ps1
+Enable/disable USB storage ports for all users
+```
+& 'C:\Program Files\labadmin\labadmin-freezer\config-usbstorage.ps1' -Enable
+& 'C:\Program Files\labadmin\labadmin-freezer\config-usbstorage.ps1' -Enable
+```
