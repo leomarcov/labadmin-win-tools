@@ -14,10 +14,10 @@ Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManage
 <br>
 
 ## profiles-cleaner.ps1
-`profiles-cleaner.ps1` is a script to automate user profiles clean. 
+`profiles-cleaner.ps1` is a script to automate user profiles cleaning. 
   * User profiles are backup in a secure place and are autorestored periodically (each reboot, once a day, once in some days, etc.)
   * Some folders of user profile are restored on each reboot (userfull for browser history).
-  * 
+  * Restore con be forced programatically.
 
 ### Install 
 * Create first backup for each user:
@@ -32,8 +32,9 @@ Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManage
   * **Disable run start asynchronously**
     * `Computer Configuration > Administrative Templates > System > Scripts > Run startup scripts asynchronously`
     * Set to **Disabled**
- 
-* Config each user config editting **`<username>.cfg`** file in `C:\Users\profiles-cleaner\`:
+
+### Configuration
+Each user can be config editting **`<username>.cfg`** file in `C:\Users\profiles-cleaner\`:
   * `cleanAfterDays`: number of days from last clean to next autoclean. 0 clean in each reboot. 1 clean every day.
   * `skipUserp`: boolean value to skip this user from autoclean.
   * `cleanAllways`: array of realtive profile paths to clean on every reboot.
