@@ -43,9 +43,11 @@ Each user can be config in **`<username>.cfg`** JSON file in `C:\Users\profiles-
 
 ### Usage
 ```
+SYNTAX
 profiles-cleaner.ps1 -BackupProfiles -Users <String[]> [-Log] [<CommonParameters>]
 profiles-cleaner.ps1 -RestoreProfiles [-Users <String[]>] [-Force] [-Log] [<CommonParameters>]
 
+EXAMPLES
 profiles-cleaner.ps1 -BackupProfiles -Users u1,u2   # Create or update backup profile folder for u1 and u2
 profiles-cleaner.ps1 -RestoreProfiles               # Clean all users with saved backup according his config file
 profiles-cleaner.ps1 -RestoreProfiles -Force        # Force clean of all users with saved bakcup
