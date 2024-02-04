@@ -11,8 +11,13 @@ Labadmin freezer is a collection of PowerShell scripts to manage Windows 10 syst
 ```
 Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/leomarcov/labadmin-freezer/main/install.ps1'))
 ```
+## profiles-cleaner.ps1
+`profiles-cleaner.ps1` is a script to automate user profiles clean. 
+  * User profiles are backup in a secure place and are autorestored periodically (each reboot, once a day, once in some days, etc.)
+  * Some folders of user profile are restored on each reboot (userfull for browser history).
+  * 
 
-### Install profiles-cleaner
+## Install 
 * Create first backup for each user:
 ```
 & 'C:\Program Files\labadmin\labadmin-freezer\profiles-cleaner.ps1' -CreateBackup -Users user1,user2
