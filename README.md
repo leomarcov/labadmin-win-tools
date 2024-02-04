@@ -15,7 +15,7 @@ Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManage
 
 ## profiles-cleaner.ps1
 `profiles-cleaner.ps1` is a script to automate user profiles cleaning. 
-  * User profiles are backup in a secure place and are autorestored periodically (each reboot, once a day, once in some days, etc.)
+  * User profiles are backup in a secure place and autorestored periodically (each reboot, once a day, once in some days, etc.)
   * Some folders of user profile are restored on each reboot (userfull for browser history).
   * Restore con be forced programatically.
 
