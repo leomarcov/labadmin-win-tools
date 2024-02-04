@@ -7,7 +7,7 @@ Labadmin freezer is a collection of PowerShell scripts to manage Windows 10 syst
 <br>
 
 ## Package Install
-* Download and copy scripts files to `Program Files\labadmin\labadmin-freezer\` folder:
+* Download and copy scripts files to `Program Files` folder:
 ```
 Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/leomarcov/labadmin-freezer/main/install.ps1'))
 ```
@@ -15,8 +15,9 @@ Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManage
 
 ## profiles-cleaner.ps1
 `profiles-cleaner.ps1` is a script to automate user profiles cleaning. 
-  * User profiles are backup in a secure place and autorestored periodically (each reboot, once a day, once in some days, etc.)
-  * Some folders of user profile are restored on each reboot (userfull for browser history).
+  * User profiles are backup in a secure place and are autorestored periodically (each reboot, once a day, once in some days, etc.).
+  * Each user has is own autorestore settings.
+  * Some folders in user profile can be restored on each reboot (userfull for browser history).
   * Restore con be forced programatically.
 
 ### Install 
@@ -39,9 +40,3 @@ Each user can be config editting **`<username>.cfg`** file in `C:\Users\profiles
   * `skipUserp`: boolean value to skip this user from autoclean.
   * `cleanAllways`: array of realtive profile paths to clean on every reboot.
   * `lastClean`: date where last clean was executed.
-
-### Usage
-```
-profiles-cleaner.sp1 -CreateBackup -Users user1,user2        # Create or updates profile backup of users user1 and user2 (stored in c:\users\profiles-backup\)
-
-```
