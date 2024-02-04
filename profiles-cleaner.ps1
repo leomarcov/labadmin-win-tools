@@ -5,7 +5,7 @@
     Automated user profiles cleaner
 
 .DESCRIPTION
-    Automated user profiles cleaner for backup and autorestore at startup 
+    Automated user profiles cleaner for backup and autorestore at startup according scheduled rules
     Each profile is backup in c:\users\profiles-cleaner\ and a username.cfg file is generated
     Profile config file syntax is:
         cleanAfterDays                      # Number of days until autoclean
