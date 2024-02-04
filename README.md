@@ -43,8 +43,8 @@ Each user can be config in **`<username>.cfg`** JSON file in `C:\Users\profiles-
 
 ### Usage
 ```
-profiles-cleaner.ps1 -CreateBackup -Users user1,user2         # Create or update backup profile folder for users1 and 2
-profiles-cleaner.ps1                                          # Autoclean (restore) for all users with saves backup
-profiles-cleaner.ps1 -Force
-profiles-cleaner.ps1 -Users user1                             # Autoclean only user1
+profiles-cleaner.ps1 -CreateBackup -Users u1,u2     # Create or update backup profile folder for u1 and u2
+profiles-cleaner.ps1                                # Try clean all users with saved backup according his config file
+profiles-cleaner.ps1 -Force                         # Force clean of all users with saved bakcup
+profiles-cleaner.ps1 -Users user1                   # Try clean user1 only
 ```
