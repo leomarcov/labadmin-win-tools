@@ -35,7 +35,7 @@ Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManage
     * Set to **Disabled**
 
 ### Configuration
-Each user can be config editting **`<username>.cfg`** file in `C:\Users\profiles-cleaner\`:
+Each user can be config in **`<username>.cfg`** file in `C:\Users\profiles-cleaner\`:
   * `cleanAfterDays`: number of days from last clean to next autoclean. 0 clean in each reboot. 1 clean every day.
   * `skipUserp`: boolean value to skip this user from autoclean.
   * `cleanAllways`: array of realtive profile paths to clean on every reboot.
