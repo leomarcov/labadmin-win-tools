@@ -17,7 +17,7 @@ Param(
 
   [parameter(ParameterSetName="user-password")]
   [parameter(ParameterSetName="user")]
-  [Switch]$SetUserPassword
+  [Switch]$SetUserPassword,
   
   [parameter(Mandatory=$true, ParameterSetName="users")]
   [String[]]$Users,
