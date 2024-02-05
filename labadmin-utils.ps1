@@ -10,22 +10,21 @@ Param(
   [Switch]$RestoreLabadminRestorePoint,
   [Switch]$DeleteAllRestorePoints,  
 
-  [parameter(ParameterSetName="users")]
-  [Switch]$HideUser,
-  [parameter(ParameterSetName="users")]
-  [Switch]$UnhideUser,
+  [parameter(ParameterSetName="users")][Switch]$HideUser,
+  [parameter(ParameterSetName="users")][Switch]$UnhideUser,
   
   [parameter(Mandatory=$true, ParameterSetName="users")]
   [String[]]$Users,
-
   [parameter(Mandatory=$true, ParameterSetName="user")]
+  [parameter(Mandatory=$true, ParameterSetName="user-password")]
   [String]$User,
   
   [parameter(Mandatory=$true, ParameterSetName="password")]
+  [parameter(Mandatory=$true, ParameterSetName="user-password")]
   [String[]]$Password,
 
-  [parameter(ParameterSetName="user")]
-  [Switch]$SetUserPassword
+  [parameter(ParameterSetName="user-password")]
+  [parameter(ParameterSetName="user")][Switch]$SetUserPassword
   
 )
 
@@ -60,10 +59,14 @@ if($DeleteAllRestorePoints) {
   vssadmin delete shadows /all /quiet
 }
 
-#### HIDE USER
+#### CONFIG USER
 if($HideUser) {
-  New-Item 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\SpecialAccounts\UserList' -Force | New-ItemProperty -Name $user -Value 0 -PropertyType DWord -Force
+  New-Item 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\SpecialAccounts\UserList' -Force | New-ItemProperty -Name $user -Value 0 -PropertyType DWord -ForceNam
 }
 if($UnhideUser) {
 	Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\SpecialAccounts\UserList" -Name $user -Force
+}
+if($SetUserPassword) {
+	$ss=$Password|ConvertTo-SecureString -AsPlainText -Force
+ 	Set-LocalUser -Name $user -Password $ss
 }
