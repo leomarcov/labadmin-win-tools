@@ -10,13 +10,23 @@ Param(
   [Switch]$RestoreLabadminRestorePoint,
   [Switch]$DeleteAllRestorePoints,  
 
-  [parameter(Mandatory=$true, ParameterSetName="hide")]
+  [parameter(ParameterSetName="users")]
   [Switch]$HideUser,
-  [parameter(Mandatory=$true, ParameterSetName="hide")]
+  [parameter(ParameterSetName="users")]
   [Switch]$UnhideUser,
   
-  [parameter(Mandatory=$true, ParameterSetName="hide")]
+  [parameter(Mandatory=$true, ParameterSetName="users")]
   [String[]]$Users,
+
+  [parameter(Mandatory=$true, ParameterSetName="user")]
+  [String]$User,
+  
+  [parameter(Mandatory=$true, ParameterSetName="password")]
+  [String[]]$Password,
+
+  [parameter(ParameterSetName="user")]
+  [Switch]$SetUserPassword
+  
 )
 
 #### USB STORAGE
