@@ -16,7 +16,8 @@ Param(
   [Switch]$UnhideUser,
 
   [parameter(ParameterSetName="user-password")]
-  [parameter(ParameterSetName="user")][Switch]$SetUserPassword
+  [parameter(ParameterSetName="user")]
+  [Switch]$SetUserPassword
   
   [parameter(Mandatory=$true, ParameterSetName="users")]
   [String[]]$Users,
