@@ -29,6 +29,6 @@ if($disable) {
 
 # SHOW CURRENT STATUS
 } else {
-  if ((Get-ItemPropertyValue -Path 'HKLM:\SYSTEM\CurrentControlSet\Services\USBSTOR\' -Name "Start") -eq 4) { Write-Output "Disabled" } 
-  else { Write-Output "Enabled" }
+  if ((Get-ItemPropertyValue -Path 'HKLM:\SYSTEM\CurrentControlSet\Services\USBSTOR\' -Name "Start") -eq 4) { Write-Output "Current status: Disabled" } 
+  else { Write-Output "Current status: Enabled" }
 }
