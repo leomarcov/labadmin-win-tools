@@ -1,8 +1,8 @@
 #Requires -RunAsAdministrator
 
 Param(
-  [parameter(Mandatory=$true, ParameterSetName="change")]
   [parameter(Mandatory=$true, ParameterSetName="remove")]
+  [parameter(Mandatory=$true, ParameterSetName="change")]
   [String]$User,
   [parameter(Mandatory=$true, ParameterSetName="change")]
   [String]$Passowrd,
