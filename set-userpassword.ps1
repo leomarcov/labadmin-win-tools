@@ -3,9 +3,9 @@
 Param(
   [parameter(Mandatory=$true, ParameterSetName="change")]
   [parameter(Mandatory=$true, ParameterSetName="remove")]
-  [Switch]$User,
+  [String]$User,
   [parameter(Mandatory=$true, ParameterSetName="change")]
-  [Switch]$Passowrd,
+  [String]$Passowrd,
   [parameter(Mandatory=$true, ParameterSetName="remove")]
   [Switch]$NoPassowrd
 )
