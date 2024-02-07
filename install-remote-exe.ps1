@@ -1,11 +1,12 @@
 #Requires -RunAsAdministrator
 Param(
-  [URI]$URL,
   [parameter(Mandatory=$true)]
-  [String]$filename,
-  [Switch]$downloadOverride,
-  [Switch]$removeDownload,
-  [String]$argumentList
+  [String]$filename,                  # filename of saved file installation
+  [URI]$URL,                          # URL from download (only download if file not exists)
+  [Switch]$forceDownload,             # force download and override install file
+  [Switch]$removeInstaller,           # remove install file after installation
+  [String]$md5File,                   # MD5 to check integrity install file
+  [String]$argumentList               # Optional argument list to silent installation instead of default: "/S /v /qn"
 )
 
 #### CONFIG VARIABLES
@@ -25,7 +26,7 @@ if(!url -AND !(Test-Path -LiteralPath $filePath -PathType Leaf)) {
 }
 
 # Download
-if($downloadOverride -OR !(Test-Path -LiteralPath $filePath -PathType Leaf)) {
+if($forceDownload -OR !(Test-Path -LiteralPath $filePath -PathType Leaf)) {
     Write-Output "Downloading: $filePath"
     Invoke-WebRequest -URI $url -outfile ${filePath} -ErrorAction Stop
     Write-Output "Download succsessful: $filePath"
@@ -39,6 +40,6 @@ $lec=$LASTEXITCODE
 Write-Output "Exit status: $? ($lec)"
 
 # Remove download
-if($removeDownload) { Remove-Item -Force $filePath }
+if($removeInstaller) { Remove-Item -Force $filePath }
 
 exit $lec
