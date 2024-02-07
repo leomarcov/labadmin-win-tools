@@ -27,6 +27,10 @@ if($downloadOverride -OR !(Test-Path -LiteralPath $filePath -PathType Leaf)) {
 # Install
 Write-Output "Installing in silent mode: $filePath"
 Start-Process -FilePath $filePath -ArgumentList '/S','/v','/qn' -Verb runas -Wait
+$lec=$LASTEXITCODE
+Write-Output "Exit status: $? ($lec)"
 
 # Remove download
 if($removeDownload) { Remove-Item -Force $filePath }
+
+exit $lec
