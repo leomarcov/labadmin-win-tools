@@ -1,11 +1,11 @@
 #Requires -RunAsAdministrator
 Param(
   [parameter(Mandatory=$true)]
-  [String]$filename,                  # filename of saved file installation
-  [URI]$URL,                          # URL from download (only download if file not exists)
+  [String]$filename,                  # filename of installer file
+  [URI]$URL,                          # URL from download (only download if file not exists and MD5 match)
   [Switch]$forceDownload,             # force download and override install file
   [Switch]$removeInstaller,           # remove install file after installation
-  [String]$md5File,                   # MD5 to check integrity install file
+  [String]$md5File,                   # MD5 to check integrity install file (if match not download)
   [String]$argumentList               # Optional argument list to silent installation instead of default: "/S /v /qn"
 )
 
@@ -13,33 +13,41 @@ Param(
 $downloadsPath="${ENV:ALLUSERSPROFILE}\labadmin\downloads"                                    # Labadmin Downloads base directory
 $defaultArguments='/S /v /qn'
 
-if(!$argumentList) { $argumentList=$defaultArguments }
 
-# Create download folder if not exists
+# CREATE FOLDERS
 if (-not (Test-Path -LiteralPath $downloadsPath -PathType Container)) {	New-Item -ItemType Directory -Path $downloadsPath }   
-$filePath="${downloadsPath}\${filename}"                                                  # File to download path
+$installerPath="${downloadsPath}\${filename}"                                                  # File to download path
 
-# if no URL check if file exists
-if(!url -AND !(Test-Path -LiteralPath $filePath -PathType Leaf)) {
-    Write-Error "ERROR: File $filename not found"
-    exit 1
+# CHECK PARAMS
+if(!$argumentList) { $argumentList=$defaultArguments }
+if(!$url -AND ($forceDownload -OR $md5File)) { Write-Error "URL param is mandatory when forceDownload or md5File"; exit 1 }
+if(!$forceDownload) {
+	# If previuos downloader installer not found
+	if(!(Test-Path -LiteralPath $installerPath -PathType Leaf)) {
+		if(!url) {  Write-Error "ERROR: File $filename not found"; exit 1 }
+		$forceDownload=$true	
+	# If previuous downloaded installer found
+	} else {
+		if(!$md5File) { $forceDownload=$false }
+		elseif((Get-FileHash $installerPath -Algorithm MD5).Hash -ne $md5file) { Write-Output "MD5 match!"; $forceDownload=$false }
+		else { Write-Output "MD5 not matching! Forced download"; $forceDownload=$true }
+	}
 }
 
-# Download
-if($forceDownload -OR !(Test-Path -LiteralPath $filePath -PathType Leaf)) {
-    Write-Output "Downloading: $filePath"
-    Invoke-WebRequest -URI $url -outfile ${filePath} -ErrorAction Stop
-    Write-Output "Download succsessful: $filePath"
+# DOWNLOAD
+if($forceDownload) {
+    Write-Output "Downloading: $installerPath"
+    Invoke-WebRequest -URI $url -outfile ${installerPath} -ErrorAction Stop
+    Write-Output "Download succsessful: $installerPath"
 }
 
-
-# Install
-Write-Output "Installing in silent mode: $filePath"
-Start-Process -FilePath $filePath -ArgumentList $argumentList -Verb runas -Wait
+# INSTALL
+Write-Output "Installing in silent mode: $installerPath"
+Start-Process -FilePath $installerPath -ArgumentList $argumentList -Verb runas -Wait
 $lec=$LASTEXITCODE
 Write-Output "Exit status: $? ($lec)"
 
-# Remove download
-if($removeInstaller) { Remove-Item -Force $filePath }
+# REMOVE
+if($removeInstaller) { Remove-Item -Force $installerPath }
 
 exit $lec
