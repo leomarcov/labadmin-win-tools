@@ -7,7 +7,10 @@ Param(
   [Switch]$removeDownload
 )
 
+#### CONFIG VARIABLES
 $downloadsPath="${ENV:ALLUSERSPROFILE}\labadmin\downloads"                                    # Labadmin Downloads base directory
+
+
 if (-not (Test-Path $downloadsPath)) {	New-Item -ItemType Directory -Path $downloadsPath }   
 $downloadPath="${downloadsPath}\${filename}"                                                  # File to download path
 
