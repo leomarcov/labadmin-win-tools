@@ -13,10 +13,10 @@ if($enable) {
 } elseif($disable) {
   Set-MpPreference -DisableRealtimeMonitoring $true
   if((Get-MpPreference).DisableRealtimeMonitoring) { Write-Output "Realtime monitoring is DISABLED"; exit 0	}
-  else { Write-Output "WARMIMG! Realtime monitoring is ENABLED"; exit 1 }
+  else { Write-Error "Realtime monitoring is still ENABLED!"; exit 1 }
 
 } else {
-  if((Get-MpPreference).DisableRealtimeMonitoring) { Write-Output "Realtime monitoring is DISABLED"; exit 1	}
+  if((Get-MpPreference).DisableRealtimeMonitoring) { Write-Error "Realtime monitoring is still DISABLED"; exit 1	}
   else { Write-Output "Realtime monitoring is ENABLED"; exit 0 }
 }
 
