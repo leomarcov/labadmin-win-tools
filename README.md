@@ -2,7 +2,7 @@
 <img align="right" src="https://cdn4.iconfinder.com/data/icons/online-marketing-hand-drawn-vol-3/52/online__options__services__setting__gear__option__support-128.png">
 Labadmin Win Tools is a collection of PowerShell scripts to manage Windows 10 systems in a lab school environment. Includes functions to:
 
-  * Autoclean user profiles
+  * **Autoclean user profiles**
   * Disable USB storage
   * Manage Windows Restoration Points
   * Download and install files
