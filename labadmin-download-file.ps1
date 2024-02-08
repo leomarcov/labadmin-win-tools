@@ -2,19 +2,19 @@
 
 <#
 .SYNOPSIS
-	URL File downloader
+	URL File downloader manager
 .DESCRIPTION
 	Download file from URL to labadmin base downloads dir (or specific destinationPath)
 	If file exists not download and if MD5 is supplied check before download to determine if download is needed
 .PARAMETER fileName
 	Filename for downloaded file
-.PARAMETER md5File
+.PARAMETER MD5
 	MD5 hash to check file integrity
 	If file exists in destionation path check integrety before to determine if download is needed
 	If file is downloaded checks integrity after download to determine is download is correct
 .PARAMETER URL
 	URL from download file
-	If no supplied use local file in destionation path if exists. In this case is recomended supply MD5File param to check integrety
+	If no supplied use local file in destionation path if exists. In this case is recomended supply MD5 param to check integrety
 .PARAMETER forceDownload
 	Force download file and overrides local file if exists
 .PARAMETER destinationPath
@@ -29,7 +29,7 @@
 Param(
   [parameter(Mandatory=$true)]
   [String]$fileName,                 # Filename of downloaded file
-  [String]$md5File,                  # MD5 to check integrity downloaded file (if match not download)
+  [String]$MD5,                      # MD5 to check integrity downloaded file (if match not download)
   [URI]$URL,                         # URL from download (only download if file not exists and MD5 match)  
   [Switch]$forceDownload,            # Force download and override local file
   [String]$destinationPath	     # Optional folder to download instead of labadmin base download
@@ -50,10 +50,10 @@ if(!$forceDownload) {
 		$forceDownload=$true 
 	# If local file found
 	} else {
-		if(!$md5File) {	
+		if(!$MD5) {	
 			Write-Output "WARNING!: Using local $filePath but not integrity checked!"
 			exit 0 
-		}elseif((Get-FileHash $filePath -Algorithm MD5).Hash -eq $md5File) { 
+		}elseif((Get-FileHash $filePath -Algorithm MD5).Hash -eq $MD5) { 
 			Write-Output "MD5 match!. Using local $filePath"
 			exit 0 
 		}else { 
@@ -71,8 +71,8 @@ if($forceDownload) {
     Write-Output "Download succsessful: $filePath"
 	
 	# Check integrity
-	if($md5File) {
-		if((Get-FileHash $filePath -Algorithm MD5).Hash -eq $md5File) { Write-Output "MD5 match!"; exit 0 }
+	if($MD5) {
+		if((Get-FileHash $filePath -Algorithm MD5).Hash -eq $MD5) { Write-Output "MD5 match!"; exit 0 }
 		else { Write-Error "MD5 not match!"; exit 1 }
 	}
 	exit 0
