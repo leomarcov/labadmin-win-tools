@@ -6,7 +6,7 @@ Param(
 
 $name=$literalName
 
-if($list) { Get-Package; exit }
+if($list) { Get-Package | Select-Object -Property Name; exit }
 if(!(Get-Package $name)) { Write-Error "Cant find installed package $name"; exit 1 }
 
 # TRY UNINSTALL: WmiObject
