@@ -1,14 +1,15 @@
 #Requires -RunAsAdministrator
 
-$install_path=$ENV:ProgramFiles+"\labadmin\labadmin-freezer\"
+$install_path=$ENV:ProgramFiles+"\labadmin\labadmin-win-tools\"
+$url="https://github.com/leomarcov/labadmin-win-tools/archive/refs/heads/main.zip"
 
 # Create folder
 New-Item -ItemType Directory -Force -Path $install_path | Out-Null
 
-# Download files
-$url="https://raw.githubusercontent.com/leomarcov/labadmin-freezer/main/"
+# Download repository
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-$url_files="config-usbstorage.ps1 manage-restorepoints.ps1 profiles-cleaner.ps1 install.ps1"
-foreach($f in $url_files.split(" ")) { Invoke-WebRequest -Uri ("${url}/${f}") -OutFile ($install_path+"\$f") }
-Move-Item -Path "${install_path}\install.ps1" -Destination "${install_path}\update.ps1" -Force
+Invoke-WebRequest -Uri ${url} -OutFile "${install_path}\main.zip" -ErrorAction Stop
+Expand-Archive -LiteralPath "${install_path}\main.zip" -DestinationPath $install_path -Force -ErrorAction Stop
+Move-Item -Path "${install_path}\labadmin-win-tools-main\*.ps1" -Destination $install_path -ErrorAction Stop
+Remove-Item -LiteralPath "${install_path}\labadmin-win-tools-main" -Force -Recurse
 
