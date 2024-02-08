@@ -70,6 +70,7 @@ if(!$url -AND $forceDownload) { Write-Error "URL needed to download file"; exit 
 # DOWNLOAD?
 if($forceDownload) {
     Write-Output "Downloading: $filePath"
+    $ProgressPreference = 'SilentlyContinue'	# Disable progress bar increase speed
     Invoke-WebRequest -URI $url -outfile ${filePath} -ErrorAction Stop
     Write-Output "Download succsessful: $filePath"
 	
