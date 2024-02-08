@@ -1,5 +1,5 @@
 # Labadmin Win Tools
-<img align="left" src="https://cdn4.iconfinder.com/data/icons/online-marketing-hand-drawn-vol-3/52/online__options__services__setting__gear__option__support-96.png">
+<img align="left" src="https://cdn4.iconfinder.com/data/icons/online-marketing-hand-drawn-vol-3/52/online__options__services__setting__gear__option__support-72.png">
 Labadmin freezer is a collection of PowerShell scripts to manage Windows 10 systems in a lab school environment. Includes functions to autoclean user profiles, disable USB storage, manage Windows Restoration Points, etc.
 <br>
 <br>
