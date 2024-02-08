@@ -6,7 +6,7 @@
 
 .DESCRIPTION
     Automated user profiles cleaner for backup and autorestore at startup according scheduled rules
-    Each profile is backup in c:\users\profiles-cleaner\ and a username.cfg file is generated
+    Each profile is backup in c:\users\labadmin-profiles-cleaner\ and a username.cfg file is generated
     Profile config file syntax is:
         cleanAfterDays                      # Number of days from last clean to next autoclean (0 clean in each reboot, 1 clean every day, etc)
         skipUser                            # Boolean to skip this user from autoclean (skips cleanAfterDays and cleanAllways)
@@ -14,7 +14,7 @@
         lastClean                           # Date when last clean was performed
 
 .PARAMETER CreateBackup
-    Backup (or update backup if previos backup exists) current users profiles to c:\users\profiles-cleaner\
+    Backup (or update backup if previos backup exists) current users profiles to c:\users\labadmin-profiles-cleaner\
     Parameter -users must be given with list of users to backup
     For new backups default username.cfg file is generated
 
@@ -58,7 +58,7 @@ Param(
 
 
 #### CONFIG VARIABLES ############################################
-$backups_path="${ENV:SystemDrive}\Users\profiles-cleaner"                                # Path to save backups and configs
+$backups_path="${ENV:SystemDrive}\Users\labadmin-profiles-cleaner"                       # Path to save backups and configs
 $log_path="${backups_path}\log.txt"                                                      # Path to save logs
 $default_config=@{
     cleanAfterDays=1                                                                     # Days after spend to exec a new profile autoclean
