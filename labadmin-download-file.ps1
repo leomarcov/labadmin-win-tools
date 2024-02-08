@@ -14,7 +14,7 @@
 	If file is downloaded checks integrity after download to determine is download is correct
 .PARAMETER URL
 	URL from download file
-	If no supplied use local file in destionation path if exists. In this case is recomended use MD5 to check integrety
+	If no supplied use local file in destionation path if exists. In this case is recomended supply MD5File param to check integrety
 .PARAMETER forceDownload
 	Force download file and overrides local file if exists
 .PARAMETER destinationPath
