@@ -28,7 +28,7 @@
 
 Param(
   [parameter(Mandatory=$true)]
-  [String]$fileName,                 # filename of downloaded file
+  [String]$fileName,                 # Filename of downloaded file
   [String]$md5File,                  # MD5 to check integrity downloaded file (if match not download)
   [URI]$URL,                         # URL from download (only download if file not exists and MD5 match)  
   [Switch]$forceDownload,            # Force download and override local file
