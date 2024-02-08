@@ -8,7 +8,7 @@ Labadmin Win Tools is a collection of PowerShell scripts to manage Windows 10 sy
   * Download and install files
   * Hide and disable users
   * Set gateway address
-  * Config antivirus
+  * Enable/disable antivirus realtime protection
 <br>
 
 ## Package Install
