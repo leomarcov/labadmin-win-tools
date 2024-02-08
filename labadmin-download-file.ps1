@@ -35,6 +35,7 @@ Param(
   [String]$destinationPath	     # Optional folder to download instead of labadmin base download
 )
 
+
 #### CONFIG VARIABLES
 $labadminDownloadsPath="${ENV:ALLUSERSPROFILE}\labadmin\downloads"
 if(!$destinationPath) { $destinationPath=$labadminDownloadsPath}
@@ -51,10 +52,11 @@ if(!$forceDownload) {
 		$forceDownload=$true 
 	# If local file found
 	} else {
+
 		if(!$MD5) {	
 			Write-Output "WARNING!: Using local $filePath but not integrity checked!"
 			exit 0 
-		}elseif((Get-FileHash $filePath -Algorithm MD5).Hash -eq $MD5) { 
+		}elseif((Get-FileHash -LiteralPath $filePath -Algorithm MD5).Hash -eq $MD5) { 
 			Write-Output "MD5 match!. Using local $filePath"
 			exit 0 
 		}else { 
