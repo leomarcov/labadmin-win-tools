@@ -18,7 +18,7 @@
 .PARAMETER forceDownload
 	Force download file and overrides local file if exists
 .PARAMETER destinationPath
-	Optional destination folder to save download. If no supplied use labadmin base download
+	Optional destination folder to save download (by default labadmin base download is used c:\program data\labadmin\downloads)
 
 .NOTES
 	File Name      : labadmin-download-file.ps1
@@ -36,7 +36,8 @@ Param(
 )
 
 #### CONFIG VARIABLES
-if(!$destinationPath) { $destinationPath="${ENV:ALLUSERSPROFILE}\labadmin\downloads"}
+$labadminDownloadsPath="${ENV:ALLUSERSPROFILE}\labadmin\downloads"}
+if(!$destinationPath) { $destinationPath=$labadminDownloadsPath}
 
 # CREATE FOLDERS
 if (!(Test-Path -LiteralPath $destinationPath -PathType Container)) { New-Item -ItemType Directory -Path $destinationPath -Force | Out-Null}   
