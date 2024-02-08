@@ -33,7 +33,7 @@ Write-Output "Installing in silent mode: $filePath"
 if($fileTypeEXE) { 
   Start-Process -FilePath $filePath -ArgumentList $argumentList -Verb runas -Wait }
 elseif($fileTypeMSI) { 
-  Start-Process msiexec.exe -Wait -ArgumentList "/I '${$filePath}' /norestart /QN" 
+  Start-Process msiexec.exe -Wait -ArgumentList "/I `"${filePath}`" /norestart /QN"
 }
 $lec=$LASTEXITCODE
 Write-Output "Exit status: $? ($lec)"
