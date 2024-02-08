@@ -25,4 +25,5 @@ if(!($current_path.Split(';') | Where-Object { $_ -eq $install_path })){
   Write-Output "Adding $install_path to ENVIRONMENT PATH variable"
   Set-ItemProperty -Path 'Registry::HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\Environment' -Name PATH -Value $new_path
 }
+Write-Output "`n"
 
