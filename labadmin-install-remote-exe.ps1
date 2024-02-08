@@ -15,8 +15,7 @@ $defaultArguments='/S /v /qn'
 if(!$argumentList) { $argumentList=$defaultArguments }
 
 # CALL labadmin-download-file.ps1
-$PSBoundParameters.Remove("removeInstaller") | Out-Null
-$PSBoundParameters.Remove("argumentList") | Out-Null
+$PSBoundParameters.Remove("removeInstaller") | Out-Null; $PSBoundParameters.Remove("argumentList") | Out-Null
 & "${PSScriptRoot}\labadmin-download-file.ps1" @$PSBoundParameters
 
 # INSTALL
