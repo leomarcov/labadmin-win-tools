@@ -18,8 +18,8 @@ Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManage
 ```
 <br>
 
-## profiles-cleaner.ps1
-`profiles-cleaner.ps1` is a script to automate user profiles cleaning. 
+## labadmin-profiles-cleaner.ps1
+`labadmin-profiles-cleaner.ps1` is a script to automate user profiles cleaning. 
   * User profiles are backup in a secure place and are autorestored periodically (each reboot, once a day, once in some days, etc.).
   * Each user has is own autorestore settings.
   * Some folders in user profile can be restored on each reboot (userfull for browser history).
@@ -28,12 +28,12 @@ Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManage
 ### Install 
 * Create first backup for each user:
 ```
-& 'C:\Program Files\labadmin\labadmin-win-tools\profiles-cleaner.ps1' -BackupProfiles -Users user1,user2
+& 'C:\Program Files\labadmin\labadmin-win-tools\labadmin-profiles-cleaner.ps1' -BackupProfiles -Users user1,user2
 ```
 * Config Group Policies in `gpedit.msc`:
   * **Exec script at startup**
     * `Computer Configuracion > Windows Settings > Scripts > Startup > PowerShell Scripts`
-    * Script to exec: `C:\Program Files\labadmin\labadmin-win-tools\profiles-cleaner.ps1`
+    * Script to exec: `C:\Program Files\labadmin\labadmin-win-tools\labadmin-profiles-cleaner.ps1`
     * Params: `-RestoreProfile -Log`
   * **Disable run start asynchronously**
     * `Computer Configuration > Administrative Templates > System > Scripts > Run startup scripts asynchronously`
@@ -49,13 +49,13 @@ Each user can be config in **`<username>.cfg`** JSON file in `C:\Users\profiles-
 ### Usage
 ```
 SYNTAX
-profiles-cleaner.ps1 -BackupProfiles -Users <String[]> [-Log] 
-profiles-cleaner.ps1 -RestoreProfiles [-Users <String[]>] [-Force] [-Log] 
+labadmin-profiles-cleaner.ps1 -BackupProfiles -Users <String[]> [-Log] 
+labadmin-profiles-cleaner.ps1 -RestoreProfiles [-Users <String[]>] [-Force] [-Log] 
 
 EXAMPLES
-profiles-cleaner.ps1 -BackupProfiles -Users u1,u2   # Create or update backup profile folder for u1 and u2
-profiles-cleaner.ps1 -RestoreProfiles               # Clean all users with saved backup according his config file
-profiles-cleaner.ps1 -RestoreProfiles -Force        # Force clean of all users with saved bakcup
-profiles-cleaner.ps1 -RestoreProfiles -Users u1     # Try clean user u1 only
+labadmin-profiles-cleaner.ps1 -BackupProfiles -Users u1,u2   # Create or update backup profile folder for u1 and u2
+labadmin-profiles-cleaner.ps1 -RestoreProfiles               # Clean all users with saved backup according his config file
+labadmin-profiles-cleaner.ps1 -RestoreProfiles -Force        # Force clean of all users with saved bakcup
+labadmin-profiles-cleaner.ps1 -RestoreProfiles -Users u1     # Try clean user u1 only
 ```
 
