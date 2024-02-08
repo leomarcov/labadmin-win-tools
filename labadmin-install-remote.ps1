@@ -7,7 +7,7 @@ Param(
   [Switch]$forceDownload,             # Force download and override install file
   [String]$destinationPath,	          # Optional folder to download instead of labadmin base download  
   [Switch]$removeInstaller,           # Remove install file after installation
-  [String]$argumentList               # Optional argument list to silent installation instead of default: "/S /v /qn"
+  [String]$argumentList               # Optional argument list to silent installation for exe files (instead of default: "/S /v /qn")
 )
 
 
@@ -19,15 +19,22 @@ if(!$argumentList) { $argumentList=$defaultArguments }
 if(!$destinationPath) { $destinationPath=$labadminDownloadsPath}
 $filePath="${destinationPath}\${fileName}"    
 
+# CHECK EXTESION
+if([System.IO.Path]::GetExtension($filePath) -eq ".exe") { $fileTypeEXE = $true }
+elseif([System.IO.Path]::GetExtension($filePath) -eq ".msi") { $fileTypeMSI= $true }
+else { Write-Error "File extension not supoerted (only .exe and .msi files)"; exit 1 }
+
 # DOWNLOAD: call labadmin-download-file.ps1
 $PSBoundParameters.Remove("removeInstaller") | Out-Null; $PSBoundParameters.Remove("argumentList") | Out-Null
-
-
 & "${PSScriptRoot}\labadmin-download-file.ps1" @PSBoundParameters -ErrorAction Stop
 
 # INSTALL
 Write-Output "Installing in silent mode: $filePath"
-Start-Process -FilePath $filePath -ArgumentList $argumentList -Verb runas -Wait
+if($fileTypeEXE) { 
+  Start-Process -FilePath $filePath -ArgumentList $argumentList -Verb runas -Wait }
+elseif($fileTypeMSI) { 
+  Start-Process msiexec.exe -Wait -ArgumentList "/I '${$filePath}' /norestart /QN" 
+}
 $lec=$LASTEXITCODE
 Write-Output "Exit status: $? ($lec)"
 
