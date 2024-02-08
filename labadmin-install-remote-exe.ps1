@@ -10,9 +10,9 @@ Param(
 )
 
 #### CONFIG VARIABLES
+$installerPath="${ENV:ALLUSERSPROFILE}\labadmin\downloads\${fileName}"
 $defaultArguments='/S /v /qn'
 if(!$argumentList) { $argumentList=$defaultArguments }
-$installerPath="${ENV:ALLUSERSPROFILE}\labadmin\downloads\${fileName}"
 
 # CALL labadmin-download-file.ps1
 $PSBoundParameters.Remove("removeInstaller") | Out-Null
