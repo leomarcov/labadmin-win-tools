@@ -15,7 +15,7 @@ if(!$argumentList) { $argumentList=$defaultArguments }
 $installerPath="${ENV:ALLUSERSPROFILE}\labadmin\downloads\${fileName}"
 
 # DOWNLOAD
-${PSScriptRoot}\download-file.ps1 -file
+${PSScriptRoot}\download-file.ps1 -fileName $filename 
 
 # INSTALL
 Write-Output "Installing in silent mode: $installerPath"
