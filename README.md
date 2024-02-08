@@ -24,6 +24,7 @@ Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManage
   * Each user has is own autorestore settings.
   * Some folders in user profile can be restored on each reboot (userfull to remove personal data, like browser settings).
   * Restore can be forced programatically.
+  * Logs are saved on `C:\Users\labadmin-profiles-cleaner\log.txt`.
 
 ### Install 
 * Create first backup for each user:
