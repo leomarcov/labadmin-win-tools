@@ -25,7 +25,10 @@ if($app) {
 # TRY REGEDIT uninstall
 Write-Output "Trying uninstall using Regedit uninstall path..."
 $app=gci "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall" | foreach { gp $_.PSPath } | ? { $_.DisplayName -eq $name }
+if(!$app) { $app = gci "HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall" | foreach { gp $_.PSPath } | ? { $_.DisplayName -eq $name } }
 if($app) {
   $uninstallPath=$app.UninstallString.Trim("`"")
+  Write-Output "Executing uninstall: ${uninstallPath} /S"
   & $uninstallPath "/S"
+  if(!(Get-Package $name)) { exit 0 }
 }
