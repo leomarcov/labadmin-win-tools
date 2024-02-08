@@ -4,8 +4,8 @@ $install_path=$ENV:ProgramFiles+"\labadmin\labadmin-win-tools\"
 $url="https://github.com/leomarcov/labadmin-win-tools/archive/refs/heads/main.zip"
 
 # Create folder
-if(!(Test-Path -LiteralPath $install_path -PathType Container)) { New-Item -ItemType Directory -Force -Path $install_path | Out-Null }
-else { Remove-Item -LiteralPath ${install_path} -Force -Recurse }
+if((Test-Path -LiteralPath $install_path -PathType Container)) { Remove-Item -LiteralPath ${install_path} -Force -Recurse }
+New-Item -ItemType Directory -Force -Path $install_path | Out-Null
 
 # Download repository
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
