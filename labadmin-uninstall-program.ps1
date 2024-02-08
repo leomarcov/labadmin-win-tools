@@ -10,10 +10,12 @@ if($list) { Get-Package; exit }
 if(!(Get-Package $name)) { Write-Error "Cant find installed package $name"; exit 1 }
 
 # TRY UNINSTALL: WmiObject
+Write-Output "Trying uninstall using WmiObject..."
 $app=Get-WmiObject -Class Win32_Product | Where-Object { $_.Name -eq $name }
 if($app) { $app.Uninstall(); if($?) { exit 0 } }
 
-# TRY UNINSTALL: Uninstall-Packate
+# TRY UNINSTALL: Uninstall-Package
+Write-Output "Trying uninstall using Uninstall-Package..."
 $app=Get-Package $name
 if($app) {
   Uninstall-Package -Name $name -Force
@@ -21,6 +23,7 @@ if($app) {
 }
 
 # TRY REGEDIT uninstall
+Write-Output "Trying uninstall using Regedit uninstall path..."
 $app=gci "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall" | foreach { gp $_.PSPath } | ? { $_.DisplayName -eq $name }
 if($app) {
   $uninstallPath=$app.UninstallString
