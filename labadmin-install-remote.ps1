@@ -7,13 +7,13 @@ Param(
   [Switch]$forceDownload,             # Force download and override install file
   [String]$destinationPath,	          # Optional folder to download instead of labadmin base download  
   [Switch]$removeInstaller,           # Remove install file after installation
-  [String]$argumentList               # Optional argument list to silent installation for exe files (instead of default: "/S /v /qn")
+  [String]$argumentList               # Optional argument list to silent installation for exe files (instead of default: /S /v"/qn")
 )
 
 
 #### CONFIG VARIABLES
 $labadminDownloadsPath="${ENV:ALLUSERSPROFILE}\labadmin\downloads"
-$defaultArguments='/S /v/qn'
+$defaultArguments='/S /v`"/qn`"'
 
 if(!$argumentList) { $argumentList=$defaultArguments }
 if(!$destinationPath) { $destinationPath=$labadminDownloadsPath}
