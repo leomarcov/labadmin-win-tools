@@ -1,4 +1,4 @@
-c#Requires -RunAsAdministrator
+#Requires -RunAsAdministrator
 Param(
   [String]$literalName,                  # Exact name of program to uninstall
   [Switch]$List
@@ -10,14 +10,15 @@ $name=$literalName
 if($list) { Get-Package | Select-Object -Property Name; exit }
 
 # CHECK PACKAGE INSTALLED
-if(!(Get-Package $name)) { Write-Error "Cant find installed package $name"; exit 1 }
+if(!$name) { Write-Error "-literalName param required"; exit 1 }
+if(!(Get-Package $name -ErrorAction SilentlyContinue)) { Write-Error "Cant find installed package $name"; exit 1 }
 
 # TRY UNINSTALL: WmiObject
 Write-Output "Trying uninstall using WmiObject..."
 $app=Get-WmiObject -Class Win32_Product | Where-Object { $_.Name -eq $name }
 if($app) { 
   $app.Uninstall()
-  if(!(Get-Package $name)) { Write-Output "Uninstall successful!"; exit 0 }
+  if(!(Get-Package $name -ErrorAction SilentlyContinue)) { Write-Output "Uninstall successful!"; exit 0 }
 }
 
 # TRY UNINSTALL: Uninstall-Package
@@ -25,7 +26,7 @@ Write-Output "Trying uninstall using Uninstall-Package..."
 $app=Get-Package $name
 if($app) {
   Uninstall-Package -Name $name -Force
-  if(!(Get-Package $name)) { Write-Output "Uninstall successful!"; exit 0 }
+  if(!(Get-Package $name -ErrorAction SilentlyContinue)) { Write-Output "Uninstall successful!"; exit 0 }
 }
 
 # TRY REGEDIT uninstall
@@ -36,7 +37,7 @@ if($app) {
   $uninstallPath=$app.UninstallString.Trim("`"")
   Write-Output "Executing uninstall: ${uninstallPath} /S"
   & $uninstallPath "/S"
-  if(!(Get-Package $name)) { Write-Output "Uninstall successful!"; exit 0 }
+  if(!(Get-Package $name -ErrorAction SilentlyContinue)) { Write-Output "Uninstall successful!"; exit 0 }
 }
 
 # NO METHOD FOUND!
