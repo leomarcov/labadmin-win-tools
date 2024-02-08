@@ -1,4 +1,4 @@
-Requires -RunAsAdministrator
+#Requires -RunAsAdministrator
 
 Param(
   [Parameter(Mandatory=$true)]
