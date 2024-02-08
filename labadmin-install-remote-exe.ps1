@@ -10,8 +10,9 @@ Param(
   [String]$argumentList               # Optional argument list to silent installation instead of default: "/S /v /qn"
 )
 
+
 #### CONFIG VARIABLES
-$labadminDownloadsPath="${ENV:ALLUSERSPROFILE}\labadmin\downloads"}
+$labadminDownloadsPath="${ENV:ALLUSERSPROFILE}\labadmin\downloads"
 $defaultArguments='/S /v /qn'
 
 if(!$argumentList) { $argumentList=$defaultArguments }
@@ -20,7 +21,9 @@ $filePath="${destinationPath}\${fileName}"
 
 # DOWNLOAD: call labadmin-download-file.ps1
 $PSBoundParameters.Remove("removeInstaller") | Out-Null; $PSBoundParameters.Remove("argumentList") | Out-Null
-& "${PSScriptRoot}\labadmin-download-file.ps1" @PSBoundParameters
+
+
+& "${PSScriptRoot}\labadmin-download-file.ps1" @PSBoundParameters -ErrorAction Stop
 
 # INSTALL
 Write-Output "Installing in silent mode: $filePath"
@@ -29,6 +32,9 @@ $lec=$LASTEXITCODE
 Write-Output "Exit status: $? ($lec)"
 
 # REMOVE
-if($removeInstaller) { Remove-Item -Force $filePath }
+if($removeInstaller) { 
+    Write-Output "Removing install file: $filePath"
+    Remove-Item -Force $filePath 
+}
 
 exit $lec
