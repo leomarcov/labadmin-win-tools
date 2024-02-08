@@ -39,7 +39,7 @@ Param(
 if(!$destinationPath) { $destinationPath="${ENV:ALLUSERSPROFILE}\labadmin\downloads"}
 
 # CREATE FOLDERS
-if (-not (Test-Path -LiteralPath $destinationPath -PathType Container)) { New-Item -ItemType Directory -Path $destinationPath -Force | Out-Null}   
+if (!(Test-Path -LiteralPath $destinationPath -PathType Container)) { New-Item -ItemType Directory -Path $destinationPath -Force | Out-Null}   
 $filePath="${destinationPath}\${fileName}"    # File to download path
 
 # CHECK IF NEED DOWNLOAD
