@@ -29,10 +29,11 @@ $PSBoundParameters.Remove("removeInstaller") | Out-Null; $PSBoundParameters.Remo
 & "${PSScriptRoot}\labadmin-download-file.ps1" @PSBoundParameters -ErrorAction Stop
 
 # INSTALL
-Write-Output "Installing in silent mode: $filePath"
 if($fileTypeEXE) { 
+  Write-Output "Installing EXE in silent mode: $filePath $argumentList"
   Start-Process -FilePath $filePath -ArgumentList $argumentList -Verb runas -Wait }
 elseif($fileTypeMSI) { 
+  Write-Output "Installing MSI in silent mode: $filePath"
   Start-Process msiexec.exe -Wait -ArgumentList "/I `"${filePath}`" /norestart /QN"
 }
 $lec=$LASTEXITCODE
