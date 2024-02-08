@@ -58,4 +58,11 @@ labadmin-profiles-cleaner.ps1 -RestoreProfiles               # Clean all users w
 labadmin-profiles-cleaner.ps1 -RestoreProfiles -Force        # Force clean of all users with saved bakcup
 labadmin-profiles-cleaner.ps1 -RestoreProfiles -Users u1     # Try clean user u1 only
 ```
+&nbsp;  
+# Lincense
+Labadmin license is [GPLv3](LICENSE)
 
+# Contact
+My name is Leonardo Marco. I'm sysadmin teacher in [CIFP Carlos III](https://cifpcarlos3.es/), Cartagena, Murcia (Spain).
+
+You can email me for suggestions, contributions, labadmin help or share your feelings: labadmin@leonardomarco.com
