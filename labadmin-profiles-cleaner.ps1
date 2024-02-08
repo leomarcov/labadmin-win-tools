@@ -33,7 +33,7 @@
     Save output to log file in c:\users\profiels-cleaner\log.txt
 
 .NOTES
-    File Name      : profiles-cleaner.ps1
+    File Name      : labadmin-profiles-cleaner.ps1
     Author         : Leonardo Marco
 #>
 
