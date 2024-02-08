@@ -1,6 +1,6 @@
-#Requires -RunAsAdministrator
+c#Requires -RunAsAdministrator
 Param(
-  [String]$literalName,                  # Name of program
+  [String]$literalName,                  # Exact name of program to uninstall
   [Switch]$List
 )
 
