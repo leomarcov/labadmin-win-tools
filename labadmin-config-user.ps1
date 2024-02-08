@@ -28,7 +28,7 @@ Param(
 Get-LocalUser -Name $UserName -ErrorAction Stop | Out-Null
 
 if($Hide) {
-  New-Item 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\SpecialAccounts\UserList' -Force | New-ItemProperty -Name $UserName -Value 0 -PropertyType DWord -Force
+	New-Item 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\SpecialAccounts\UserList' -Force | New-ItemProperty -Name $UserName -Value 0 -PropertyType DWord -Force
 }
 elseif($Unhide) {
 	Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\SpecialAccounts\UserList" -Name $UserName -Force
@@ -36,11 +36,11 @@ elseif($Unhide) {
 
 if($Disable) {
 	Disable-LocalUser -Name $UserName
-    Get-LocalUser -Name $UserName
+	Get-LocalUser -Name $UserName
 }
 elseif($Enable) {
 	Enable-LocalUser -Name $UserName
-    Get-LocalUser -Name $UserName
+    	Get-LocalUser -Name $UserName
 }
 
 if($NoPassword) {
