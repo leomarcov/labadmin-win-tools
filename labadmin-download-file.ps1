@@ -10,7 +10,7 @@
 	Filename for downloaded file
 .PARAMETER md5File
 	MD5 hash to check file integrity
-	If file exists in destionation path check integrety before to determine if download or not
+	If file exists in destionation path check integrety before to determine if download is needed
 	If file is downloaded checks integrity after download to determine is download is correct
 .PARAMETER URL
 	URL from download file. 
