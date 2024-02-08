@@ -20,7 +20,7 @@ $filePath="${destinationPath}\${fileName}"
 
 # DOWNLOAD: call labadmin-download-file.ps1
 $PSBoundParameters.Remove("removeInstaller") | Out-Null; $PSBoundParameters.Remove("argumentList") | Out-Null
-& "${PSScriptRoot}\labadmin-download-file.ps1" @$PSBoundParameters
+& "${PSScriptRoot}\labadmin-download-file.ps1" @PSBoundParameters
 
 # INSTALL
 Write-Output "Installing in silent mode: $filePath"
