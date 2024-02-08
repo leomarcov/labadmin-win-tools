@@ -2,9 +2,9 @@
 
 <#
 .SYNOPSIS
-    URL File downloader
+	URL File downloader
 .DESCRIPTION
-    Download file from URL to labadmin base downloads dir (or specific destinationPath)
+	Download file from URL to labadmin base downloads dir (or specific destinationPath)
 	If file exists not download and if MD5 is supplied check before download to determine if download is needed
 .PARAMETER fileName
 	Filename for downloaded file
@@ -16,13 +16,13 @@
 	URL from download file. 
 	If no supplied use local file in destionation path if exists. In this case is recomended use MD5 to check integrety.
 .PARAMETER forceDownload
-    Force download file and overrides local file if exists
+	Force download file and overrides local file if exists
 .PARAMETER destinationPath
-    Optional destination folder to save download. If no supplied use labadmin base download
+	Optional destination folder to save download. If no supplied use labadmin base download
 
 .NOTES
-    File Name      : download-file.ps1
-    Author         : Leonardo Marco
+	File Name      : labadmin-download-file.ps1
+	Author         : Leonardo Marco
 #>
 
 
