@@ -1,8 +1,8 @@
 #Requires -RunAsAdministrator
 Param(
   [parameter(Mandatory=$true)]
-  [String]$fileNname,                  # Filename of installer file
-  [String]$md5File,                   # MD5 to check integrity install file (if match not download)
+  [String]$fileName,                 # Filename of installer file
+  [String]$MD5,                   # MD5 to check integrity install file (if match not download)
   [URI]$URL,                          # URL from download (only download if file not exists and MD5 match)
   [Switch]$forceDownload,             # Force download and override install file
   [Switch]$removeInstaller,           # Remove install file after installation
@@ -15,7 +15,9 @@ if(!$argumentList) { $argumentList=$defaultArguments }
 $installerPath="${ENV:ALLUSERSPROFILE}\labadmin\downloads\${fileName}"
 
 # DOWNLOAD
-${PSScriptRoot}\labadmin-download-file.ps1 -fileName $filename 
+$PSBoundParameters.Remove("removeInstaller") | Out-Null
+$PSBoundParameters.Remove("argumentList") | Out-Null
+& "${PSScriptRoot}\labadmin-download-file.ps1" @$PSBoundParameters
 
 # INSTALL
 Write-Output "Installing in silent mode: $installerPath"
