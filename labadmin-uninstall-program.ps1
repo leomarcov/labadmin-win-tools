@@ -6,7 +6,10 @@ Param(
 
 $name=$literalName
 
+#LIST 
 if($list) { Get-Package | Select-Object -Property Name; exit }
+
+# CHECK PACKAGE INSTALLED
 if(!(Get-Package $name)) { Write-Error "Cant find installed package $name"; exit 1 }
 
 # TRY UNINSTALL: WmiObject
@@ -36,5 +39,6 @@ if($app) {
   if(!(Get-Package $name)) { Write-Output "Uninstall successful!"; exit 0 }
 }
 
+# NO METHOD FOUND!
 Write-Error "Cant found uninstall method for $name package"
 exit 1
