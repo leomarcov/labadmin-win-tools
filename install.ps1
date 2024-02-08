@@ -11,5 +11,6 @@ New-Item -ItemType Directory -Force -Path $install_path | Out-Null
 Invoke-WebRequest -Uri ${url} -OutFile "${install_path}\main.zip" -ErrorAction Stop
 Expand-Archive -LiteralPath "${install_path}\main.zip" -DestinationPath $install_path -Force -ErrorAction Stop
 Move-Item -Path "${install_path}\labadmin-win-tools-main\*.ps1" -Destination $install_path -ErrorAction Stop
+Remove-Item -LiteralPath "${install_path}\main.zip" -Force -Recurse
 Remove-Item -LiteralPath "${install_path}\labadmin-win-tools-main" -Force -Recurse
 
