@@ -13,7 +13,7 @@ Param(
 
 #### CONFIG VARIABLES
 $labadminDownloadsPath="${ENV:ALLUSERSPROFILE}\labadmin\downloads"
-$defaultArguments='/S /v /qn'
+$defaultArguments='/S /v/qn'
 
 if(!$argumentList) { $argumentList=$defaultArguments }
 if(!$destinationPath) { $destinationPath=$labadminDownloadsPath}
