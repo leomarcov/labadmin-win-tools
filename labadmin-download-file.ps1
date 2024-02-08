@@ -36,7 +36,7 @@ Param(
 )
 
 #### CONFIG VARIABLES
-$labadminDownloadsPath="${ENV:ALLUSERSPROFILE}\labadmin\downloads"}
+$labadminDownloadsPath="${ENV:ALLUSERSPROFILE}\labadmin\downloads"
 if(!$destinationPath) { $destinationPath=$labadminDownloadsPath}
 
 # CREATE FOLDERS
