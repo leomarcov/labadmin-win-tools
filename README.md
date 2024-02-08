@@ -22,7 +22,7 @@ Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManage
 `labadmin-profiles-cleaner.ps1` is a script to automate user profiles cleaning. 
   * Fresh user profiles are backup in a secure place and are autorestored periodically (each reboot, once a day, once in some days, etc.).
   * Each user has is own autorestore settings.
-  * Some folders in user profile can be restored on each reboot (userfull for browser history).
+  * Some folders in user profile can be restored on each reboot (userfull to remove personal data, like browser settings).
   * Restore can be forced programatically.
 
 ### Install 
