@@ -54,7 +54,7 @@ if(!$forceDownload) {
 			Write-Output "WARNING!: Using local $filePath but not integrity checked!"
 			exit 0 
 		}elseif((Get-FileHash $filePath -Algorithm MD5).Hash -eq $md5File) { 
-			Write-Output " MD5 match!. Using local $filePath"
+			Write-Output "MD5 match!. Using local $filePath"
 			exit 0 
 		}else { 
 			Write-Output "MD5 not matching! Forced download to $filePath"; $forceDownload=$true 
