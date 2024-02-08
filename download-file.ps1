@@ -29,10 +29,10 @@
 Param(
   [parameter(Mandatory=$true)]
   [String]$fileName,                 # filename of downloaded file
-  [String]$md5File,                  # MD5 to check integrity install file (if match not download)
+  [String]$md5File,                  # MD5 to check integrity downloaded file (if match not download)
   [URI]$URL,                         # URL from download (only download if file not exists and MD5 match)  
-  [Switch]$forceDownload,            # force download and override install file
-  [String]$destinationPath		     # Optional folder to download instead of labadmin base download
+  [Switch]$forceDownload,            # Force download and override local file
+  [String]$destinationPath	     # Optional folder to download instead of labadmin base download
 )
 
 #### CONFIG VARIABLES
@@ -44,11 +44,11 @@ $filePath="${destinationPath}\${fileName}"    # File to download path
 
 # CHECK IF NEED DOWNLOAD
 if(!$forceDownload) {
-	# If previuos downloader installer not found
+	# If local file not found
 	if(!(Test-Path -LiteralPath $filePath -PathType Leaf)) { 
 		Write-Output "File $filePath not found. Force Download"
 		$forceDownload=$true 
-	# If previuous downloaded installer found
+	# If local file found
 	} else {
 		if(!$md5File) {	
 			Write-Output "WARNING!: Using local $filePath but not integrity checked!"
