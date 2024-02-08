@@ -28,12 +28,12 @@ Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManage
 ### Install 
 * Create first backup for each user:
 ```
-& 'C:\Program Files\labadmin\labadmin-freezer\profiles-cleaner.ps1' -BackupProfiles -Users user1,user2
+& 'C:\Program Files\labadmin\labadmin-win-tools\profiles-cleaner.ps1' -BackupProfiles -Users user1,user2
 ```
 * Config Group Policies in `gpedit.msc`:
   * **Exec script at startup**
     * `Computer Configuracion > Windows Settings > Scripts > Startup > PowerShell Scripts`
-    * Script to exec: `C:\Program Files\labadmin\labadmin-freezer\profiles-cleaner.ps1`
+    * Script to exec: `C:\Program Files\labadmin\labadmin-win-tools\profiles-cleaner.ps1`
     * Params: `-RestoreProfile -Log`
   * **Disable run start asynchronously**
     * `Computer Configuration > Administrative Templates > System > Scripts > Run startup scripts asynchronously`
@@ -59,24 +59,3 @@ profiles-cleaner.ps1 -RestoreProfiles -Force        # Force clean of all users w
 profiles-cleaner.ps1 -RestoreProfiles -Users u1     # Try clean user u1 only
 ```
 
-<br>
-
-## config-usbstorage.ps1
-Enable/disable USB storage ports for all users
-```
-& 'C:\Program Files\labadmin\labadmin-freezer\config-usbstorage.ps1'             #Show status
-& 'C:\Program Files\labadmin\labadmin-freezer\config-usbstorage.ps1' -Enable
-& 'C:\Program Files\labadmin\labadmin-freezer\config-usbstorage.ps1' -Diasble
-```
-
-<br>
-
-## manage-restorepoints.ps1
-Manage Windows Restore Points programatically.
-```
-& 'C:\Program Files\labadmin\labadmin-freezer\manage-restorepoints.ps1' -List
-& 'C:\Program Files\labadmin\labadmin-freezer\manage-restorepoints.ps1' -Enable
-& 'C:\Program Files\labadmin\labadmin-freezer\manage-restorepoints.ps1' -Create
-& 'C:\Program Files\labadmin\labadmin-freezer\manage-restorepoints.ps1' -DeleteAll
-& 'C:\Program Files\labadmin\labadmin-freezer\manage-restorepoints.ps1' -Restore
-```
