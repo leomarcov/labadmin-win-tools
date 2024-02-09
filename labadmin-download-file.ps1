@@ -1,10 +1,9 @@
 #Requires -RunAsAdministrator
-
 <#
 .SYNOPSIS
 	URL File downloader manager
 .DESCRIPTION
-	Download file from URL to labadmin base downloads dir (or specific destinationPath)
+	Download file from URL to labadmin base downloads dir (or specific -destinationPath)
 	If file exists not download but if MD5 is supplied check before download to determine if download is needed
 .PARAMETER fileName
 	Filename for downloaded file
@@ -18,13 +17,12 @@
 .PARAMETER forceDownload
 	Force download file and overrides local file if exists
 .PARAMETER destinationPath
-	Optional destination folder to save download (by default labadmin base download is used c:\programdata\labadmin\downloads)
+	Optional destination folder to save download (by default labadmin base download is used C:\ProgramData\labadmin\downloads\)
 
 .NOTES
 	File Name      : labadmin-download-file.ps1
 	Author         : Leonardo Marco
 #>
-
 
 Param(
   [parameter(Mandatory=$true)]
@@ -52,20 +50,18 @@ if(!$forceDownload) {
 		$forceDownload=$true 
 	# If local file found
 	} else {
-
 		if(!$MD5) {	
 			Write-Output "WARNING!: Using local $filePath but not integrity checked!"
 			exit 0 
-		}elseif((Get-FileHash -LiteralPath $filePath -Algorithm MD5).Hash -eq $MD5) { 
+		} elseif((Get-FileHash -LiteralPath $filePath -Algorithm MD5).Hash -eq $MD5) { 
 			Write-Output "MD5 match!. Using local $filePath"
 			exit 0 
-		}else { 
+		} else { 
 			Write-Output "MD5 not matching! Forced download to $filePath"; $forceDownload=$true 
 		}
 	}
 }
 if(!$url -AND $forceDownload) { Write-Error "URL needed to download file"; exit 1 }
-
 
 # DOWNLOAD?
 if($forceDownload) {
@@ -81,3 +77,5 @@ if($forceDownload) {
 	}
 	exit 0
 }
+
+
