@@ -32,7 +32,8 @@ $PSBoundParameters.Remove("removeInstaller") | Out-Null; $PSBoundParameters.Remo
 if($fileTypeEXE) { 
   Write-Output "Installing EXE in silent mode: $filePath $argumentList"
   Start-Process -FilePath $filePath -ArgumentList $argumentList -Verb runas -Wait }
-  Write-Output "Pleas, check manuallay if package is installed. If fail, typical argument alternatives are:"
+  Write-Output "Please, check manuallay if package is installed"
+  Write-Output "If fail, typical argument alternatives are:"
   Write-Output "  * /S /v`"/qn`""
   Write-Output "  * /S"
   Write-Output "  * /SILENT"
