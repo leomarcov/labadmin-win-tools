@@ -1,4 +1,18 @@
 #Requires -RunAsAdministrator
+<#
+.SYNOPSIS
+    Enable/disable Windows antivirus real time protection
+.PARAMETER Enabled
+    Enable antivirus real time protection
+.PARAMETER Disabled
+    Disable antivirus real time protection
+.PARAMETER Status
+    Show current status
+.NOTES
+    File Name      : labadmin-profiles-cleaner.ps1
+    Author         : Leonardo Marco
+#>
+
 
 Param(
   [Switch]$Enable,
