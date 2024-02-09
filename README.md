@@ -13,8 +13,8 @@ Labadmin Win Tools is a collection of PowerShell scripts to admin Windows 10 sys
   * Force NTP time sync
 <br>
 
-## Package Install
-* Exec this PowerShell command as admin (download and copy scripts files to `Program Files\labadmin\labadmin-win-tools` folder and add to PATH):
+## Install
+* Exec this PowerShell command as admin (download and copy all scripts files to `Program Files\labadmin\labadmin-win-tools` folder and add to PATH):
 ```
 Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/leomarcov/labadmin-win-tools/main/install.ps1'))
 ```
@@ -28,7 +28,7 @@ Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManage
   * Restore can be **forced** programatically.
   * **Logs** are saved on `C:\Users\labadmin-profiles-cleaner\log.txt`.
 
-### Install 
+### First Config
 * Create first backup for each user:
 ```
 & 'C:\Program Files\labadmin\labadmin-win-tools\labadmin-profiles-cleaner.ps1' -BackupProfiles -Users user1,user2
@@ -42,7 +42,7 @@ Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManage
     * `Computer Configuration > Administrative Templates > System > Scripts > Run startup scripts asynchronously`
     * Set to **Disabled**
 
-### Configuration
+### User configuration
 Each user can be config in **`<username>.cfg`** JSON file in `C:\Users\labadmin-profiles-cleaner\`:
   * `cleanAfterDays`: number of days from last clean to next autoclean (0 clean in each reboot, 1 clean every day, etc).
   * `skipUserp`: boolean to skip this user from autoclean (skips cleanAfterDays and cleanAllways).
