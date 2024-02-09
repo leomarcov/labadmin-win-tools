@@ -2,6 +2,7 @@
 <#
 .SYNOPSIS
   Manage Windows Restore Points
+  
 .PARAMETER List
 	List all current saved restore points
 .PARAMETER Enable
