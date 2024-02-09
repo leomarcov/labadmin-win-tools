@@ -1,58 +1,46 @@
 #Requires -RunAsAdministrator
-
 <#
 .SYNOPSIS
     Automated user profiles cleaner
-
 .DESCRIPTION
     Automated user profiles cleaner for backup and autorestore at startup according scheduled rules
-    Each profile is backup in c:\users\labadmin-profiles-cleaner\ and a username.cfg file is generated
-    Profile config file syntax is:
-        cleanAfterDays                      # Number of days from last clean to next autoclean (0 clean in each reboot, 1 clean every day, etc)
-        skipUser                            # Boolean to skip this user from autoclean (skips cleanAfterDays and cleanAllways)
-        cleanAlways                         # Array of relative paths to clean on every call
-        lastClean                           # Date when last clean was performed
+    Each profile is backup in c:\users\labadmin-profiles-cleaner\ and a <username>.cfg file is generated
+    Profile config file JSON options are:
+        cleanAfterDays: Number of days from last clean to next autoclean (0 clean in each reboot, 1 clean every day, etc)
+        skipUser      : Boolean to skip this user from autoclean (skips cleanAfterDays and cleanAllways)
+        cleanAlways   : Array of relative paths to clean on every call
+        lastClean     : Date when last clean was performed
 
 .PARAMETER CreateBackup
-    Backup (or update backup if previos backup exists) current users profiles to c:\users\labadmin-profiles-cleaner\
-    Parameter -users must be given with list of users to backup
-    For new backups default username.cfg file is generated
-
+    Backup (or update backup if previos backup exists) users profiles to C:\Users\labadmin-profiles-cleaner\
+    For new backups default <username>.cfg file is generated
+    Parameter -Users must be given with list of users to backup
 .PARAMETER RestoreProfiles
     Try to restore profiles according user backup profile config
-
 .PARAMETER Users
     List of users to backup/restore
     With -CreateBackup this parameter is mandatory
     When restore is optional. If no given all backup profiles stored are used
-
 .PARAMETER Force
     Force profile clean and ommits skipUser and cleanAfterDays config
-
 .PARAMETER Log
-    Save output to log file in c:\users\profiels-cleaner\log.txt
+    Save output to log file in C:\Users\labadmin-profiles-cleaner\log.txt
 
 .NOTES
-    File Name      : labadmin-profiles-cleaner.ps1
-    Author         : Leonardo Marco
+    File Name: labadmin-profiles-cleaner.ps1
+    Author   : Leonardo Marco
 #>
 
-
-#### PARAMETERS ##################################################
 Param(
   [parameter(Mandatory=$true, ParameterSetName="create")]
   [Switch]$BackupProfiles,
-  
   [parameter(Mandatory=$true, ParameterSetName="restore")]
   [Switch]$RestoreProfiles,
-
   [parameter(Mandatory=$true, ParameterSetName="create")]
   [parameter(Mandatory=$false, ParameterSetName="restore")]
   [String[]]$Users,
-
   [parameter(ParameterSetName="restore")]
   [Switch]$Force,
-
   [Switch]$Log
 )
 
@@ -66,8 +54,6 @@ $default_config=@{
     skipUser=$false                                                                      # Skip this user of autoclean
     cleanAllways=@("\Appdata\Local\Google\Chrome","\Appdata\Local\Mozilla\Firefox")      # Items inside profile user to clean on every call
 }
-
-
 
 
 function BackupProfiles {
@@ -99,8 +85,6 @@ function BackupProfiles {
     if(!(Test-Path $user_conf_file)) { $default_config | ConvertTo-Json | Out-File $user_conf_file }
   }
 }
-
-
 
 
 function RestoreProfiles {
@@ -148,18 +132,16 @@ function RestoreProfiles {
 }
 
 
-
-
 function main {
     if($BackupProfiles)      { BackupProfiles  }
     elseif($RestoreProfiles) { RestoreProfiles }
 }
 
 
-# Exec 
+# EXEC 
 if(!$Log) { main }
 
-# Exec and redirect to log.txt
+# EXEC > log.txt
 else {
     if((Get-ChildItem $logs_path | % {[int]($_.length / 1kb)}) -gt 8) { Remove-Item -Path $log_path }  # Delete log if size > 8kb
     &{ Write-Output "`n`n#########################################################################################################"(Get-Date).toString()"#########################################################################################################"; main } 2>&1 | Out-File -FilePath $log_path -Append 
