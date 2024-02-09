@@ -1,7 +1,7 @@
 #Requires -RunAsAdministrator
 <#
 .SYNOPSIS
-  Enable/disable use of USB for storage devices
+  Enable/disable USB for storage devices connection
 .PARAMETER Enabled
     Enable USB storage devices
 .PARAMETER Disabled
