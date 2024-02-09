@@ -9,8 +9,8 @@
 .PARAMETER Status
     Show current status
 .NOTES
-    File Name      : labadmin-profiles-cleaner.ps1
-    Author         : Leonardo Marco
+    File Name: labadmin-config-antivirus.ps1
+    Author   : Leonardo Marco
 #>
 
 
