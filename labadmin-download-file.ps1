@@ -5,6 +5,7 @@
 .DESCRIPTION
 	Download file from URL to labadmin base downloads dir (or specific -destinationPath)
 	If file exists not download but if MD5 is supplied check before download to determine if download is needed
+
 .PARAMETER fileName
 	Filename for downloaded file
 .PARAMETER MD5
@@ -77,5 +78,3 @@ if($forceDownload) {
 	}
 	exit 0
 }
-
-
