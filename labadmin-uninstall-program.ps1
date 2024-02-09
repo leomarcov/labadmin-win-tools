@@ -7,6 +7,7 @@ Param(
 
 # CONFIG VARIABLES
 $argumentsMethods=@("/S", "/S /v`"/qn`"", "/SILENT", "/VERYSILENT")      # Unisntall.exe arguments to try
+if($argumentList) { $argumentsMethods=@($argumentList) }
 $name=$literalName
 
 #LIST 
@@ -39,7 +40,6 @@ if(!$app) { $app = gci "HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVers
 if($app) {
   $uninstallPath=$app.UninstallString.Trim("`"")
   if([System.IO.Path]::GetExtension($uninstallPath) -eq ".exe") {
-    if($argumentList) { $argumentsMethods=@($argumentList)+$argumentsMethods }
     foreach($arg in $argumentsMethods) {
       Write-Output "Executing uninstall: ${uninstallPath} ${arg}"
       Start-Process -FilePath $uninstallPath -ArgumentList $arg -Verb runas -Wait
