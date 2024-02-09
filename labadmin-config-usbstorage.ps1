@@ -1,6 +1,5 @@
 #Requires -RunAsAdministrator
 
-
 <#
 .SYNOPSIS
   Enable/disable use of USB for storage devices. If no parameters supplied show current status.
