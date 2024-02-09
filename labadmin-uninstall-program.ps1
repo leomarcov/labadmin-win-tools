@@ -6,7 +6,7 @@ Param(
 )
 
 # CONFIG VARIABLES
-$argumentsMethods=@("/S", "/S /v`"/qn`"", "/SILENT")      # Unisntall.exe arguments to try
+$argumentsMethods=@("/S", "/S /v`"/qn`"", "/SILENT", "/VERYSILENT")      # Unisntall.exe arguments to try
 $name=$literalName
 
 #LIST 
