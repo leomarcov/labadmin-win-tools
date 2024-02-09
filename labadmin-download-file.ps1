@@ -20,8 +20,8 @@
 	Optional destination folder to save download (by default labadmin base download is used C:\ProgramData\labadmin\downloads\)
 
 .NOTES
-	File Name      : labadmin-download-file.ps1
-	Author         : Leonardo Marco
+	File Name : labadmin-download-file.ps1
+	Author    : Leonardo Marco
 #>
 
 Param(
