@@ -1,5 +1,17 @@
 #Requires -RunAsAdministrator
 
+<#
+.SYNOPSIS
+    Set gateway address (even if current addres has been get using dhcp)
+
+.PARAMETER gwAddress
+    Gateway address 
+.NOTES
+    File Name      : labadmin-profiles-cleaner.ps1
+    Author         : Leonardo Marco
+#>
+
+
 Param(
   [Parameter(Mandatory)]
   [ipaddress]$gwAddress
