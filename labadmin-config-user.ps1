@@ -1,4 +1,31 @@
 #Requires -RunAsAdministrator
+<#
+.SYNOPSIS
+    Config some user login authentication/login settings (hide from login list, remove password, disable account, etc).
+
+.PARAMETER UserName
+	Username of account to config
+.PARAMETER SetPassword
+	Config new account password
+.PARAMETER Password
+	Password in plain text to set
+.PARAMETER NoPassword
+	Remove user password for login without password
+.PARAMETER Hide
+	Hide user from login list
+.PARAMETER Unhide
+	Unhide user from login list
+.PARAMETER Disable
+	Disable user account
+.PARAMETER Enable
+ 	Enable user account
+
+.NOTES
+    File Name      : labadmin-profiles-cleaner.ps1
+    Author         : Leonardo Marco
+#>
+
+
 
 Param(
   [Parameter(Mandatory=$true)]
