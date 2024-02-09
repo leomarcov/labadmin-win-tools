@@ -1,9 +1,32 @@
 #Requires -RunAsAdministrator
+<#
+.SYNOPSIS
+	Try uninstall program using some methods
+
+.PARAMETER literalName
+	Exact name of program to uninstall
+.PARAMETER List
+  List all installed packages on system. Optional string can be used to filter matches
+.PARAMETER argumentList
+  Optional argument list to use for uninstall.exe method
+  If no argumentList is give uninstall try these arguments:
+    * /S
+    * /S /v"/qn"
+    * /SILENT
+    * /VERYSILENT
+    * /VERYSILENT /SUPPRESSMSGBOXES
+
+.NOTES
+	File Name: labadmin-uninstall-program.ps1
+	Author   : Leonardo Marco
+#>
+
 Param(
-  [String]$literalName,                  # Exact name of program to uninstall
-  [String]$argumentList,                 # Optional arguments for uninstall.exe method
+  [String]$literalName,
+  [String]$argumentList,
   [Switch]$List
 )
+
 
 # CONFIG VARIABLES
 $argumentsMethods=@("/S", "/S /v`"/qn`"", "/SILENT", "/VERYSILENT", "/VERYSILENT /SUPPRESSMSGBOXES")      # Unisntall.exe arguments to try
@@ -49,11 +72,11 @@ if($app) {
 }
 
 # NO METHOD FOUND!
-Write-Outout "Cant found uninstall method for $name package"
-Write-Output "Typical uninstall.exe argumentList parameters are"
-Write-Output "  * /S /v`"/qn`""
-Write-Output "  * /S"
-Write-Output "  * /SILENT"
-Write-Output "  * /VERYSILENT"
-Write-Output "  * /SILENT /SUPPRESSMSGBOXES"
+Write-Outout "ERROR!: Cant found uninstall method for $name package
+Typical uninstall.exe argumentList parameters are
+  * /S /v`"/qn`""
+  * /S"
+  * /SILENT"
+  * /VERYSILENT"
+  * /SILENT /SUPPRESSMSGBOXES"
 exit 1
