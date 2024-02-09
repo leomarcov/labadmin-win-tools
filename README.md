@@ -10,6 +10,7 @@ Labadmin Win Tools is a collection of PowerShell scripts to admin Windows 10 sys
   * Config user: hide from login, disable, delete/change password, etc.
   * Set gateway address
   * Enable/disable antivirus realtime protection
+  * Force NTP time sync
 <br>
 
 ## Package Install
