@@ -5,15 +5,16 @@
 
 .PARAMETER gwAddress
     Gateway address 
+    
 .NOTES
     File Name: labadmin-config-gateway.ps1
     Author   : Leonardo Marco
 #>
+
 Param(
   [Parameter(Mandatory)]
   [ipaddress]$gwAddress
 )
-
 
 $wmi = Get-WmiObject win32_networkadapterconfiguration -filter "ipenabled = 'true'"
 $wmi.SetGateways($gwAddress, 1) | Out-null
