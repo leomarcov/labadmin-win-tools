@@ -39,8 +39,7 @@ if($fileTypeEXE) {
   Write-Output "  * /SILENT"
   Write-Output "  * /VERYSILENT"
   Write-Output "  * /SILENT /SUPPRESSMSGBOXES"
-}  
-elseif($fileTypeMSI) { 
+} elseif($fileTypeMSI) { 
   Write-Output "Installing MSI in silent mode: $filePath"
   Start-Process msiexec.exe -Wait -ArgumentList "/I `"${filePath}`" /norestart /QN"
 }
