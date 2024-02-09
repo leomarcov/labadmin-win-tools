@@ -16,10 +16,20 @@ Param(
   [ipaddress]$gwAddress
 )
 
+# GET CURRENT GW
+$gwCurrent=(Get-NetIPConfiguration).IPv4DefaultGateway.NextHop
+
+# SET NEW GW
 $wmi = Get-WmiObject win32_networkadapterconfiguration -filter "ipenabled = 'true'"
 $wmi.SetGateways($gwAddress, 1) | Out-null
 
+# SHOW NEW CONFIG
 Get-NetIPConfiguration
 
-if($gwAddress -eq (Get-NetIPConfiguration).IPv4DefaultGateway.NextHop) { exit 0 } 
-else { Write-Output "WANING! Gateway address not chnaged!"; exit 1 }
+# EXIT CODE
+if($gwAddress -eq (Get-NetIPConfiguration).IPv4DefaultGateway.NextHop) { 
+    Remove-NetRoute -NextHop $gwCurrent -Confirm:$false | Out-Null    # Remove old gw
+    exit 0 
+} else { 
+    Write-Output "WANING! Gateway address not chnaged!"; exit 1 
+}
