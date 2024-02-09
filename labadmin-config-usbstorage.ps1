@@ -1,5 +1,4 @@
 #Requires -RunAsAdministrator
-
 <#
 .SYNOPSIS
   Enable/disable use of USB for storage devices
@@ -7,7 +6,8 @@
     Enable USB storage devices
 .PARAMETER Disabled
     Disable USB storage devices
-
+.PARAMETER Status
+    Show current status
 .NOTES
     File Name      : labadmin-profiles-cleaner.ps1
     Author         : Leonardo Marco
@@ -26,6 +26,6 @@ if($disable) {
   Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\USBSTOR\" -Name "Start" -Value 3
 
 } else {
-  if ((Get-ItemPropertyValue -Path 'HKLM:\SYSTEM\CurrentControlSet\Services\USBSTOR\' -Name "Start") -eq 4) { Write-Output "Current status: Disabled"; exit 1 } 
-  else { Write-Output "Current status: Enabled"; exit 0 }
+  if ((Get-ItemPropertyValue -Path 'HKLM:\SYSTEM\CurrentControlSet\Services\USBSTOR\' -Name "Start") -eq 4) { Write-Output "Current status: DISABLED"; exit 1 } 
+  else { Write-Output "Current status: ENABLED"; exit 0 }
 }
