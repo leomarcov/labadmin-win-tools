@@ -23,8 +23,8 @@
   Other typical options are: /S, /SILENT, /VERYSILENT, /SUPPRESSMSGBOXES
 
 .NOTES
-	File Name      : labadmin-download-file.ps1
-	Author         : Leonardo Marco
+	File Name: labadmin-install-remote.ps1
+	Author   : Leonardo Marco
 #>
 
 Param(
