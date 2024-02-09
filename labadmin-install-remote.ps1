@@ -2,8 +2,6 @@
 <#
 .SYNOPSIS
 	Download installer program from URL file (EXE or MSI) and install it silently
-.DESCRIPTION
-	Download installer file from URL to labadmin base downloads dir (or specific -destinationPath) and install it
 .PARAMETER fileName
 	Filename for downloaded installer file
 .PARAMETER MD5
