@@ -2,12 +2,14 @@
 <#
 .SYNOPSIS
   Enable/disable USB for storage devices connection
+  
 .PARAMETER Enabled
     Enable USB storage devices
 .PARAMETER Disabled
     Disable USB storage devices
 .PARAMETER Status
     Show current status
+    
 .NOTES
     File Name: labadmin-config-usbstorage.ps1
     Author   : Leonardo Marco
@@ -15,7 +17,8 @@
 
 Param(
   [Switch]$Enable,
-  [Switch]$Disable
+  [Switch]$Disable,
+  [Switch]$Status
 )
 
 # DISABLE
