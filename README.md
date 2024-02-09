@@ -28,7 +28,7 @@ Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManage
   * Restore can be **forced** programatically.
   * **Logs** are saved on `C:\Users\labadmin-profiles-cleaner\log.txt`.
 
-### First Config
+### Configuration
 * Create first backup for each user:
 ```
 & 'C:\Program Files\labadmin\labadmin-win-tools\labadmin-profiles-cleaner.ps1' -BackupProfiles -Users user1,user2
