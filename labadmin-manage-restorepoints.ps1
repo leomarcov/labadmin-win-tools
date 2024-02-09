@@ -14,10 +14,9 @@
 	Delete all saved restore points
 
 .NOTES
-    File Name      : labadmin-manage-restorepoints.ps1
-    Author         : Leonardo Marco
+    File Name: labadmin-manage-restorepoints.ps1
+    Author   : Leonardo Marco
 #>
-
 
 #### PARAMETERS ##################################################
 Param(
