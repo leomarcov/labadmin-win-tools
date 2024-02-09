@@ -5,7 +5,7 @@
 	URL File downloader manager
 .DESCRIPTION
 	Download file from URL to labadmin base downloads dir (or specific destinationPath)
-	If file exists not download and if MD5 is supplied check before download to determine if download is needed
+	If file exists not download but if MD5 is supplied check before download to determine if download is needed
 .PARAMETER fileName
 	Filename for downloaded file
 .PARAMETER MD5
@@ -18,7 +18,7 @@
 .PARAMETER forceDownload
 	Force download file and overrides local file if exists
 .PARAMETER destinationPath
-	Optional destination folder to save download (by default labadmin base download is used c:\program data\labadmin\downloads)
+	Optional destination folder to save download (by default labadmin base download is used c:\programdata\labadmin\downloads)
 
 .NOTES
 	File Name      : labadmin-download-file.ps1
@@ -30,9 +30,9 @@ Param(
   [parameter(Mandatory=$true)]
   [String]$fileName,                 # Filename of downloaded file
   [String]$MD5,                      # MD5 to check integrity downloaded file (if match not download)
-  [URI]$URL,                         # URL from download (only download if file not exists and MD5 match)  
+  [URI]$URL,                         # URL from download
   [Switch]$forceDownload,            # Force download and override local file
-  [String]$destinationPath	     # Optional folder to download instead of labadmin base download
+  [String]$destinationPath	     # Optional folder to download instead labadmin base download
 )
 
 
