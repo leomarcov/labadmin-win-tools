@@ -1,13 +1,43 @@
 #Requires -RunAsAdministrator
+<#
+.SYNOPSIS
+	Download installer program from URL file (EXE or MSI) and install it silently
+.DESCRIPTION
+	Download installer file from URL to labadmin base downloads dir (or specific -destinationPath) and install it
+.PARAMETER fileName
+	Filename for downloaded installer file
+.PARAMETER MD5
+	MD5 hash to check file integrity
+	If file exists in destionation path check integrety before to determine if download is needed
+	If file is downloaded checks integrity after download to determine is download is correct
+.PARAMETER URL
+	URL from download file
+	If no supplied use local file in destionation path if exists. In this case is recomended supply MD5 param to check integrety
+.PARAMETER forceDownload
+	Force download file and overrides local file if exists
+.PARAMETER destinationPath
+	Optional destination folder to save download (by default labadmin base download is used C:\ProgramData\labadmin\downloads\)
+.PARAMETER removeInstaller
+  Remove installer file after install (by default is not removed)
+.PARAMETER argumentList
+  Optional argument list for EXE installer to silent installation
+  By default parameters used are: /S /v"/qn"
+  Other typical options are: /S, /SILENT, /VERYSILENT, /SUPPRESSMSGBOXES
+
+.NOTES
+	File Name      : labadmin-download-file.ps1
+	Author         : Leonardo Marco
+#>
+
 Param(
   [parameter(Mandatory=$true)]
-  [String]$fileName,                  # Filename of installer file
-  [String]$MD5,                       # MD5 to check integrity install file (if match not download)
-  [URI]$URL,                          # URL from download (only download if file not exists and MD5 match)
-  [Switch]$forceDownload,             # Force download and override install file
-  [String]$destinationPath,	          # Optional folder to download instead of labadmin base download  
-  [Switch]$removeInstaller,           # Remove install file after installation
-  [String]$argumentList               # Optional argument list to silent installation for exe files (instead of default: /S /v"/qn", others typicall options: /S, /SILENT, /VERYSILENT, /SUPPRESSMSGBOXES)
+  [String]$fileName,
+  [String]$MD5,
+  [URI]$URL,
+  [Switch]$forceDownload,
+  [String]$destinationPath,
+  [Switch]$removeInstaller,
+  [String]$argumentList
 )
 
 
