@@ -1,4 +1,23 @@
 #Requires -RunAsAdministrator
+<#
+.SYNOPSIS
+  Manage Windows Restore Points
+.PARAMETER List
+	List all current saved restore points
+.PARAMETER Enable
+	Enable use of restore points with 5GB of max use
+.PARAMETER Create
+	Create restore point with description "labadmin-main"
+.PARAMETER Restore
+	Restore restore point with description "labadmin-main"
+.PARAMETER DelteAll
+	Delete all saved restore points
+
+.NOTES
+    File Name      : labadmin-manage-restorepoints.ps1
+    Author         : Leonardo Marco
+#>
+
 
 #### PARAMETERS ##################################################
 Param(
