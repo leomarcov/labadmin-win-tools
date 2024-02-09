@@ -49,5 +49,11 @@ if($app) {
 }
 
 # NO METHOD FOUND!
-Write-Error "Cant found uninstall method for $name package"
+Write-Outout "Cant found uninstall method for $name package"
+Write-Output "Typical uninstall.exe argumentList parameters are"
+Write-Output "  * /S /v`"/qn`""
+Write-Output "  * /S"
+Write-Output "  * /SILENT"
+Write-Output "  * /VERYSILENT"
+Write-Output "  * /SILENT /SUPPRESSMSGBOXES"
 exit 1
