@@ -6,8 +6,8 @@
 .PARAMETER gwAddress
     Gateway address 
 .NOTES
-    File Name      : labadmin-profiles-cleaner.ps1
-    Author         : Leonardo Marco
+    File Name: labadmin-config-gateway.ps1
+    Author   : Leonardo Marco
 #>
 
 Param(
