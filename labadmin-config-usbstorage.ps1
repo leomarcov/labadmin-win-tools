@@ -2,7 +2,7 @@
 
 <#
 .SYNOPSIS
-  Enable/disable use of USB for storage devices. If no parameters supplied show current status.
+  Enable/disable use of USB for storage devices
 .PARAMETER Enabled
     Enable USB storage devices
 .PARAMETER Disabled
