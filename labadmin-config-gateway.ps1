@@ -1,5 +1,4 @@
 #Requires -RunAsAdministrator
-
 <#
 .SYNOPSIS
     Set gateway address (even if current addres has been get using dhcp)
@@ -11,11 +10,11 @@
     Author         : Leonardo Marco
 #>
 
-
 Param(
   [Parameter(Mandatory)]
   [ipaddress]$gwAddress
 )
+
 
 $wmi = Get-WmiObject win32_networkadapterconfiguration -filter "ipenabled = 'true'"
 $wmi.SetGateways($gwAddress, 1) | Out-null
