@@ -31,7 +31,7 @@ $PSBoundParameters.Remove("removeInstaller") | Out-Null; $PSBoundParameters.Remo
 # INSTALL
 if($fileTypeEXE) { 
   Write-Output "Installing EXE in silent mode: $filePath $argumentList"
-  Start-Process -FilePath $filePath -ArgumentList $argumentList -Verb runas -Wait }
+  Start-Process -FilePath $filePath -ArgumentList $argumentList -Verb runas -Wait
   Write-Output "Please, check manuallay if package is installed"
   Write-Output "If fail, typical uninstall argumentList alternatives are:"
   Write-Output "  * /S /v`"/qn`""
@@ -39,7 +39,7 @@ if($fileTypeEXE) {
   Write-Output "  * /SILENT"
   Write-Output "  * /VERYSILENT"
   Write-Output "  * /SILENT /SUPPRESSMSGBOXES"
-  
+}  
 elseif($fileTypeMSI) { 
   Write-Output "Installing MSI in silent mode: $filePath"
   Start-Process msiexec.exe -Wait -ArgumentList "/I `"${filePath}`" /norestart /QN"
