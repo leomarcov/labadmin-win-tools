@@ -25,8 +25,6 @@
     Author   : Leonardo Marco
 #>
 
-
-
 Param(
   [Parameter(Mandatory=$true)]
   [String]$UserName,
@@ -54,26 +52,26 @@ Param(
 
 Get-LocalUser -Name $UserName -ErrorAction Stop | Out-Null
 
+# HIDE/UNHIDE
 if($Hide) {
 	New-Item 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\SpecialAccounts\UserList' -Force | New-ItemProperty -Name $UserName -Value 0 -PropertyType DWord -Force
-}
-elseif($Unhide) {
+} elseif($Unhide) {
 	Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\SpecialAccounts\UserList" -Name $UserName -Force
 }
 
+# ENABLE/DISABLE
 if($Disable) {
 	Disable-LocalUser -Name $UserName
 	Get-LocalUser -Name $UserName
-}
-elseif($Enable) {
+} elseif($Enable) {
 	Enable-LocalUser -Name $UserName
     	Get-LocalUser -Name $UserName
 }
 
+# NOPASSWORD/SETPASSWORD
 if($NoPassword) {
 	Set-LocalUser -Name $UserName -Password ([securestring]::new())
-}
-if($SetPassword){
+} else if($SetPassword){
  	$ss=$Password|ConvertTo-SecureString -AsPlainText -Force
  	Set-LocalUser -Name $UserName -Password $ss
 }
