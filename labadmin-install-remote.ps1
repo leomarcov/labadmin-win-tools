@@ -2,6 +2,7 @@
 <#
 .SYNOPSIS
 	Download installer program from URL file (EXE or MSI) and install it silently
+
 .PARAMETER fileName
 	Filename for downloaded installer file
 .PARAMETER MD5
