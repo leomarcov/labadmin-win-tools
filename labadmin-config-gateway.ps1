@@ -9,7 +9,6 @@
     File Name: labadmin-config-gateway.ps1
     Author   : Leonardo Marco
 #>
-
 Param(
   [Parameter(Mandatory)]
   [ipaddress]$gwAddress
