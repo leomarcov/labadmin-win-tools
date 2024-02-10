@@ -62,6 +62,7 @@ if(!$argumentList) { $argumentList="/S" }
 #LIST 
 if($list) {
 	$list2=Get-Package | Select-Object -Property Name | Where-Object { $_.Name -match $programName }
+    $literalName=$list2.Name
     if($list2 -is [Array]) { $list2; exit 0 }
     # Show app info
     elseif ($list2) {
@@ -69,10 +70,12 @@ if($list) {
         $app=gci "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall" | foreach { gp $_.PSPath } | ? { $_.DisplayName -eq $literalName }
 	    if(!$app) { $app = gci "HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall" | foreach { gp $_.PSPath } | ? { $_.DisplayName -eq $literalName } }
 	    if($app) {
-            $uninstallString=$app.UninstallString
-            Write-Output "Uninstall registry: yes -> $uninstallString"
+            $ui=$app.UninstallString
+            $qui=$app.QuietUninstallString
+            Write-Output "Uninstall registry       : yes"
+            Write-Output "   Uninstall string      : $ui"
+            Write-Output "   Quiet uninstall string: $qui`n"
         }
-        $literalName=$list2.Name
         if(Get-WmiObject -Class Win32_Product | Where-Object { $_.Name -eq $literalName }) { 
             Write-Output "Uninstall WmiObject: yes"
         }
