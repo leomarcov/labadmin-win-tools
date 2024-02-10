@@ -63,6 +63,12 @@ if($app) {
   if(!(Get-Package $literalName -ErrorAction SilentlyContinue)) { Write-Output "Uninstall successful!"; exit 0 }
 }
 
+# TRY UNINSTALL: winget
+if(Get-Command winget -ErrorAction SilentlyContinue) {
+  winget uninstall --force --silent --disable-interactivity $literalName
+  if(!(Get-Package $literalName -ErrorAction SilentlyContinue)) { Write-Output "Uninstall successful!"; exit 0 }
+}
+
 # TRY REGEDIT uninstall.exe
 Write-Output "Trying uninstall using Regedit uninstall path..."
 $app=gci "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall" | foreach { gp $_.PSPath } | ? { $_.DisplayName -eq $literalName }
