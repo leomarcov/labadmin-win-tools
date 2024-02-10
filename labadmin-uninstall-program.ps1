@@ -35,7 +35,7 @@ if(!$argumentList) { $argumentList="/SILENT") }
 
 #LIST 
 if($list) {
-	Get-Package | Select-Object -Property Name | Where-Object { $_.Name -match $name }
+	Get-Package | Select-Object -Property Name 
  	exit
 }
 
