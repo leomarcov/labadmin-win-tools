@@ -35,7 +35,7 @@ if(!$argumentList) { $argumentList="/SILENT") }
 
 #LIST 
 if($list) {
-	Get-Package | Select-Object -Property Name 
+	Get-Package | Select-Object -Property Name | Where-Object { $_.Name -match $literalName }
  	exit
 }
 
@@ -65,7 +65,7 @@ if($app) {
 
 # TRY UNINSTALL: winget
 if(Get-Command winget -ErrorAction SilentlyContinue) {
-  winget uninstall --force --silent --disable-interactivity $literalName
+  winget uninstall --exact --force --silent --disable-interactivity --accept-source-agreements $literalName
   if(!(Get-Package $literalName -ErrorAction SilentlyContinue)) { Write-Output "Uninstall successful!"; exit 0 }
 }
 
