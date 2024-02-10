@@ -6,9 +6,21 @@
 .PARAMETER programName
   Name of package to match (if multiple matches will be cancelled)
 .PARAMETER List
-  List all installed packages on system. Optional string can be used to filter matches
+  No uninstall, only list all installed packages on system. Optional -programName can be used to filter matches
+.PARAMETER useMethod-WmiObject
+  Try WmiObject method to uninstall
+  If no any method is specified methods used are: wmiobject, uninstall-package, winget, uninstall-regedit
+.PARAMETER useMethod-UninstallPackage
+  Try Uninstall-Package method to uninstall
+  If no any method is specified methods used are: wmiobject, uninstall-package, winget, uninstall-regedit
+.PARAMETER useMethod-Winget
+  Try winget method to uninstall
+  If no any method is specified methods used are: wmiobject, uninstall-package, winget, uninstall-regedit
+.PARAMETER useMethod-UninstallRegedit
+  Try Uninstall Regedit method to uninstall
+  If no any method is specified methods used are: wmiobject, uninstall-package, winget, uninstall-regedit
 .PARAMETER argumentList
-  Optional argument list to use for uninstall.exe (by default /SILENT is used)
+  Optional argument list to use for regedit uninstall.exe (by default /SILENT is used)
   Typical arguments are: 
     * /s
     * /S
@@ -24,9 +36,21 @@
 #>
 
 Param(
+  [parameter(Mandatory=$true, ParameterSetName="uninstall")]
   [String]$programName,
+  [parameter(Mandatory=$false, ParameterSetName="uninstall")]
+  [Switch]$useMethod-WmiObject
+  [parameter(Mandatory=$false, ParameterSetName="uninstall")]
+  [Switch]$useMethod-UninstallPackage
+  [parameter(Mandatory=$false, ParameterSetName="uninstall")]
+  [Switch]$useMethod-Winget
+  [parameter(Mandatory=$false, ParameterSetName="uninstall")]  
+  [Switch]$useMethod-UninstallRegedit
+  [parameter(Mandatory=$false, ParameterSetName="uninstall")]
   [String]$argumentList,
-  [Switch]$List
+
+  [parameter(Mandatory=$true, ParameterSetName="list")]
+  [Switch]$list
 )
 
 
@@ -48,47 +72,56 @@ $literalName=$literalName.Name
 if($programName -ne $literalName) { Write-Output "Literal program name found: $literalName" }
 
 # TRY UNINSTALL: WmiObject
-Write-Output "Trying uninstall using WmiObject..."
-$app=Get-WmiObject -Class Win32_Product | Where-Object { $_.Name -eq $literalName }
-if($app) { 
-  $app.Uninstall()
-  if(!(Get-Package $literalName -ErrorAction SilentlyContinue)) { Write-Output "Uninstall successful!"; exit 0 }
+if($useMethod-WmiObject) {
+	Write-Output "Trying uninstall using WmiObject..."
+	$app=Get-WmiObject -Class Win32_Product | Where-Object { $_.Name -eq $literalName }
+	if($app) { 
+	  $app.Uninstall()
+	  if(!(Get-Package $literalName -ErrorAction SilentlyContinue)) { Write-Output "Uninstall successful!"; exit 0 }
+	}
 }
 
 # TRY UNINSTALL: Uninstall-Package
-Write-Output "Trying uninstall using Uninstall-Package..."
-$app=Get-Package $literalName
-if($app) {
-  Uninstall-Package -Name $literalName -Force
-  if(!(Get-Package $literalName -ErrorAction SilentlyContinue)) { Write-Output "Uninstall successful!"; exit 0 }
+if($useMethod-UninstallPackage) {
+	Write-Output "Trying uninstall using Uninstall-Package..."
+	$app=Get-Package $literalName
+	if($app) {
+	  Uninstall-Package -Name $literalName -Force
+	  if(!(Get-Package $literalName -ErrorAction SilentlyContinue)) { Write-Output "Uninstall successful!"; exit 0 }
+	}
 }
 
 # TRY UNINSTALL: winget
-if(Get-Command winget -ErrorAction SilentlyContinue) {
-  winget uninstall --exact --force --silent --disable-interactivity --accept-source-agreements $literalName
-  if(!(Get-Package $literalName -ErrorAction SilentlyContinue)) { Write-Output "Uninstall successful!"; exit 0 }
+if($useMethod-Winget) {
+	if(Get-Command winget -ErrorAction SilentlyContinue) {
+	  winget uninstall --exact --force --silent --disable-interactivity --accept-source-agreements $literalName
+	  if(!(Get-Package $literalName -ErrorAction SilentlyContinue)) { Write-Output "Uninstall successful!"; exit 0 }
+	}
 }
 
 # TRY REGEDIT uninstall.exe
-Write-Output "Trying uninstall using Regedit uninstall path..."
-$app=gci "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall" | foreach { gp $_.PSPath } | ? { $_.DisplayName -eq $literalName }
-if(!$app) { $app = gci "HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall" | foreach { gp $_.PSPath } | ? { $_.DisplayName -eq $literalName } }
-if($app) {
-  $uninstallPath=$app.UninstallString.Trim("`"")
-  if([System.IO.Path]::GetExtension($uninstallPath) -eq ".exe") {
-	Write-Output "Executing uninstall: ${uninstallPath} ${arg}"
-	Start-Process -FilePath $uninstallPath -ArgumentList $argumentList -Verb runas -Wait
-	if(!(Get-Package $literalName -ErrorAction SilentlyContinue)) { Write-Output "Uninstall successful!"; exit 0 }
-	Write-Outout "ERROR!: Cant found uninstall method for $literalName package
-	Typical uninstall.exe argumentList parameters are:
-	    * /s
-	    * /S
-	    * /S /v"/qn"
-	    * /SILENT
-	    * /VERYSILENT
-	    * /VERYSILENT /SUPPRESSMSGBOXES
-	    * Try $uninstallPath /? to get specific method"
-	  }
+if($useMethod-RegeditUninstall) {
+	Write-Output "Trying uninstall using Regedit uninstall path..."
+	$app=gci "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall" | foreach { gp $_.PSPath } | ? { $_.DisplayName -eq $literalName }
+	if(!$app) { $app = gci "HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall" | foreach { gp $_.PSPath } | ? { $_.DisplayName -eq $literalName } }
+	if($app) {
+	  $uninstallPath=$app.UninstallString.Trim("`"")
+   	  # .EXE UNINSTALL
+	  if([System.IO.Path]::GetExtension($uninstallPath) -eq ".exe") {
+		Write-Output "Executing uninstall: ${uninstallPath} ${arg}"
+		Start-Process -FilePath $uninstallPath -ArgumentList $argumentList -Verb runas -Wait
+		if(!(Get-Package $literalName -ErrorAction SilentlyContinue)) { Write-Output "Uninstall successful!"; exit 0 }
+		Write-Outout "ERROR!: Cant found uninstall method for $literalName package
+		Typical uninstall.exe argumentList parameters are:
+		    * /s
+		    * /S
+		    * /S /v"/qn"
+		    * /SILENT
+		    * /VERYSILENT
+		    * /VERYSILENT /SUPPRESSMSGBOXES
+		    * Try $uninstallPath /? to get specific method"
+		  }
+	}
 }
 
 # NO METHOD FOUND!
