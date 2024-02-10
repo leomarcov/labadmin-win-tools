@@ -28,6 +28,7 @@
     * /SILENT
     * /VERYSILENT
     * /VERYSILENT /SUPPRESSMSGBOXES
+    * /quiet
     * Try uninstall.exe /? to get specific method
 
 .NOTES
@@ -60,8 +61,27 @@ if(!$argumentList) { $argumentList="/S" }
 
 #LIST 
 if($list) {
-	Get-Package | Select-Object -Property Name | Where-Object { $_.Name -match $programName }
- 	exit
+	$list2=Get-Package | Select-Object -Property Name | Where-Object { $_.Name -match $programName }
+    if($list2 -is [Array]) { $list2; exit 0 }
+    # Show app info
+    elseif ($list2) {
+        $list2; Write-Output "`n"
+        $app=gci "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall" | foreach { gp $_.PSPath } | ? { $_.DisplayName -eq $literalName }
+	    if(!$app) { $app = gci "HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall" | foreach { gp $_.PSPath } | ? { $_.DisplayName -eq $literalName } }
+	    if($app) {
+            $uninstallString=$app.UninstallString
+            Write-Output "Uninstall registry: yes -> $uninstallString"
+        }
+        $literalName=$list2.Name
+        if(Get-WmiObject -Class Win32_Product | Where-Object { $_.Name -eq $literalName }) { 
+            Write-Output "Uninstall WmiObject: yes"
+        }
+        if((Get-Command winget -ErrorAction SilentlyContinue) -AND (winget list $literalName)) {
+            Write-Output "Uninstall winget: yes"
+        }
+        exit 0
+    }
+ 	exit 1
 }
 
 # CHECK PACKAGE INSTALLED AND GET $literalName
@@ -115,12 +135,12 @@ if($useMethodUninstallRegister) {
       # .MSI UNINSTALL
       if($uninstallString -match "msiexec.exe") {
         $msiID=($uninstallString -Replace "msiexec.exe","" -Replace "/I","" -Replace "/X","").Trim()
-        Write-Output "Executing MSI uninstall from: ${msiID}"
-        start-process "msiexec.exe" -arg "/X $uninstall64 /qn" -Wait
+        Write-Output "Executing MSI uninstall: msiexec.exe /x ${msiID} /qn"
+        start-process "msiexec.exe" -arg "/x $msiID /qn" -Wait
         if(!(Get-Package $literalName -ErrorAction SilentlyContinue)) { Write-Output "Uninstall successful!"; exit 0 }
 
    	  # .EXE UNINSTALL?
-	  }elseif($uninstallString -match "uninst") {
+	  }elseif($uninstallString -match "unins") {
         $uninstallPath=$uninstallString
         $uninstallArgs=$argumentList
         if($uninstallPath.StartsWith("`"")) { 
@@ -139,6 +159,7 @@ if($useMethodUninstallRegister) {
      * /SILENT
      * /VERYSILENT
      * /VERYSILENT /SUPPRESSMSGBOXES
+     * /quiet
      * Try & `"$uninstallPath`" /? to get specific method"
 		  }
 	}
