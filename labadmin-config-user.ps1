@@ -71,7 +71,7 @@ if($Disable) {
 # NOPASSWORD/SETPASSWORD
 if($NoPassword) {
 	Set-LocalUser -Name $UserName -Password ([securestring]::new())
-} else if($SetPassword){
+} elseif($SetPassword){
  	$ss=$Password|ConvertTo-SecureString -AsPlainText -Force
  	Set-LocalUser -Name $UserName -Password $ss
 }
