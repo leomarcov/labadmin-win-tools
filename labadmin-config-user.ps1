@@ -7,8 +7,6 @@
 	Username of account to config
 .PARAMETER SetPassword
 	Config new account password
-.PARAMETER Password
-	Password in plain text to set
 .PARAMETER NoPassword
 	Remove user password for login without password
 .PARAMETER Hide
@@ -29,10 +27,8 @@ Param(
   [Parameter(Mandatory=$true)]
   [String]$UserName,
 
-  [parameter(Mandatory=$true, ParameterSetName='password')]
-  [Switch]$SetPassword,
-  [parameter(Mandatory=$true, ParameterSetName='password')]
-  [String]$Password,
+  [parameter(ParameterSetName='password')]
+  [String]$SetPassword,
 
   [Parameter(ParameterSetName='nopass')]
   [Switch]$NoPassword,
@@ -40,13 +36,13 @@ Param(
   [Parameter(ParameterSetName='hide')]
   [Switch]$Hide,
   
-  [Parameter(ParameterSetName='hide')]
+  [Parameter(ParameterSetName='unhide')]
   [Switch]$Unhide,
   
   [Parameter(ParameterSetName='disable')]
   [Switch]$Disable,
   
-  [Parameter(ParameterSetName='disable')]
+  [Parameter(ParameterSetName='enable')]
   [Switch]$Enable
 )
 
@@ -65,13 +61,13 @@ if($Disable) {
 	Get-LocalUser -Name $UserName
 } elseif($Enable) {
 	Enable-LocalUser -Name $UserName
-    	Get-LocalUser -Name $UserName
+    Get-LocalUser -Name $UserName
 }
 
 # NOPASSWORD/SETPASSWORD
 if($NoPassword) {
 	Set-LocalUser -Name $UserName -Password ([securestring]::new())
 } elseif($SetPassword){
- 	$ss=$Password|ConvertTo-SecureString -AsPlainText -Force
+ 	$ss=$SetPassword|ConvertTo-SecureString -AsPlainText -Force
  	Set-LocalUser -Name $UserName -Password $ss
 }
