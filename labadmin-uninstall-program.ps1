@@ -20,8 +20,8 @@
 .PARAMETER uninstallRegistryUninstaller
   Try uninstall string from registry method to uninstall
 .PARAMETER uninstallArgs
-  Optional argument list to use for uninstall.exe (by default /S is used)
-  Typical arguments for silent and no GUI are:
+  Optional argument list to use for uninstall.exe
+  Typical arguments for silent noGUI are:
     * /s
     * /S
     * /S /v"/qn"
@@ -59,9 +59,6 @@ Param(
   [Switch]$list
 )
 
-
-# CONFIG VARIABLES
-if(!$uninstallArgs) { $uninstallArgs="/S" }
 
 #########################################################################################
 ##### LIST ##############################################################################
