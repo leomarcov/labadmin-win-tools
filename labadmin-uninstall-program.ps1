@@ -2,7 +2,7 @@
 
 <#
 .SYNOPSIS
-	Try silent noGUI uninstall program using some methods
+  Try silent noGUI uninstall program using some methods
 .PARAMETER list
   No uninstall, only list all installed packages on system. Optional name can be used to filter matches
   
