@@ -1,4 +1,5 @@
 #Requires -RunAsAdministrator
+
 <#
 .SYNOPSIS
 	Download installer program from URL file (EXE or MSI) and install it silently
