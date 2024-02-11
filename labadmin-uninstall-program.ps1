@@ -165,7 +165,7 @@ if($uninstallWinget) {
 	}
 }
 
-# TRY REGEDIT uninstall.exe or MSI ID
+# TRY REGEDIT uninstall string
 if($uninstallRegistryUninstaller) {
 	Write-Output "Trying uninstall using register uninstall string path..."
 	$app=gci "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall" | foreach { gp $_.PSPath } | ? { $_.DisplayName -eq $literalName }
