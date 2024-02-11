@@ -1,25 +1,25 @@
 #Requires -RunAsAdministrator
+
 <#
 .SYNOPSIS
 	Try silent noGUI uninstall program using some methods
-
+.PARAMETER list
+  No uninstall, only list all installed packages on system. Optional name can be used to filter matches
+  
+ .PARAMETER uninstallCustomString
+  Uninstall using custom command and arguments. Example: "c:\path\to\command.exe" /arg1 /arg2 /arg3
+  
 .PARAMETER programName
   Name of package to match (if multiple matches will be cancelled)
-.PARAMETER List
-  No uninstall, only list all installed packages on system. Optional name can be used to filter matches
-.PARAMETER useMethodWmiObject
+.PARAMETER uninstallWmiObject
   Try WmiObject method to uninstall
-  If no any method is specified methods used are: wmiobject, uninstall-package, winget, register
-.PARAMETER useMethodUninstallPackage
-  Try Uninstall-Package method to uninstall
-  If no any method is specified methods used are: wmiobject, uninstall-package, winget, register
-.PARAMETER useMethodWinget
+.PARAMETER uninstallUninstallPackage
+  Try Uninstall-Package cmdlet method to uninstall
+.PARAMETER uninstallWinget
   Try winget method to uninstall
-  If no any method is specified methods used are: wmiobject, uninstall-package, winget, register
-.PARAMETER useMethodUninstallRegister
-  Try uninstall string from regedit method to uninstall
-  If no any method is specified methods used are: wmiobject, uninstall-package, winget, register
-.PARAMETER argumentList
+.PARAMETER uninstallRegistryUninstaller
+  Try uninstall string from registry method to uninstall
+.PARAMETER uninstallArgs
   Optional argument list to use for uninstall.exe (by default /S is used)
   Typical arguments for silent and no GUI are:
     * /s
@@ -30,7 +30,6 @@
     * /VERYSILENT /SUPPRESSMSGBOXES
     * /quiet
     * Try uninstall.exe /? to get specific method
-
 .NOTES
 	File Name: labadmin-uninstall-program.ps1
 	Author   : Leonardo Marco
@@ -41,53 +40,91 @@ Param(
   [parameter(Mandatory=$true, ParameterSetName="uninstall")]
   [String]$programName,
   [parameter(Mandatory=$false, ParameterSetName="uninstall")]
-  [Switch]$useMethodWmiObject,
+  [Switch]$uninstallWmiObject,
   [parameter(Mandatory=$false, ParameterSetName="uninstall")]
-  [Switch]$useMethodUninstallPackage,
+  [Switch]$uninstallUninstallPackage,
   [parameter(Mandatory=$false, ParameterSetName="uninstall")]
-  [Switch]$useMethodWinget,
+  [Switch]$uninstallWinget,
   [parameter(Mandatory=$false, ParameterSetName="uninstall")]  
-  [Switch]$useMethodUninstallRegister,
+  [Switch]$uninstallRegistryUninstaller,
   [parameter(Mandatory=$false, ParameterSetName="uninstall")]
 
-  [String]$argumentList,
+  [String]$uninstallArgs,
+
+  [parameter(Mandatory=$false, ParameterSetName="uninstallcustom")]
+  [String]$uninstallCustomString,
+  
+  
   [parameter(Position=0, Mandatory=$true, ParameterSetName="list")]
   [Switch]$list
 )
 
 
 # CONFIG VARIABLES
-if(!$argumentList) { $argumentList="/S" }
+if(!$uninstallArgs) { $uninstallArgs="/S" }
 
-#LIST 
+#########################################################################################
+##### LIST ##############################################################################
+#########################################################################################
 if($list) {
 	$list2=Get-Package | Select-Object -Property Name | Where-Object { $_.Name -match $programName }
     $literalName=$list2.Name
+	# Multiple result: show list
     if($list2 -is [Array]) { $list2; exit 0 }
-    # Show app info
+    # 1 result: Show app info
     elseif ($list2) {
+		# Check REGISTRY UNINSTALLER 
         $list2; Write-Output "`n"
+		Write-Output "Available methods`n-----------------"
         $app=gci "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall" | foreach { gp $_.PSPath } | ? { $_.DisplayName -eq $literalName }
 	    if(!$app) { $app = gci "HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall" | foreach { gp $_.PSPath } | ? { $_.DisplayName -eq $literalName } }
 	    if($app) {
             $ui=$app.UninstallString
             $qui=$app.QuietUninstallString
-            Write-Output "Uninstall registry       : yes"
-            Write-Output "   Uninstall string      : $ui"
-            Write-Output "   Quiet uninstall string: $qui`n"
-        }
-        if(Get-WmiObject -Class Win32_Product | Where-Object { $_.Name -eq $literalName }) { 
-            Write-Output "Uninstall WmiObject: yes"
-        }
-        if((Get-Command winget -ErrorAction SilentlyContinue) -AND (winget list $literalName)) {
-            Write-Output "Uninstall winget: yes"
-        }
+            Write-Output " * uninstallRegistryUninstaller : yes"
+            Write-Output "      Uninstall string          : $ui"
+            Write-Output "      Quiet uninstall string    : $qui`n"
+        } 		else { Write-Output " * uninstallRegistryUninstaller : no" }
+        # Check WMIOBJECT 
+		if(Get-WmiObject -Class Win32_Product | Where-Object { $_.Name -eq $literalName }) { 
+            Write-Output " * uninstallWmiObject           : yes"
+        } else { Write-Output " * uninstallWmiObject           : no" }
+        # Check WINGET
+		if((Get-Command winget -ErrorAction SilentlyContinue) -AND (winget list $literalName)) {
+            Write-Output " * uninstallWinget              : yes"
+        } else { Write-Output " * uninstallWinget              : no" }
+		# Check UNINSTALL-PACKAGE CMDLET
+		if(Get-Package |  Where-Object { $_.ProviderName -ne "Programs" -AND $_.Name -eq "$literalName" } -ErrorAction SilentlyContinue) {
+            Write-Output " * uninstallUninstallPackage    : yes"
+        } else { Write-Output " * uninstallUninstallPackage    : no" }			
+		
         exit 0
     }
  	exit 1
 }
 
-# CHECK PACKAGE INSTALLED AND GET $literalName
+
+
+#########################################################################################
+##### UNINSTALL #########################################################################
+#########################################################################################
+
+# TRY UNINSTALL: custom command
+if($uninstallCustomString) {
+	Write-Output "Trying uninstall using custom command"
+	# Split uninstallCustomString: uninstallPath + uninstallArgs
+	$uninstallPath=$uninstallCustomString
+	if($uninstallPath.StartsWith("`"")) { $uninstallPath=$uninstallCustomString.Split("`"")[1]; $uninstallArgs=$uninstallCustomString.Split("`"")|Select -Skip 2 }
+	else { $uninstallPath=$uninstallCustomString.Split(" ")[0]; $uninstallArgs=$uninstallCustomString.Split(" ")|Select -Skip 1  }	
+	
+	Write-Output "Executing command: ${uninstallPath}  ${uninstallArgs}"
+	Start-Process -FilePath $uninstallPath -ArgumentList $uninstallArgs -Verb runas -Wait
+	if(!(Get-Package $literalName -ErrorAction SilentlyContinue)) { Write-Output "Uninstall successful!"; exit 0 }
+	exit 1
+}
+
+
+# GET LITERAL NAME MATCH
 if(!$programName) { Write-Error "-programName param required"; exit 1 }
 $literalName=Get-Package | Select-Object -Property Name | Where-Object { $_.Name -match $programName }
 if(!$literalName) { Write-Error "Cant find installed program $programName"; exit 1 }
@@ -95,13 +132,13 @@ if($literalName -is [Array]) {  $literalName; Write-Error "Multiple matching for
 $literalName=$literalName.Name
 if($programName -ne $literalName) { Write-Output "Literal program name found: $literalName" }
 
-# CHECK METHODS TO USE
-if(!$useMethodWmiObject -AND !$useMethodUninstallPackage -AND !$useMethodWinget -AND !$useMethodUninstallRegister) {
-    $useMethodWmiObject=$true; $useMethodUninstallPackage=$true; $useMethodWinget=$true; $useMethodUninstallRegister=$true
+# CHECK PARAMETERS
+if(!$uninstallCustomString -AND !$uninstallWmiObject -AND !$uninstallUninstallPackage -AND !$uninstallWinget -AND !$uninstallRegistryUninstaller) {
+    Write-Error "Missing uninstall method parameter";	exit 1
 }
 
 # TRY UNINSTALL: WmiObject
-if($useMethodWmiObject) {
+if($uninstallWmiObject) {
 	Write-Output "Trying uninstall using WmiObject..."
 	$app=Get-WmiObject -Class Win32_Product | Where-Object { $_.Name -eq $literalName }
 	if($app) { 
@@ -111,7 +148,7 @@ if($useMethodWmiObject) {
 }
 
 # TRY UNINSTALL: Uninstall-Package
-if($useMethodUninstallPackage) {
+if($uninstallUninstallPackage) {
 	Write-Output "Trying uninstall using Uninstall-Package..."
 	$app=Get-Package $literalName
 	if($app) {
@@ -121,7 +158,7 @@ if($useMethodUninstallPackage) {
 }
 
 # TRY UNINSTALL: winget
-if($useMethodWinget) {
+if($uninstallWinget) {
 	if(Get-Command winget -ErrorAction SilentlyContinue) {
 	  winget uninstall --exact --force --silent --disable-interactivity --accept-source-agreements $literalName
 	  if(!(Get-Package $literalName -ErrorAction SilentlyContinue)) { Write-Output "Uninstall successful!"; exit 0 }
@@ -129,13 +166,16 @@ if($useMethodWinget) {
 }
 
 # TRY REGEDIT uninstall.exe or MSI ID
-if($useMethodUninstallRegister) {
+if($uninstallRegistryUninstaller) {
 	Write-Output "Trying uninstall using register uninstall string path..."
 	$app=gci "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall" | foreach { gp $_.PSPath } | ? { $_.DisplayName -eq $literalName }
 	if(!$app) { $app = gci "HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall" | foreach { gp $_.PSPath } | ? { $_.DisplayName -eq $literalName } }
 	if($app) {
+	  # Get uninstall string
       $uninstallString=$app.UninstallString
-      # .MSI UNINSTALL
+	  if($app.QuietUninstallString) { $uninstallString=$app.QuietUninstallString }	  
+      
+	  # .MSI UNINSTALL
       if($uninstallString -match "msiexec.exe") {
         $msiID=($uninstallString -Replace "msiexec.exe","" -Replace "/I","" -Replace "/X","").Trim()
         Write-Output "Executing MSI uninstall: msiexec.exe /x ${msiID} /qn"
@@ -143,19 +183,17 @@ if($useMethodUninstallRegister) {
         if(!(Get-Package $literalName -ErrorAction SilentlyContinue)) { Write-Output "Uninstall successful!"; exit 0 }
 
    	  # .EXE UNINSTALL?
-	  }elseif($uninstallString -match "unins") {
+	  } else {
         $uninstallPath=$uninstallString
-        $uninstallArgs=$argumentList
-        if($uninstallPath.StartsWith("`"")) { 
-            $uninstallPath=$uninstallString.Split("`"")[1]
-            $uninstallArgs=$uninstallString.Split("`"")|Select -Skip 2
-            $uninstallArgs=$uninstallArgs+" "+$argumentList
-        }
-		Write-Output "Executing uninstall: ${uninstallPath} ${uninstallArgs}"
+		# Split uninstallString: uninstallPath + uninstallArgs
+        if($uninstallPath.StartsWith("`"")) { $uninstallPath=$uninstallString.Split("`"")[1]; $uninstallArgs=($uninstallString.Split("`"")|Select -Skip 2)+" ${uninstallArgs}" }
+		else { $uninstallPath=$uninstallString.Split(" ")[0]; $uninstallArgs=($uninstallString.Split(" ")|Select -Skip 1)+" ${uninstallArgs}"  }
+		Write-Output "Executing uninstall: ${uninstallPath}  ${uninstallArgs}"
+		
 		Start-Process -FilePath $uninstallPath -ArgumentList $uninstallArgs -Verb runas -Wait
 		if(!(Get-Package $literalName -ErrorAction SilentlyContinue)) { Write-Output "Uninstall successful!"; exit 0 }
 		Write-Output "ERROR!: Cant found uninstall method for $literalName package
-   Typical uninstall.exe argumentList parameters are:
+   Typical uninstall.exe uninstallArgs parameters are:
      * /s
      * /S
      * /S /v`"/qn`"
