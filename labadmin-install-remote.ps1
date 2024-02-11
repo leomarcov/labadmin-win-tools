@@ -68,9 +68,9 @@ $PSBoundParameters.Remove("removeInstaller") | Out-Null; $PSBoundParameters.Remo
 # INSTALL
 if($fileTypeEXE) { 
   Write-Output "Installing EXE in silent mode: $filePath $installArgs"
-  Start-Process -FilePath $filePath -ArgumentList $installArgs -Verb runas -Wait
-  Write-Output "Please, check manuallay if package is installed
-Typical installArgs for silent noGUI are:
+  Start-Process -FilePath $filePath -ArgumentList $installArgs -Verb runas -Wait; $lec=$LASTEXITCODE
+  Write-Output "DONE! Please, check manuallay if package is installed
+If fail, typical installArgs for silent noGUI are:
    * /s
    * /S
    * /S /v`"/qn`"
@@ -81,9 +81,9 @@ Typical installArgs for silent noGUI are:
    * Try & `"$filePath`" /? to get specific method"
 } elseif($fileTypeMSI) { 
   Write-Output "Installing MSI in silent mode: $filePath"
-  Start-Process msiexec.exe -Wait -ArgumentList "/I `"${filePath}`" /norestart /QN"
+  Start-Process msiexec.exe -Wait -ArgumentList "/I `"${filePath}`" /norestart /QN"; $lec=$LASTEXITCODE
 }
-$lec=$LASTEXITCODE
+
 
 # REMOVE
 if($removeInstaller) { 
