@@ -44,7 +44,7 @@ Param(
   [Switch]$forceDownload,
   [String]$destinationPath,
   [Switch]$removeInstaller,
-  [String]$argumentList
+  [String]$installArgs
 )
 
 
