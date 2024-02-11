@@ -19,7 +19,7 @@
 	Optional destination folder to save download (by default labadmin base download is used C:\ProgramData\labadmin\downloads\)
 .PARAMETER removeInstaller
   Remove installer file after install (by default is not removed)
-.PARAMETER argumentList
+.PARAMETER installArgs
   Optional argument list for EXE installer to silent noGUI installation
   By default parameters used are: /S /v"/qn"
   Other typical  parameters are:
@@ -50,9 +50,9 @@ Param(
 
 #### CONFIG VARIABLES
 $labadminDownloadsPath="${ENV:ALLUSERSPROFILE}\labadmin\downloads"
-$defaultArguments='/S /v`"/qn`"'
+$defaultInstallArgs='/S /v`"/qn`"'
 
-if(!$argumentList) { $argumentList=$defaultArguments }
+if(!$installArgs) { $installArgs=$defaultInstallArgs }
 if(!$destinationPath) { $destinationPath=$labadminDownloadsPath}
 $filePath="${destinationPath}\${fileName}"    
 
@@ -62,15 +62,15 @@ elseif([System.IO.Path]::GetExtension($filePath) -eq ".msi") { $fileTypeMSI= $tr
 else { Write-Error "File extension not supoerted (only .exe and .msi files)"; exit 1 }
 
 # DOWNLOAD: call labadmin-download-file.ps1
-$PSBoundParameters.Remove("removeInstaller") | Out-Null; $PSBoundParameters.Remove("argumentList") | Out-Null
+$PSBoundParameters.Remove("removeInstaller") | Out-Null; $PSBoundParameters.Remove("installArgs") | Out-Null
 & "${PSScriptRoot}\labadmin-download-file.ps1" @PSBoundParameters -ErrorAction Stop
 
 # INSTALL
 if($fileTypeEXE) { 
-  Write-Output "Installing EXE in silent mode: $filePath $argumentList"
-  Start-Process -FilePath $filePath -ArgumentList $argumentList -Verb runas -Wait
+  Write-Output "Installing EXE in silent mode: $filePath $installArgs"
+  Start-Process -FilePath $filePath -ArgumentList $installArgs -Verb runas -Wait
   Write-Output "Please, check manuallay if package is installed
-Typical argumentList for silent noGUI are:
+Typical installArgs for silent noGUI are:
    * /s
    * /S
    * /S /v`"/qn`"
