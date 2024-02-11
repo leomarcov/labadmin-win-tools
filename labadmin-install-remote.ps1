@@ -2,7 +2,7 @@
 
 <#
 .SYNOPSIS
-	Download installer program from URL file (EXE or MSI) and install it silently
+	Download installer program from URL file (EXE or MSI) and install it silently noGUI
 
 .PARAMETER fileName
 	Filename for downloaded installer file
@@ -20,10 +20,17 @@
 .PARAMETER removeInstaller
   Remove installer file after install (by default is not removed)
 .PARAMETER argumentList
-  Optional argument list for EXE installer to silent installation
+  Optional argument list for EXE installer to silent noGUI installation
   By default parameters used are: /S /v"/qn"
-  Other typical options are: /S, /SILENT, /VERYSILENT, /SUPPRESSMSGBOXES
-
+  Other typical  parameters are:
+     * /s
+     * /S
+     * /SILENT
+     * /VERYSILENT
+     * /VERYSILENT /SUPPRESSMSGBOXES
+     * /quiet
+     * Try exec: installer /? to get specific method
+  
 .NOTES
 	File Name: labadmin-install-remote.ps1
 	Author   : Leonardo Marco
@@ -62,13 +69,16 @@ $PSBoundParameters.Remove("removeInstaller") | Out-Null; $PSBoundParameters.Remo
 if($fileTypeEXE) { 
   Write-Output "Installing EXE in silent mode: $filePath $argumentList"
   Start-Process -FilePath $filePath -ArgumentList $argumentList -Verb runas -Wait
-  Write-Output "Please, check manuallay if package is installed"
-  Write-Output "`nIf fail, typical uninstall argumentList alternatives are:"
-  Write-Output "  * /S /v`"/qn`""
-  Write-Output "  * /S"
-  Write-Output "  * /SILENT"
-  Write-Output "  * /VERYSILENT"
-  Write-Output "  * /SILENT /SUPPRESSMSGBOXES"
+  Write-Output "Please, check manuallay if package is installed
+   Typical argumentList for silent noGUI are:
+     * /s
+     * /S
+     * /S /v`"/qn`"
+     * /SILENT
+     * /VERYSILENT
+     * /VERYSILENT /SUPPRESSMSGBOXES
+     * /quiet
+     * Try & `"$uninstallPath`" /? to get specific method"
 } elseif($fileTypeMSI) { 
   Write-Output "Installing MSI in silent mode: $filePath"
   Start-Process msiexec.exe -Wait -ArgumentList "/I `"${filePath}`" /norestart /QN"
