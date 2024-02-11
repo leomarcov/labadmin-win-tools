@@ -53,7 +53,7 @@ $labadminDownloadsPath="${ENV:ALLUSERSPROFILE}\labadmin\downloads"
 $defaultInstallArgs='/S /v`"/qn`"'
 
 if(!$installArgs) { $installArgs=$defaultInstallArgs }
-if(!$destinationPath) { $destinationPath=$labadminDownloadsPath}
+if(!$destinationPath) { $destinationPath=$labadminDownloadsPath }
 $filePath="${destinationPath}\${fileName}"    
 
 # CHECK EXTESION
