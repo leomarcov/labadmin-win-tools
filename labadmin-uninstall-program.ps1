@@ -48,12 +48,10 @@ Param(
   [parameter(Mandatory=$false, ParameterSetName="uninstall")]  
   [Switch]$uninstallRegistryUninstaller,
   [parameter(Mandatory=$false, ParameterSetName="uninstall")]
-
   [String]$uninstallArgs,
-
+  
   [parameter(Mandatory=$false, ParameterSetName="uninstallcustom")]
   [String]$uninstallCustomString,
-  
   
   [parameter(Position=0, Mandatory=$true, ParameterSetName="list")]
   [Switch]$list
