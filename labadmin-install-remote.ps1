@@ -78,7 +78,7 @@ if($fileTypeEXE) {
      * /VERYSILENT
      * /VERYSILENT /SUPPRESSMSGBOXES
      * /quiet
-     * Try & `"$uninstallPath`" /? to get specific method"
+     * Try & `"$filePath`" /? to get specific method"
 } elseif($fileTypeMSI) { 
   Write-Output "Installing MSI in silent mode: $filePath"
   Start-Process msiexec.exe -Wait -ArgumentList "/I `"${filePath}`" /norestart /QN"
