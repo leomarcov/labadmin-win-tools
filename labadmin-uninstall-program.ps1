@@ -7,7 +7,7 @@
   No uninstall, only list all installed packages on system. Optional name can be used to filter matches
   
  .PARAMETER uninstallCustomString
-  Uninstall using custom command and arguments. Example: "`"c:\path to\command.exe`" /arg1 /arg2 /arg3"
+  Uninstall using custom command and arguments. Example: ... -uninstallCustomString "`"c:\path to\command.exe`" /arg1 /arg2 /arg3"
   
 .PARAMETER programName
   Name of package to match (if multiple matches will be cancelled)
