@@ -70,15 +70,15 @@ if($fileTypeEXE) {
   Write-Output "Installing EXE in silent mode: $filePath $argumentList"
   Start-Process -FilePath $filePath -ArgumentList $argumentList -Verb runas -Wait
   Write-Output "Please, check manuallay if package is installed
-   Typical argumentList for silent noGUI are:
-     * /s
-     * /S
-     * /S /v`"/qn`"
-     * /SILENT
-     * /VERYSILENT
-     * /VERYSILENT /SUPPRESSMSGBOXES
-     * /quiet
-     * Try & `"$filePath`" /? to get specific method"
+Typical argumentList for silent noGUI are:
+   * /s
+   * /S
+   * /S /v`"/qn`"
+   * /SILENT
+   * /VERYSILENT
+   * /VERYSILENT /SUPPRESSMSGBOXES
+   * /quiet
+   * Try & `"$filePath`" /? to get specific method"
 } elseif($fileTypeMSI) { 
   Write-Output "Installing MSI in silent mode: $filePath"
   Start-Process msiexec.exe -Wait -ArgumentList "/I `"${filePath}`" /norestart /QN"
