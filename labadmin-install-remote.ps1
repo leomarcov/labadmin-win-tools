@@ -50,7 +50,7 @@ Param(
 
 #### CONFIG VARIABLES
 $labadminDownloadsPath="${ENV:ALLUSERSPROFILE}\labadmin\downloads"
-$defaultInstallArgs='/S /v`"/qn`"'
+$defaultInstallArgs="/S /v`"/qn`""
 
 if(!$installArgs) { $installArgs=$defaultInstallArgs }
 if(!$destinationPath) { $destinationPath=$labadminDownloadsPath }
