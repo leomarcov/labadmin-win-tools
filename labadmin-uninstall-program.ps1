@@ -3,14 +3,13 @@
 <#
 .SYNOPSIS
   Try silent noGUI uninstall program using some methods
-.PARAMETER list
-  No uninstall, only list all installed packages on system. Optional name can be used to filter matches
+
+.PARAMETER programName
+  Name of package to match (if multiple matches will be cancelled)
   
  .PARAMETER uninstallCustomString
   Uninstall using custom command and arguments. Example: ... -uninstallCustomString "`"c:\path to\command.exe`" /arg1 /arg2 /arg3"
   
-.PARAMETER programName
-  Name of package to match (if multiple matches will be cancelled)
 .PARAMETER uninstallWmiObject
   Try WmiObject method to uninstall
 .PARAMETER uninstallUninstallPackage
@@ -30,15 +29,16 @@
     * /VERYSILENT /SUPPRESSMSGBOXES
     * /quiet
     * Try uninstall.exe /? to get specific method
+
 .NOTES
 	File Name: labadmin-uninstall-program.ps1
 	Author   : Leonardo Marco
 #>
 
 Param(
-  [parameter(Position=1, Mandatory=$false, ParameterSetName="list")]
   [parameter(Mandatory=$true, ParameterSetName="uninstall")]
   [String]$programName,
+  
   [parameter(Mandatory=$false, ParameterSetName="uninstall")]
   [Switch]$uninstallWmiObject,
   [parameter(Mandatory=$false, ParameterSetName="uninstall")]
@@ -48,21 +48,17 @@ Param(
   [parameter(Mandatory=$false, ParameterSetName="uninstall")]  
   [Switch]$uninstallRegistryUninstaller,
   [parameter(Mandatory=$false, ParameterSetName="uninstall")]
-
   [String]$uninstallArgs,
-
+  
   [parameter(Mandatory=$false, ParameterSetName="uninstallcustom")]
-  [String]$uninstallCustomString,
-  
-  
-  [parameter(Position=0, Mandatory=$true, ParameterSetName="list")]
-  [Switch]$list
+  [String]$uninstallCustomString
 )
 
 
 #########################################################################################
 ##### LIST ##############################################################################
 #########################################################################################
+if(!$uninstallCustomString -AND !$uninstallWmiObject -AND !$uninstallUninstallPackage -AND !$uninstallWinget -AND !$uninstallRegistryUninstaller) { $list=$true }
 if($list) {
 	$list2=Get-Package | Select-Object -Property Name | Where-Object { $_.Name -match $programName }
     $literalName=$list2.Name
@@ -105,7 +101,6 @@ if($list) {
 #########################################################################################
 ##### UNINSTALL #########################################################################
 #########################################################################################
-
 # TRY UNINSTALL: custom command
 if($uninstallCustomString) {
 	Write-Output "Trying uninstall using custom command"
@@ -129,10 +124,7 @@ if($literalName -is [Array]) {  $literalName; Write-Error "Multiple matching for
 $literalName=$literalName.Name
 if($programName -ne $literalName) { Write-Output "Literal program name found: $literalName" }
 
-# CHECK PARAMETERS
-if(!$uninstallCustomString -AND !$uninstallWmiObject -AND !$uninstallUninstallPackage -AND !$uninstallWinget -AND !$uninstallRegistryUninstaller) {
-    Write-Error "Missing uninstall method parameter";	exit 1
-}
+
 
 # TRY UNINSTALL: WmiObject
 if($uninstallWmiObject) {
