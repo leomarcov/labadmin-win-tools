@@ -67,7 +67,7 @@ $PSBoundParameters.Remove("removeInstaller") | Out-Null; $PSBoundParameters.Remo
 
 # INSTALL
 if($fileTypeEXE) { 
-  Write-Output "Installing EXE in silent mode: $filePath $installArgs"
+  Write-Output "Installing EXE in silent mode: $filePath  $installArgs"
   Start-Process -FilePath $filePath -ArgumentList $installArgs -Verb runas -Wait; $lec=$LASTEXITCODE
   Write-Output "DONE! Please, check manuallay if package is installed
 If fail, typical installArgs for silent noGUI are:
