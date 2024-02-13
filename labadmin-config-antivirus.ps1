@@ -36,7 +36,7 @@ if($enable) {
 
 # STATUS
 } else {
-  if((Get-MpPreference).DisableRealtimeMonitoring) { Write-Error "Current status: DISABLED"; exit 1	}
+  if((Get-MpPreference).DisableRealtimeMonitoring) { Write-Output "Current status: DISABLED"; exit 1	}
   else { Write-Output "Current status: ENABLED"; exit 0 }
 }
 
