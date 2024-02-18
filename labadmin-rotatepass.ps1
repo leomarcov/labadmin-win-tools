@@ -93,10 +93,10 @@ function unregister {
 if($register -OR $unregister -OR $enable -OR $disable -OR $show) { if([Environment]::UserName -ne $userName) { Write-Error "Exec as user: $userName"; exit 1 } }
 
 if($register) 		{ register }
-elseif($unregister) { unregister }
+elseif($unregister) 	{ unregister }
 elseif($enable) 	{ enable }
 elseif($disable) 	{ disable }
 elseif($show) 		{ show }
-else 				{ rotatePassword }
+else 			{ rotatePassword }
 
 
