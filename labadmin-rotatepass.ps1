@@ -6,8 +6,6 @@
 
 .PARAMETER userName
 	Username account to rotate
-.PARAMETER rotatePassword
-	Rotate userName password
 .PARAMETER show
 	Show schedule job info rotation for userName account
 .PARAMETER disable
@@ -25,9 +23,9 @@
 #>
 
 Param(
-  [parameter(Mandatory=$true)]
+  [parameter(Mandatory=$true, Position=0)]
   [String]$userName,
-  [Switch]$rotatePassword,
+
   [Switch]$show,
   [Switch]$disable,
   [Switch]$enable,
@@ -45,7 +43,8 @@ function rotatePassword {
     $f2="A","S","D","F","G","H","J","K","L","Ñ" 
     $f3="Z","X","C","V","B","N","M",",",".","-"
     $p=$f1[[System.Int32]::Parse($d[0])-1]+$f1[[System.Int32]::Parse($d[1])-1]+$f1[[System.Int32]::Parse($d[2])-1]+$f1[[System.Int32]::Parse($d[3])-1]+$f2[[System.Int32]::Parse($d[4])-1]+$f2[[System.Int32]::Parse($d[5])-1]+$f3[[System.Int32]::Parse($d[6])-1]+$f3[[System.Int32]::Parse($d[7])-1]
-    $ss=$p|ConvertTo-SecureString -AsPlainText -Force
+$p 
+   $ss=$p|ConvertTo-SecureString -AsPlainText -Force
     Set-LocalUser -Name $userName -Password $ss
 }
 
@@ -78,7 +77,7 @@ function enable {
 function register {
     Write-Output "Registering scheduled job $scheduledJobName for user $userName .."
     Unregister-ScheduledJob $scheduledJobName -ErrorAction SilentlyContinue
-    Register-ScheduledJob -Name $scheduledJobName -FilePath ${PSCommandPath} -ArgumentList "-rotatePassword -userName ${userName}" -Trigger (New-JobTrigger -AtStartup -RandomDelay 00:00:30) -ScheduledJobOption (New-ScheduledJobOption -RunElevated)
+    Register-ScheduledJob -Name $scheduledJobName -FilePath ${PSCommandPath} -ArgumentList @("${userName}") -Trigger (New-JobTrigger -AtStartup -RandomDelay 00:00:30) -ScheduledJobOption (New-ScheduledJobOption -RunElevated)
 }
 
 function unregister {
@@ -90,12 +89,14 @@ function unregister {
 
 
 
-if($rotatePassword) { rotatePassword; exit }
-if([Environment]::UserName -ne $userName) { Write-Error "Exec as user: $userName"; exit 1 }
-if($register) { register }
+
+if($register -OR $unregister -OR $enable -OR $disable -OR $show) { if([Environment]::UserName -ne $userName) { Write-Error "Exec as user: $userName"; exit 1 } }
+
+if($register) 		{ register }
 elseif($unregister) { unregister }
-elseif($enable) { enable }
-elseif($disable) { disable }
-else { show }
+elseif($enable) 	{ enable }
+elseif($disable) 	{ disable }
+elseif($show) 		{ show }
+else 				{ rotatePassword }
 
 
