@@ -43,7 +43,6 @@ function rotatePassword {
     $f2="A","S","D","F","G","H","J","K","L","Ñ" 
     $f3="Z","X","C","V","B","N","M",",",".","-"
     $p=$f1[[System.Int32]::Parse($d[0])-1]+$f1[[System.Int32]::Parse($d[1])-1]+$f1[[System.Int32]::Parse($d[2])-1]+$f1[[System.Int32]::Parse($d[3])-1]+$f2[[System.Int32]::Parse($d[4])-1]+$f2[[System.Int32]::Parse($d[5])-1]+$f3[[System.Int32]::Parse($d[6])-1]+$f3[[System.Int32]::Parse($d[7])-1]
-$p 
    $ss=$p|ConvertTo-SecureString -AsPlainText -Force
     Set-LocalUser -Name $userName -Password $ss
 }
