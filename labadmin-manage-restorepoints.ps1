@@ -22,11 +22,11 @@
 
 #### PARAMETERS ##################################################
 Param(
-  [Switch]$List              # List RPs
+  [Switch]$List,             # List RPs
   [Switch]$Enable,           # Enable RPs
   [Switch]$Create,           # Create RP
   [Switch]$Restore,          # Restore RP 1
-  [Switch]$DeleteAll,        # Delete ALL restore points
+  [Switch]$DeleteAll         # Delete ALL restore points
 )
 
 #### ACTION LIST ##################################################
