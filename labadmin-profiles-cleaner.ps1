@@ -215,7 +215,7 @@ function main {
 	if($BackupProfiles)      	{ BackupProfiles  	}
 	elseif($RestoreProfiles) 	{ RestoreProfiles 	}
  	elseif($ShowConfig) 	 	{ ShowConfig      	}	
-  	elseif($ShowLog)			{ ShowLog         	}
+  	elseif($ShowLog)		{ ShowLog         	}
  	elseif($ModifyUsersConfig)	{ ModifyUsersConfig	}
 }
 
