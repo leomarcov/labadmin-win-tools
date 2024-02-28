@@ -94,8 +94,8 @@ $default_config=@{
     lastClean=(Get-Date -Format "yyy-MM-dd")                                             # Date of last autoclean executed
     skipUser=$false                                                                      # Skip this user of autoclean
     cleanAllways=@("\Appdata\Local\Google\Chrome","\Appdata\Local\Mozilla\Firefox")      # Items inside profile user to clean on every call
-}
-
+    #cleanAllways=@("\Appdata\Local\Google\Chrome","\Appdata\Local\Mozilla\Firefox","\Appdata\Local\Microsoft\Credentials","\Appdata\Local\Microsoft\IdentityCache","\Appdata\Local\Microsoft\TokenBroker","\Appdata\Local\Microsoft\OneAuth","\Appdata\Local\Packages\Microsoft.Windows.CloudExperienceHost_cw5n1h2txyewy","\Appdata\Local\ConnectedDevicesPlataform","\Appdata\Roaming\Microsoft\Crypto\Keys","\Appdata\Roaming\Microsoft\SystemCertificates","\Appdata\Local\Packages\Microsoft.AAD.BrokerPlugin_cw5n1h2txyewy")
+    }
 
 function BackupProfiles {
   # Create backups folder and set Administrator permissions
