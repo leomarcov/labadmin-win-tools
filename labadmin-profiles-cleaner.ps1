@@ -11,6 +11,16 @@
         skipUser      : Boolean (true or false) to skip this user from autoclean (skips cleanAfterDays and cleanAllways)
         cleanAlways   : Array of relative paths to clean on every call
         lastClean     : Date when last clean was performed
+    
+	INSTALLATION NOTES
+	Once script is installed in Program Files folder, to config autostart script open gpedit.msc and config 2 group policies:
+      * Exec script at startup:
+        - Computer Configuracion > Windows Settings > Scripts > Startup > PowerShell Scripts
+        - Script to exec: C:\Program Files\labadmin\labadmin-win-tools\labadmin-profiles-cleaner.ps1
+        - Params: -RestoreProfile -Log
+      * Disable run start asynchronously:
+        - Computer Configuration > Administrative Templates > System > Scripts > Run startup scripts asynchronously
+        - Set to Disabled
 
 .PARAMETER CreateBackup
     Backup (or update backup if previos backup exists) users profiles to c:\users\labadmin-profiles-cleaner\
@@ -38,6 +48,18 @@
 #>
 
 Param(
+  [parameter(Mandatory=$true, ParameterSetName="create")]
+  [Switch]$BackupProfiles,
+
+  [parameter(Mandatory=$true, ParameterSetName="restore")]
+  [Switch]$RestoreProfiles,
+
+  [parameter(Mandatory=$true, ParameterSetName="showlog")]
+  [Switch]$ShowLog,
+  
+  [parameter(Mandatory=$true, ParameterSetName="showuser")]
+  [Switch]$ShowConfig,
+
   [parameter(Mandatory=$true, ParameterSetName="modifyconfig")]
   [Switch]$ModifyUsersConfig,
   [parameter(Mandatory=$false, ParameterSetName="modifyconfig")]
@@ -48,18 +70,6 @@ Param(
   [String[]]$CleanAllways,
   [parameter(Mandatory=$false, ParameterSetName="modifyconfig")]
   [DateTime]$LastClean,
-  
-  [parameter(Mandatory=$true, ParameterSetName="showuser")]
-  [Switch]$ShowConfig,
-  
-  [parameter(Mandatory=$true, ParameterSetName="showlog")]
-  [Switch]$ShowLog,
-  
-  [parameter(Mandatory=$true, ParameterSetName="create")]
-  [Switch]$BackupProfiles,
-  
-  [parameter(Mandatory=$true, ParameterSetName="restore")]
-  [Switch]$RestoreProfiles,
   
   [parameter(Mandatory=$true, ParameterSetName="create")]
   [parameter(Mandatory=$false, ParameterSetName="restore")]
