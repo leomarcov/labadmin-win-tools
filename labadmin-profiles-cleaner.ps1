@@ -33,20 +33,38 @@
 #>
 
 Param(
+  [parameter(Mandatory=$true, ParameterSetName="modifyconfig")]
+  [Switch]$ModifyUserConfig,
+  [parameter(Mandatory=$false, ParameterSetName="modifyconfig")]
+  [Int]$CleanAfterDays,
+  [parameter(Mandatory=$false, ParameterSetName="modifyconfig")]
+  [Int]$SkipUser,
+  [parameter(Mandatory=$false, ParameterSetName="modifyconfig")]
+  [String[]]$CleanAllways,
+  [parameter(Mandatory=$false, ParameterSetName="modifyconfig")]
+  [Date]$LastClean,
+  
   [parameter(Mandatory=$true, ParameterSetName="showuser")]
   [Switch]$ShowConfig,
+  
   [parameter(Mandatory=$true, ParameterSetName="showlog")]
   [Switch]$ShowLog,
+  
   [parameter(Mandatory=$true, ParameterSetName="create")]
   [Switch]$BackupProfiles,
+  
   [parameter(Mandatory=$true, ParameterSetName="restore")]
   [Switch]$RestoreProfiles,
+  
   [parameter(Mandatory=$true, ParameterSetName="create")]
   [parameter(Mandatory=$false, ParameterSetName="restore")]
   [parameter(Mandatory=$false, ParameterSetName="showuser")]
+  [parameter(Mandatory=$false, ParameterSetName="modifyconfig")]
   [String[]]$Users,
+  
   [parameter(ParameterSetName="restore")]
   [Switch]$Force,
+  
   [parameter(Mandatory=$false, ParameterSetName="create")]
   [parameter(Mandatory=$false, ParameterSetName="restore")]
   [Switch]$Log
@@ -144,24 +162,42 @@ function ShowConfig {
 	foreach($u in $users) {
 		$user_conf_file="${backups_path}\$u.cfg"
 		Write-Output "#### USER: $u #################################################################"
+  		Write-Output "Path: ${user_conf_file}"
 		Get-Content -Path $user_conf_file
 	}
 }
-
 
 function ShowLog {
 	Get-Content -Path $log_path
 }
 
+function ModifyUserConfig {
+	if(!$users) { $users=foreach($f in Get-ChildItem $backups_path -filter *.cfg) {$f.basename } }
+	foreach($u in $users) {
+		$user_conf_file="${backups_path}\$u.cfg"
+		$user_conf=@{}; (Get-Content $user_conf_file | ConvertFrom-Json).psobject.properties | Foreach { $user_conf[$_.Name] = $_.Value }
+		if($user_conf.cleanAfterDays -isnot [int] -OR !$user_conf.lastClean) {
+        		Write-Output "WARNING! Invalid config file ${user_conf_file}. Skipping user ${u}"
+        		continue
+      		}
+		if($CleanAfterDays) { $user_conf.cleanAfterDays=$CleanAfterDays }
+  		if($SkipUser) { $user_conf.skipUser=$SkipUser }
+    		if($CleanAllways) { }
+      		if($LastClean) { }
+
+ 		$user_conf | ConvertTo-Json | Out-File $user_conf_file 
+ 	} 
+}
+
 
 
 function main {
-    if($BackupProfiles)      { BackupProfiles  }
-    elseif($RestoreProfiles) { RestoreProfiles }
-	elseif($ShowConfig) 	 { ShowConfig      }
-	elseif($ShowLog)		 { ShowLog         }
+	if($BackupProfiles)      	{ BackupProfiles  	}
+	elseif($RestoreProfiles) 	{ RestoreProfiles 	}
+ 	elseif($ShowConfig) 	 	{ ShowConfig      	}	
+  	elseif($ShowLog)		{ ShowLog         	}
+ 	elseif($ModifyUserConfig)	{ ModifyUserConfig	}
 }
-
 
 # EXEC 
 if(!$Log) { main }
