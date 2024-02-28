@@ -33,15 +33,22 @@
 #>
 
 Param(
+  [parameter(Mandatory=$true, ParameterSetName="showuser")]
+  [Switch]$ShowConfig,
+  [parameter(Mandatory=$true, ParameterSetName="showlog")]
+  [Switch]$ShowLog,
   [parameter(Mandatory=$true, ParameterSetName="create")]
   [Switch]$BackupProfiles,
   [parameter(Mandatory=$true, ParameterSetName="restore")]
   [Switch]$RestoreProfiles,
   [parameter(Mandatory=$true, ParameterSetName="create")]
   [parameter(Mandatory=$false, ParameterSetName="restore")]
+  [parameter(Mandatory=$false, ParameterSetName="showuser")]
   [String[]]$Users,
   [parameter(ParameterSetName="restore")]
   [Switch]$Force,
+  [parameter(Mandatory=$false, ParameterSetName="create")]
+  [parameter(Mandatory=$false, ParameterSetName="restore")]
   [Switch]$Log
 )
 
@@ -132,10 +139,27 @@ function RestoreProfiles {
     }
 }
 
+function ShowConfig {
+	if(!$users) { $users=foreach($f in Get-ChildItem $backups_path -filter *.cfg) {$f.basename } }
+	foreach($u in $users) {
+		$user_conf_file="${backups_path}\$u.cfg"
+		Write-Output "#### USER: $u #################################################################"
+		Get-Content -Path $user_conf_file
+	}
+}
+
+
+function ShowLog {
+	Get-Content -Path $log_path
+}
+
+
 
 function main {
     if($BackupProfiles)      { BackupProfiles  }
     elseif($RestoreProfiles) { RestoreProfiles }
+	elseif($ShowConfig) 	 { ShowConfig      }
+	elseif($ShowLog)		 { ShowLog         }
 }
 
 
@@ -147,5 +171,3 @@ else {
     if((Get-ChildItem $logs_path | % {[int]($_.length / 1kb)}) -gt 8) { Remove-Item -Path $log_path }  # Delete log if size > 8kb
     &{ Write-Output "`n`n#########################################################################################################"(Get-Date).toString()"#########################################################################################################"; main } 2>&1 | Out-File -FilePath $log_path -Append 
 }
-
-
