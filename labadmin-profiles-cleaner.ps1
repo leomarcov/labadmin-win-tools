@@ -22,23 +22,21 @@
         - Computer Configuration > Administrative Templates > System > Scripts > Run startup scripts asynchronously
         - Set to Disabled
 
-.PARAMETER CreateBackup
+.PARAMETER BackupProfiles
     Backup (or update backup if previos backup exists) users profiles to c:\users\labadmin-profiles-cleaner\
     For new backups default <username>.cfg file is generated
     Parameter -Users must be given with list of users to backup
 .PARAMETER RestoreProfiles
     Try to restore profiles according user backup profile config
 .PARAMETER Users
-    List of users to backup/restore/modify-config
+    List of users to backup/restore/config
 .PARAMETER Force
     Force profile clean and ommits skipUser and cleanAfterDays config
 .PARAMETER Log
     Save output to log file in c:\users\labadmin-profiles-cleaner\log.txt
-.PARAMETER ShowConfig
-	Show all (or -users list) users config
-.PARAMETER showlog
+.PARAMETER ShowLog
 	Show log file Content
-.PARAMETER ModifyUsersConfig
+.PARAMETER ConfigProfiles
 	Modify all (or -users list) users config file 
 	Modified values are given with parameters: CleanAfterDays, SkipUser, CleanAllways and LastClean
 
@@ -54,27 +52,25 @@ Param(
   [parameter(Mandatory=$true, ParameterSetName="restore")]
   [Switch]$RestoreProfiles,
 
-  [parameter(Mandatory=$true, ParameterSetName="showlog")]
+  [parameter(Mandatory=$true, ParameterSetName="config")]
+  [Switch]$ConfigProfiles,
+
+  [parameter(Mandatory=$true, ParameterSetName="log")]
   [Switch]$ShowLog,
   
-  [parameter(Mandatory=$true, ParameterSetName="showuser")]
-  [Switch]$ShowConfig,
 
-  [parameter(Mandatory=$true, ParameterSetName="modifyconfig")]
-  [Switch]$ModifyUsersConfig,
-  [parameter(Mandatory=$false, ParameterSetName="modifyconfig")]
+  [parameter(Mandatory=$false, ParameterSetName="config")]
   [Int]$CleanAfterDays,
-  [parameter(Mandatory=$false, ParameterSetName="modifyconfig")]
+  [parameter(Mandatory=$false, ParameterSetName="config")]
   [String]$SkipUser,
-  [parameter(Mandatory=$false, ParameterSetName="modifyconfig")]
+  [parameter(Mandatory=$false, ParameterSetName="config")]
   [String[]]$CleanAllways,
-  [parameter(Mandatory=$false, ParameterSetName="modifyconfig")]
+  [parameter(Mandatory=$false, ParameterSetName="config")]
   [DateTime]$LastClean,
   
   [parameter(Mandatory=$true, ParameterSetName="create")]
   [parameter(Mandatory=$false, ParameterSetName="restore")]
-  [parameter(Mandatory=$false, ParameterSetName="showuser")]
-  [parameter(Mandatory=$false, ParameterSetName="modifyconfig")]
+  [parameter(Mandatory=$false, ParameterSetName="config")]
   [String[]]$Users,
   
   [parameter(ParameterSetName="restore")]
@@ -172,22 +168,12 @@ function RestoreProfiles {
     }
 }
 
-function ShowConfig {
-	if(!$users) { $users=foreach($f in Get-ChildItem $backups_path -filter *.cfg) {$f.basename } }
-	foreach($u in $users) {
-		$user_conf_file="${backups_path}\$u.cfg"
-		Write-Output "#### USER: $u #################################################################"
-  		Write-Output "File: ${user_conf_file}"
-		Get-Content -Path $user_conf_file
-		Write-Output ""
-	}
-}
 
 function ShowLog {
 	Get-Content -Path $log_path
 }
 
-function ModifyUsersConfig {
+function ConfigProfiles {
 	if(!$users) { $users=foreach($f in Get-ChildItem $backups_path -filter *.cfg) {$f.basename } }
 	foreach($u in $users) {
 		# Get user config
@@ -207,6 +193,14 @@ function ModifyUsersConfig {
 		# Save user config
  		$user_conf | ConvertTo-Json | Out-File $user_conf_file 
  	} 
+	
+	foreach($u in $users) {
+		$user_conf_file="${backups_path}\$u.cfg"
+		Write-Output "#### USER: $u #################################################################"
+		Write-Output "File: ${user_conf_file}"
+		Get-Content -Path $user_conf_file
+		Write-Output ""
+	}
 }
 
 
@@ -214,9 +208,8 @@ function ModifyUsersConfig {
 function main {
 	if($BackupProfiles)      	{ BackupProfiles  	}
 	elseif($RestoreProfiles) 	{ RestoreProfiles 	}
- 	elseif($ShowConfig) 	 	{ ShowConfig      	}	
-  	elseif($ShowLog)		{ ShowLog         	}
- 	elseif($ModifyUsersConfig)	{ ModifyUsersConfig	}
+ 	elseif($ConfigProfiles)		{ ConfigProfiles	}
+  	elseif($ShowLog)			{ ShowLog         	}
 }
 
 # EXEC 
