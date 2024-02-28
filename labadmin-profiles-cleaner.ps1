@@ -6,7 +6,7 @@
 .DESCRIPTION
     Automated user profiles cleaner for backup and autorestore at startup according scheduled rules
     Each profile folder is backup in c:\users\labadmin-profiles-cleaner\ and a <username>.cfg file is generated
-    Profile <username>.cfg file JSON options are:
+    Profile config <username>.cfg file JSON options are:
         cleanAfterDays: Number of days from last clean to next autoclean (0 clean in each reboot, 1 clean every day, etc)
         skipUser      : Boolean (true or false) to skip this user from autoclean (skips cleanAfterDays and cleanAllways)
         cleanAlways   : Array of relative paths to clean on every call
