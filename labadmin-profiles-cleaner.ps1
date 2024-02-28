@@ -34,8 +34,6 @@
     Force profile clean and ommits skipUser and cleanAfterDays config
 .PARAMETER Log
     Save output to log file in c:\users\labadmin-profiles-cleaner\log.txt
-.PARAMETER ShowLog
-	Show log file Content
 .PARAMETER ConfigProfiles
 	Modify all (or -users list) users config file 
 	Modified values are given with parameters: CleanAfterDays, SkipUser, CleanAllways and LastClean
@@ -54,11 +52,7 @@ Param(
 
   [parameter(Mandatory=$true, ParameterSetName="config")]
   [Switch]$ConfigProfiles,
-
-  [parameter(Mandatory=$true, ParameterSetName="log")]
-  [Switch]$ShowLog,
   
-
   [parameter(Mandatory=$false, ParameterSetName="config")]
   [Int]$CleanAfterDays,
   [parameter(Mandatory=$false, ParameterSetName="config")]
@@ -169,10 +163,6 @@ function RestoreProfiles {
 }
 
 
-function ShowLog {
-	Get-Content -Path $log_path
-}
-
 function ConfigProfiles {
 	if(!$users) { $users=foreach($f in Get-ChildItem $backups_path -filter *.cfg) {$f.basename } }
 	foreach($u in $users) {
@@ -209,7 +199,6 @@ function main {
 	if($BackupProfiles)      	{ BackupProfiles  	}
 	elseif($RestoreProfiles) 	{ RestoreProfiles 	}
  	elseif($ConfigProfiles)		{ ConfigProfiles	}
-  	elseif($ShowLog)			{ ShowLog         	}
 }
 
 # EXEC 
