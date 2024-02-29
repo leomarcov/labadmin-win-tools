@@ -181,14 +181,14 @@ function ConfigProfiles {
         	continue
       	}
 		
-		# Change user config
-		if($CleanAfterDays) { $user_conf.cleanAfterDays=$CleanAfterDays }
-  		if($SkipUser) { if($SkipUser -eq "true") { $user_conf.skipUser=$true } else { $user_conf.skipUser=$false } }
+	# Change user config
+	if($CleanAfterDays) { $user_conf.cleanAfterDays=$CleanAfterDays }
+  	if($SkipUser) { if($SkipUser -eq "true") { $user_conf.skipUser=$true } else { $user_conf.skipUser=$false } }
     	if($CleanAllways) { $user_conf.cleanAllways=$CleanAllways }
       	if($LastClean) { $user_conf.lastClean=$LastClean.ToString("yyy-MM-dd") }
 
-		# Save user config
- 		$user_conf | ConvertTo-Json | Out-File $user_conf_file 
+	# Save user config
+ 	$user_conf | ConvertTo-Json | Out-File $user_conf_file 
  	} 
 	
 	foreach($u in $users) {
