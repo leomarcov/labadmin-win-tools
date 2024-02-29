@@ -141,6 +141,13 @@ function RestoreProfiles {
       # Skip user (only if no force)
       if(!$Force -AND $user_conf.skipUser -eq "true") { Write-Output "Skipping user $u (skipUser config file)"; continue }
 
+      # Skip if cleanAfterDays=0 and last shutdown was unexpected
+      if($user_conf.cleanAfterDays -eq 0) {
+	 $lastShutdown=(Get-WinEvent -FilterHashtable @{logname = 'System'; id = 6009})[0].TimeCreated
+  	 $lastUnexpectedShutdown=(Get-WinEvent -FilterHashtable @{logname = 'System'; id = 6008})[0].TimeCreated
+    	 if($lastShutdown -eq $lastUnexpectedShutdown) { Write-Output "Skipping user $u (last shutdown unexpected)"; continue }
+      }
+
       # Scheduled restore
       if($Force -OR (New-TimeSpan -Start ([DateTime]$user_conf.lastClean) -End (Get-Date)).Days -ge $user_conf.cleanAfterDays) {
         Write-Output "Removing user $u profile folder..."
