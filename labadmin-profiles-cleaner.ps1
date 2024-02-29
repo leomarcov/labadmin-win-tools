@@ -186,7 +186,7 @@ function ConfigProfiles {
 	
 	foreach($u in $users) {
 		$user_conf_file="${backups_path}\$u.cfg"
-		Write-Output "#### USER: $u #################################################################"
+		Write-Output "#########################################################################################################"
 		Write-Output "File: ${user_conf_file}"
 		Get-Content -Path $user_conf_file
 		Write-Output ""
