@@ -39,9 +39,9 @@ $scheduledJobName="labadmin-rotatepass"
 
 function rotatePassword {
     $d=(Get-Date).toString("yyyyMMdd")
-    $f1="Q","W","E","R","T","Y","U","I","O","P"
-    $f2="A","S","D","F","G","H","J","K","L","Ñ" 
-    $f3="Z","X","C","V","B","N","M",",",".","-"
+    $f1="q","w","e","r","t","y","u","i","o","p"
+    $f2="a","s","d","f","g","h","j","k","l","ñ" 
+    $f3="z","x","c","v","b","n","m",",",".","-"
     $p=$f1[[System.Int32]::Parse($d[0])-1]+$f1[[System.Int32]::Parse($d[1])-1]+$f1[[System.Int32]::Parse($d[2])-1]+$f1[[System.Int32]::Parse($d[3])-1]+$f2[[System.Int32]::Parse($d[4])-1]+$f2[[System.Int32]::Parse($d[5])-1]+$f3[[System.Int32]::Parse($d[6])-1]+$f3[[System.Int32]::Parse($d[7])-1]
     $ss=$p|ConvertTo-SecureString -AsPlainText -Force
     Set-LocalUser -Name $userName -Password $ss
