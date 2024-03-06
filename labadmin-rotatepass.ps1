@@ -76,7 +76,7 @@ function enable {
 function register {
     Write-Output "Registering scheduled job $scheduledJobName for user $userName .."
     Unregister-ScheduledJob $scheduledJobName -ErrorAction SilentlyContinue
-    Register-ScheduledJob -Name $scheduledJobName -FilePath ${PSCommandPath} -ArgumentList @("${userName}") -Trigger (New-JobTrigger -AtStartup -RandomDelay 00:00:30) -ScheduledJobOption (New-ScheduledJobOption -RunElevated)
+    Register-ScheduledJob -Name $scheduledJobName -FilePath ${PSCommandPath} -ArgumentList @("${userName}") -Trigger (New-JobTrigger -AtStartup) -ScheduledJobOption (New-ScheduledJobOption -RunElevated)
 }
 
 function unregister {
