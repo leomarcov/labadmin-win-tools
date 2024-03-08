@@ -41,7 +41,7 @@ Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManage
   * **Disable run start asynchronously**
     * `Computer Configuration > Administrative Templates > System > Scripts > Run startup scripts asynchronously`
     * Set to **Disabled**
-  * Disable Fast Boot:
+* Disable Fast Boot:
     ```
     Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Power\" -Name "HiberbootEnabled" -Value 0
     ```
