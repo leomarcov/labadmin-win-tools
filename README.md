@@ -63,10 +63,13 @@ labadmin-profiles-cleaner.ps1 -ConfigProfiles [-CleanAfterDays <Int32>] [-SkipUs
 EXAMPLES
 labadmin-profiles-cleaner.ps1 -BackupProfiles -Users u1,u2   # Create or update backup profile folder for u1 and u2
 
-labadmin-profiles-cleaner.ps1 -RestoreProfiles                               # Restore all users with saved backup according his config file
-labadmin-profiles-cleaner.ps1 -RestoreProfiles -Force                        # Restore clean of all users with saved bakcup
+labadmin-profiles-cleaner.ps1 -RestoreProfiles                               # Restore all users with saved backup according last clean and not config as skipped
+labadmin-profiles-cleaner.ps1 -RestoreProfiles -Force                        # Restore all users with saved bakcup
 labadmin-profiles-cleaner.ps1 -RestoreProfiles -Users u1                     # Restore user u1 only
-labadmin-profiles-cleaner.ps1 -ConfigProfiles -CleanAfterDays 2 -Users u1    # 
+
+labadmin-profiles-cleaner.ps1 -ConfigProfiles -CleanAfterDays                # Show config file for all users
+labadmin-profiles-cleaner.ps1 -ConfigProfiles -CleanAfterDays 2 -Users u1    # Config user u2 to clean after 2 days
+labadmin-profiles-cleaner.ps1 -ConfigProfiles -SkipUser false                # Config SkipUser to false for all users
 
 ```
 &nbsp;  
