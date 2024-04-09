@@ -61,7 +61,7 @@ labadmin-profiles-cleaner.ps1 -RestoreProfiles [-Users <String[]>] [-Force] [-Lo
 labadmin-profiles-cleaner.ps1 -ConfigProfiles [-CleanAfterDays <Int32>] [-SkipUser <String>] [-CleanAllways <String[]>] [-LastClean <DateTime>] [-Users <String[]>]
 
 EXAMPLES
-labadmin-profiles-cleaner.ps1 -BackupProfiles -Users u1,u2   # Create or update backup profile folder for u1 and u2
+labadmin-profiles-cleaner.ps1 -BackupProfiles -Users u1,u2                   # Create or update backup profile folder for u1 and u2
 
 labadmin-profiles-cleaner.ps1 -RestoreProfiles                               # Restore all users with saved backup according last clean and not config as skipped
 labadmin-profiles-cleaner.ps1 -RestoreProfiles -Force                        # Restore all users with saved bakcup
