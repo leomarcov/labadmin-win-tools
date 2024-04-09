@@ -58,12 +58,16 @@ Each user can be config in **`<username>.cfg`** JSON file in `C:\Users\labadmin-
 SYNTAX
 labadmin-profiles-cleaner.ps1 -BackupProfiles -Users <String[]> [-Log] 
 labadmin-profiles-cleaner.ps1 -RestoreProfiles [-Users <String[]>] [-Force] [-Log] 
+labadmin-profiles-cleaner.ps1 -ConfigProfiles [-CleanAfterDays <Int32>] [-SkipUser <String>] [-CleanAllways <String[]>] [-LastClean <DateTime>] [-Users <String[]>]
 
 EXAMPLES
 labadmin-profiles-cleaner.ps1 -BackupProfiles -Users u1,u2   # Create or update backup profile folder for u1 and u2
-labadmin-profiles-cleaner.ps1 -RestoreProfiles               # Clean all users with saved backup according his config file
-labadmin-profiles-cleaner.ps1 -RestoreProfiles -Force        # Force clean of all users with saved bakcup
-labadmin-profiles-cleaner.ps1 -RestoreProfiles -Users u1     # Try clean user u1 only
+
+labadmin-profiles-cleaner.ps1 -RestoreProfiles                               # Restore all users with saved backup according his config file
+labadmin-profiles-cleaner.ps1 -RestoreProfiles -Force                        # Restore clean of all users with saved bakcup
+labadmin-profiles-cleaner.ps1 -RestoreProfiles -Users u1                     # Restore user u1 only
+labadmin-profiles-cleaner.ps1 -ConfigProfiles -CleanAfterDays 2 -Users u1    # 
+
 ```
 &nbsp;  
 # Lincense
