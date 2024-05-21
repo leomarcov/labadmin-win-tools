@@ -111,7 +111,7 @@ function BackupProfiles {
     
     # Copy profile
     robocopy $user_profile $user_backup /MIR /XJ /COPYALL /NFL /NDL
-    Remove-Item -Path "${user_backup}\AppData\Local\Microsoft\Windows\UsrClass.dat"	# Avoid restore UsrClass.dat file to prevent Start button crash (will be deleted on each restore)
+    Remove-Item -Force -Path "${user_backup}\AppData\Local\Microsoft\Windows\UsrClass.dat"	# Avoid restore UsrClass.dat file to prevent Start button crash (will be deleted on each restore)
     
     # Save default user config file in backups path
     if(!(Test-Path $user_conf_file)) { $default_config | ConvertTo-Json | Out-File $user_conf_file }
