@@ -2,7 +2,7 @@
 
 <#
 .SYNOPSIS
-    Manage hosts file to denay hostname access
+	Manage hosts file to denay hostname access
 
 .PARAMETER ShowHostsFile
 	Show hosts file content
@@ -14,27 +14,27 @@
 	Remove all lines in hosts file contaning string
 
 .NOTES
-    File Name: labadmin-rotatepass.ps1
-    Author   : Leonardo Marco
+	File Name: labadmin-rotatepass.ps1
+	Author   : Leonardo Marco
 #>
 
 Param(
-  [Switch]$ShowHostsFile,
-  [String]$DenyHosts,
-  [Switch]$WipeHostsFile,
-  [String]$RemoveHosts
+	[Switch]$ShowHostsFile,
+	[String]$DenyHosts,
+	[Switch]$WipeHostsFile,
+	[String]$RemoveHosts
 )
 
 $hosts_path = "$($Env:WinDir)\system32\Drivers\etc\hosts"
 $hosts_comment= "# labadmin-edit-hostsfile"
 
 function ShowHostsFile {
-  Get-Content $hosts_path
+	Get-Content $hosts_path
 }
 
 function DenyHosts {
-  $DenyHosts = $DenyHosts.Split("`n") | foreach { "127.0.0.1".PadRight(20, " ") + $_.PadRight(40, " ") + "# labadmin-edit-hostsfile" }
-  Add-Content -Encoding UTF8  $hosts_path $DenyHosts
+	$DenyHosts = $DenyHosts.Split("`n") | foreach { "127.0.0.1".PadRight(20, " ") + $_.PadRight(40, " ") + "# labadmin-edit-hostsfile" }
+	Add-Content -Encoding UTF8  $hosts_path $DenyHosts
 }
 
 function WipeHostsFile {
@@ -48,9 +48,9 @@ function RemoveHosts {
 
 
 if($ShowHostsFile)      	{ ShowHostsFile  	}
-elseif($DenyHosts) 			{ DenyHosts 		}
+elseif($DenyHosts) 		{ DenyHosts 		}
 elseif($WipeHostsFile)		{ WipeHostsFile		}
 elseif($RemoveHosts)		{ RemoveHosts		}
-else 						{ Get-Help $PSCommandPath -Detailed	}
+else 				{ Get-Help $PSCommandPath -Detailed	}
 
 
