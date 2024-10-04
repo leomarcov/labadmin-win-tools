@@ -2,20 +2,16 @@
 
 <#
 .SYNOPSIS
-    Rotate user password according rule
+    Manage hosts file to denay hostname access
 
-.PARAMETER userName
-	Username account to rotate
-.PARAMETER show
-	Show schedule job info rotation for userName account
-.PARAMETER disable
-	Disable schedule job rotation for userName account
-.PARAMETER enable
-	Enable schedule job rotation for userName account
-.PARAMETER register
-	Register schedule job rotation for userName account
-.PARAMETER unregister
-	Unregister schedule job rotation for userName account
+.PARAMETER ShowHostsFile
+	Show hosts file content
+.PARAMETER DenyHosts
+	Add a list of hosts (each one in a line) to denay them
+.PARAMETER WipeHostsFile
+	Wipe all labadmin lines inserted
+.PARAMETER RemoveHosts
+	Remove all lines in hosts file contaning string
 
 .NOTES
     File Name: labadmin-rotatepass.ps1
@@ -23,7 +19,6 @@
 #>
 
 Param(
-  [String]$userName,
   [Switch]$ShowHostsFile,
   [String]$DenyHosts,
   [Switch]$WipeHostsFile,
@@ -31,49 +26,31 @@ Param(
 )
 
 $hosts_path = "$($Env:WinDir)\system32\Drivers\etc\hosts"
-
+$hosts_comment= "# labadmin-edit-hostsfile"
 
 function ShowHostsFile {
   Get-Content $hosts_path
 }
 
 function DenyHosts {
-  Add-Content -Encoding UTF8  $hosts_path ("127.0.0.1".PadRight(20, " ") + "$hostname".PadRight(40, " ") + "# labadmin-edit-hostsfile")
+  $DenyHosts = $DenyHosts.Split("`n") | foreach { "127.0.0.1".PadRight(20, " ") + $_.PadRight(40, " ") + "# labadmin-edit-hostsfile" }
+  Add-Content -Encoding UTF8  $hosts_path $DenyHosts
 }
 
 function WipeHostsFile {
-"# Copyright (c) 1993-2009 Microsoft Corp.
-#
-# This is a sample HOSTS file used by Microsoft TCP/IP for Windows.
-#
-# This file contains the mappings of IP addresses to host names. Each
-# entry should be kept on an individual line. The IP address should
-# be placed in the first column followed by the corresponding host name.
-# The IP address and the host name should be separated by at least one
-# space.
-#
-# Additionally, comments (such as these) may be inserted on individual
-# lines or following the machine name denoted by a '#' symbol.
-#
-# For example:
-#
-#      102.54.94.97     rhino.acme.com          # source server
-#       38.25.63.10     x.acme.com              # x client host
-
-# localhost name resolution is handled within DNS itself.
-#	127.0.0.1       localhost
-#	::1             localhost" | Out-File -Encoding UTF8 -FilePath $hosts_path
-
+	$RemoveHosts=$hosts_comment
+	RemoveHosts
 }
 
 function RemoveHosts {
-  Get-Content $hosts_path | Where-Object { -not $_.Contains($hostname) } | Set-Content $hosts_path
+  (Get-Content $hosts_path | Where-Object { -not $_.Contains($RemoveHosts) }) | Out-File -Encoding UTF8 -FilePath $hosts_path
 }
 
-function main {
-	if($BackupProfiles)      	{ BackupProfiles  	}
-	elseif($RestoreProfiles) 	{ RestoreProfiles 	}
- 	elseif($ConfigProfiles)		{ ConfigProfiles	}
-}
 
-main
+if($ShowHostsFile)      	{ ShowHostsFile  	}
+elseif($DenyHosts) 			{ DenyHosts 		}
+elseif($WipeHostsFile)		{ WipeHostsFile		}
+elseif($RemoveHosts)		{ RemoveHosts		}
+else 						{ Get-Help $PSCommandPath -Detailed	}
+
+
