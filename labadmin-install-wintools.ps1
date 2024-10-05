@@ -4,8 +4,11 @@ $install_path=$ENV:ProgramFiles+"\labadmin\labadmin-win-tools\"
 $url="https://github.com/leomarcov/labadmin-win-tools/archive/refs/heads/main.zip"
 
 # Create folder
-Write-Output "Preparing folder ${install_path} ..."
-if((Test-Path -LiteralPath $install_path -PathType Container)) { Remove-Item -LiteralPath ${install_path} -Force -Recurse }
+if((Test-Path -LiteralPath $install_path -PathType Container)) { 
+  Write-Output "Removing folder ${install_path} ..."
+  Remove-Item -LiteralPath ${install_path} -Force -Recurse 
+}
+Write-Output "Creating folder ${install_path} ..."
 New-Item -ItemType Directory -Force -Path $install_path | Out-Null
 
 # Download repository
@@ -18,6 +21,7 @@ Remove-Item -LiteralPath "${install_path}\main.zip" -Force
 Remove-Item -LiteralPath "${install_path}\labadmin-win-tools-main" -Force -Recurse
 
 # Update PATH
+Write-Output "Updating \$PATH ..."
 $current_path = (Get-ItemProperty -Path 'Registry::HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\Environment' -Name PATH).path
 # Check if install_path is already in PATH
 if(!($current_path.Split(';') | Where-Object { $_ -eq $install_path })){ 
