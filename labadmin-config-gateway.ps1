@@ -13,9 +13,14 @@
 #>
 
 Param(
-  [Parameter(Mandatory)]
   [ipaddress]$gwAddress
 )
+
+# HELP
+if(!$gwAddress) {
+  Get-Help $PSCommandPath -Detailed
+  exit 1
+}
 
 # GET CURRENT GW
 $gwCurrent=(Get-NetIPConfiguration).IPv4DefaultGateway.NextHop
