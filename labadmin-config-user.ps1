@@ -25,7 +25,7 @@
 #>
 
 Param(
-  [Parameter(Mandatory=$false), ParameterSetName='help')]
+  [Parameter(Mandatory=$false, ParameterSetName='help')]
   [Parameter(Mandatory=$true, ParameterSetName='edit')] 
   [String]$UserName,
 
