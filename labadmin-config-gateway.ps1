@@ -17,14 +17,14 @@
 #>
 
 Param(
-  [Parameter(Mandatory=$false, ParameterSetName='help')]
-  [Parameter(Mandatory=$true, ParameterSetName='address')] 
+  [Parameter(Mandatory=$true, ParameterSetName='set')] 
+  [Parameter(Mandatory=$true, ParameterSetName='reset')] 
   [ipaddress]$address,
 
-  [Parameter(ParameterSetName='address')]
+  [Parameter(ParameterSetName='set')]
   [Switch]$setGateway,                      # Set gateway
   
-  [Parameter(ParameterSetName='address')]
+  [Parameter(ParameterSetName='reset')]
   [Switch]$resetGateway                     # Reset gateway
 )
 
