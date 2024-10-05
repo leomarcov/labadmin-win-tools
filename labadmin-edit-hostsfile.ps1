@@ -2,44 +2,44 @@
 
 <#
 .SYNOPSIS
-	Manage hosts file to denay hostname access
+  Manage hosts file to denay hostname access
 
 .PARAMETER ShowHostsFile
-	Show hosts file content
+  Show hosts file content
 .PARAMETER DenyHosts
-	Add a list of hosts (each one in a line) to denay them
+  Add a list of hosts (by spaces, lines, tabs...) to denay them
 .PARAMETER WipeHostsFile
-	Wipe all labadmin lines inserted
+  Wipe all labadmin lines inserted
 .PARAMETER RemoveHosts
-	Remove all lines in hosts file contaning string
+  Remove all lines in hosts file contaning string
 
 .NOTES
-	File Name: labadmin-rotatepass.ps1
-	Author   : Leonardo Marco
+    File Name: labadmin-edit-hostsfile.ps1
+    Author   : Leonardo Marco
 #>
 
 Param(
-	[Switch]$ShowHostsFile,
-	[String]$DenyHosts,
-	[Switch]$WipeHostsFile,
-	[String]$RemoveHosts
+  [Switch]$ShowHostsFile,
+  [String]$DenyHosts,
+  [Switch]$WipeHostsFile,
+  [String]$RemoveHosts
 )
 
 $hosts_path = "$($Env:WinDir)\system32\Drivers\etc\hosts"
 $hosts_comment= "# labadmin-edit-hostsfile"
 
 function ShowHostsFile {
-	Get-Content $hosts_path
+  Get-Content $hosts_path
 }
 
 function DenyHosts {
-	$DenyHosts = $DenyHosts.Split("`n") | foreach { "127.0.0.1".PadRight(20, " ") + $_.PadRight(40, " ") + "# labadmin-edit-hostsfile" }
-	Add-Content -Encoding UTF8  $hosts_path $DenyHosts
+  $DenyHosts = $DenyHosts.Split() | foreach { "127.0.0.1".PadRight(20, " ") + $_.PadRight(40, " ") + "# labadmin-edit-hostsfile" }
+  Add-Content -Encoding UTF8  $hosts_path $DenyHosts
 }
 
 function WipeHostsFile {
-	$RemoveHosts=$hosts_comment
-	RemoveHosts
+  $RemoveHosts=$hosts_comment
+  RemoveHosts
 }
 
 function RemoveHosts {
