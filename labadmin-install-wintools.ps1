@@ -21,7 +21,7 @@ Remove-Item -LiteralPath "${install_path}\main.zip" -Force
 Remove-Item -LiteralPath "${install_path}\labadmin-win-tools-main" -Force -Recurse
 
 # Update PATH
-Write-Output "Updating \$PATH ..."
+Write-Output 'Updating $PATH ...'
 $current_path = (Get-ItemProperty -Path 'Registry::HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\Environment' -Name PATH).path
 # Check if install_path is already in PATH
 if(!($current_path.Split(';') | Where-Object { $_ -eq $install_path })){ 
