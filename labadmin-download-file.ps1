@@ -27,14 +27,28 @@
 #>
 
 Param(
-  [parameter(Mandatory=$true)]
+  [Parameter(Mandatory=$false, ParameterSetName='help')]
+  [Parameter(Mandatory=$true, ParameterSetName='file')] 
   [String]$fileName,                 # Filename of downloaded file
+  
+  [Parameter(ParameterSetName='file')]
   [String]$MD5,                      # MD5 to check integrity downloaded file (if match not download)
+  
+  [Parameter(ParameterSetName='file')]
   [URI]$URL,                         # URL from download
+
+  [Parameter(ParameterSetName='file')]
   [Switch]$forceDownload,            # Force download and override local file
+  
+  [Parameter(ParameterSetName='file')]
   [String]$destinationPath	     # Optional folder to download instead labadmin base download
 )
 
+# HELP
+if($args.Count -eq 0) {
+  Get-Help $PSCommandPath -Detailed
+  exit 1
+}
 
 #### CONFIG VARIABLES
 $labadminDownloadsPath="${ENV:ALLUSERSPROFILE}\labadmin\downloads"
