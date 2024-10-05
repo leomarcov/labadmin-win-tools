@@ -16,7 +16,7 @@ Labadmin Win Tools is a collection of PowerShell scripts to admin Windows 10 sys
 ## Install
 * Exec this PowerShell command as admin (download and copy all scripts files to `Program Files\labadmin\labadmin-win-tools` folder and add to PATH):
 ```
-Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/leomarcov/labadmin-win-tools/main/install.ps1'))
+Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/leomarcov/labadmin-win-tools/main/labadmin-install-wintools.ps1'))
 ```
 <br>
 
