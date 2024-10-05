@@ -53,7 +53,7 @@ if($setGateway) {
 } elseif($resetGateWay) {
 	Remove-NetRoute -NextHop $address -Confirm:$false
 	ipconfig /renew 
-
+ 	ipconfig
 # HELP
 } else {
   Get-Help $PSCommandPath -Detailed
