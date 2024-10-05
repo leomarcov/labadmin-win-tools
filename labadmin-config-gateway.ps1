@@ -50,7 +50,7 @@ if($setGateway) {
     }
 
 # RESETGATEWAY
-} elif($resetGateWay) {
+} elseif($resetGateWay) {
 	Remove-NetRoute -NextHop $address -Confirm:$false
 	ipconfig /renew > null
 
