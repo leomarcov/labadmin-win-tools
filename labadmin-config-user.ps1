@@ -25,35 +25,28 @@
 #>
 
 Param(
-  [Parameter(Mandatory=$false, ParameterSetName='help')]
-  [Parameter(Mandatory=$true, ParameterSetName='edit')] 
+  [Parameter(Mandatory=$true)]
   [String]$UserName,
 
-  [Parameter(ParameterSetName='edit')]
+  [parameter(ParameterSetName='password')]
   [String]$SetPassword,
 
-  [Parameter(ParameterSetName='edit')]
+  [Parameter(ParameterSetName='nopass')]
   [Switch]$NoPassword,
 
-  [Parameter(ParameterSetName='edit')]
+  [Parameter(ParameterSetName='hide')]
   [Switch]$Hide,
   
-  [Parameter(ParameterSetName='edit')]
+  [Parameter(ParameterSetName='unhide')]
   [Switch]$Unhide,
   
-  [Parameter(ParameterSetName='edit')]
+  [Parameter(ParameterSetName='disable')]
   [Switch]$Disable,
   
-  [Parameter(ParameterSetName='edit')]
+  [Parameter(ParameterSetName='enable')]
   [Switch]$Enable
 )
 
-
-# HELP
-if($args.Count -eq 0) {
-  Get-Help $PSCommandPath -Detailed
-  exit 1
-}
 
 Get-LocalUser -Name $UserName -ErrorAction Stop | Out-Null
 
