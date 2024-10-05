@@ -35,14 +35,9 @@ if($enable) {
   else { Write-Error "Realtime protection is still ENABLED!"; exit 1 }
 
 # STATUS
-} elseif($status) {
+} else {
   if((Get-MpPreference).DisableRealtimeMonitoring) { Write-Output "Current status: DISABLED"; exit 1	}
   else { Write-Output "Current status: ENABLED"; exit 0 }
-
-# HELP
-} else {
-  Get-Help $PSCommandPath -Detailed
-  exit 1
 }
 
 
