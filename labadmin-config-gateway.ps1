@@ -34,7 +34,7 @@ Get-NetIPConfiguration
 
 # EXIT CODE
 if($gwAddress -eq (Get-NetIPConfiguration).IPv4DefaultGateway.NextHop) { 
-    Remove-NetRoute -NextHop $gwCurrent -Confirm:$false | Out-Null    # Remove old gw
+    Remove-NetRoute -NextHop $gwCurrent -Confirm:$false -SilentlyContinue | Out-Null    # Remove old gw
     exit 0 
 } else { 
     Write-Output "WANING! Gateway address not chnaged!"; exit 1 
