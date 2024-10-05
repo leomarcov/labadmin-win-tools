@@ -47,6 +47,12 @@ Param(
   [Switch]$Enable
 )
 
+# HELP
+if($args.Count -eq 0) {
+  Get-Help $PSCommandPath -Detailed
+  exit 1
+}
+
 Get-LocalUser -Name $UserName -ErrorAction Stop | Out-Null
 
 # HIDE/UNHIDE
