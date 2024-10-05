@@ -2,7 +2,7 @@
 
 <#
 .SYNOPSIS
-  Manage hosts file to denay hostname access
+  Manage hosts file to denay hostnames access
 
 .PARAMETER ShowHostsFile
   Show hosts file content
@@ -50,7 +50,6 @@ function WipeHostsFile {
 function RemoveHosts {
   (Get-Content $hosts_path | Where-Object { -not $_.Contains($RemoveHosts) }) | Out-File -Encoding UTF8 -FilePath $hosts_path
 }
-
 
 
 if($WipeHostsFile)	{ WipeHostsFile		}
