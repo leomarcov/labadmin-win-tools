@@ -33,8 +33,8 @@ if($setGateway) {
     $wmi.SetGateways($setGateway, 1) | Out-null
 
     # Show new config
-    Get-NetIPConfiguration
-
+    ipconfig
+    
     # EXIT CODE
     if($setGateway -eq (Get-NetIPConfiguration).IPv4DefaultGateway.NextHop) { 
         Remove-NetRoute -NextHop $gwCurrent -Confirm:$false -ErrorAction SilentlyContinue | Out-Null    # Remove old gw
