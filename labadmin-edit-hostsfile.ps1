@@ -56,6 +56,6 @@ if($ShowHostsFile)      { ShowHostsFile  	}
 elseif($DenyHosts) 		  { DenyHosts 		}
 elseif($WipeHostsFile)	{ WipeHostsFile		}
 elseif($RemoveHosts)		{ RemoveHosts		}
-else 				            { Get-Help $PSCommandPath -Detailed	}
+else 				            { Get-Help $PSCommandPath -Detailed; exit 1 }
 
 
