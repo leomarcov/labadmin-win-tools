@@ -25,6 +25,7 @@
 #>
 
 Param(
+  [Parameter(Mandatory=$false)]
   [Parameter(Mandatory=$true, ParameterSetName='password')]
   [Parameter(Mandatory=$true, ParameterSetName='nopass')]
   [Parameter(Mandatory=$true, ParameterSetName='hide')]
@@ -33,7 +34,7 @@ Param(
   [Parameter(Mandatory=$true, ParameterSetName='enable')]    
   [String]$UserName,
 
-  [parameter(ParameterSetName='password')]
+  [Parameter(ParameterSetName='password')]
   [String]$SetPassword,
 
   [Parameter(ParameterSetName='nopass')]
