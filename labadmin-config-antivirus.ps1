@@ -42,6 +42,7 @@ if($enable) {
 # HELP
 } else {
   Get-Help $PSCommandPath -Detailed
+  exit 1
 }
 
 
