@@ -56,6 +56,6 @@ function RemoveHosts {
 if($DenyHosts) 		      { DenyHosts 		  }
 elseif($WipeHostsFile)	{ WipeHostsFile		}
 elseif($RemoveHosts)		{ RemoveHosts		  }
-else($ShowHostsFile)    { ShowHostsFile  	}
+else                    { ShowHostsFile  	}
 
 
