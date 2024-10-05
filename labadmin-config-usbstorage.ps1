@@ -26,15 +26,23 @@ Param(
 )
 
 # DISABLE
-if($disable) {
+function disable {
   Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\USBSTOR\" -Name "Start" -Value 4
+}
 
 # ENABLE
-} elseif($enable) {
+function enable {
   Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\USBSTOR\" -Name "Start" -Value 3
+}
 
 # STATUS
-} else {
+function status {
   if ((Get-ItemPropertyValue -Path 'HKLM:\SYSTEM\CurrentControlSet\Services\USBSTOR\' -Name "Start") -eq 4) { Write-Output "Current status: DISABLED"; exit 1 } 
   else { Write-Output "Current status: ENABLED"; exit 0 }
-} 
+}
+
+
+if($disable)      { disable; status } 
+elseif($enable)   { enable; status  }
+else              { status }
+
