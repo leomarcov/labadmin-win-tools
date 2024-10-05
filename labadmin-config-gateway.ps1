@@ -47,7 +47,6 @@ if($setGateway) {
 } elseif($resetGateWay) {
 	Remove-NetRoute -NextHop $resetGateway -Confirm:$false
 	ipconfig /renew 
- 	ipconfig
 } 
 
 
