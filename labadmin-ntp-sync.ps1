@@ -16,7 +16,7 @@ Param(
 )
 
 # CONFIG VARIABLES
-$defaultNTPServerList="pd.educarm.net time.windows.com 0.pool.ntp.org 1.pool.ntp.org 2.pool.ntp.org 3.pool.ntp.org"
+$defaultNTPServerList="time.windows.com 0.pool.ntp.org 1.pool.ntp.org 2.pool.ntp.org 3.pool.ntp.org"
 if(!$ntpServersList) { $ntpServersList=$defaultNTPServerList }
 
 Start-Service w32time
