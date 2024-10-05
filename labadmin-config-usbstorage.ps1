@@ -17,8 +17,11 @@
 #>
 
 Param(
+  [Parameter(Mandatory=$true, ParameterSetName='enable')] 
   [Switch]$Enable,
+  [Parameter(Mandatory=$true, ParameterSetName='disable')] 
   [Switch]$Disable,
+  [Parameter(Mandatory=$true, ParameterSetName='status')] 
   [Switch]$Status
 )
 
@@ -31,12 +34,7 @@ if($disable) {
   Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\USBSTOR\" -Name "Start" -Value 3
 
 # STATUS
-} elseif($status) {
+} else {
   if ((Get-ItemPropertyValue -Path 'HKLM:\SYSTEM\CurrentControlSet\Services\USBSTOR\' -Name "Start") -eq 4) { Write-Output "Current status: DISABLED"; exit 1 } 
   else { Write-Output "Current status: ENABLED"; exit 0 }
-
-# HELP
-} else {
-  Get-Help $PSCommandPath -Detailed
-  exit 1
-}
+} 
