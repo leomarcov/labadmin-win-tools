@@ -52,10 +52,10 @@ function RemoveHosts {
 }
 
 
-if($ShowHostsFile)      { ShowHostsFile  	}
-elseif($DenyHosts) 		  { DenyHosts 		}
+
+if($DenyHosts) 		      { DenyHosts 		  }
 elseif($WipeHostsFile)	{ WipeHostsFile		}
-elseif($RemoveHosts)		{ RemoveHosts		}
-else 				            { Get-Help $PSCommandPath -Detailed; exit 1 }
+elseif($RemoveHosts)		{ RemoveHosts		  }
+else($ShowHostsFile)    { ShowHostsFile  	}
 
 
