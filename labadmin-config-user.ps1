@@ -24,32 +24,13 @@
     Author   : Leonardo Marco
 #>
 
-Param(
-  [Parameter(Mandatory=$false)]
-  [Parameter(Mandatory=$true, ParameterSetName='password')]
-  [Parameter(Mandatory=$true, ParameterSetName='nopass')]
-  [Parameter(Mandatory=$true, ParameterSetName='hide')]
-  [Parameter(Mandatory=$true, ParameterSetName='unhide')]
-  [Parameter(Mandatory=$true, ParameterSetName='disable')]  
-  [Parameter(Mandatory=$true, ParameterSetName='enable')]    
+Param( 
   [String]$UserName,
-
-  [Parameter(ParameterSetName='password')]
   [String]$SetPassword,
-
-  [Parameter(ParameterSetName='nopass')]
   [Switch]$NoPassword,
-
-  [Parameter(ParameterSetName='hide')]
   [Switch]$Hide,
-  
-  [Parameter(ParameterSetName='unhide')]
   [Switch]$Unhide,
-  
-  [Parameter(ParameterSetName='disable')]
   [Switch]$Disable,
-  
-  [Parameter(ParameterSetName='enable')]
   [Switch]$Enable
 )
 
