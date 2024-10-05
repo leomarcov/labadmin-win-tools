@@ -4,12 +4,10 @@
 .SYNOPSIS
     Set gateway address (even if current addres has been get using dhcp)
 
-.PARAMETER address
-    Gateway address 
 .PARAMETER setGateway
-    Set gateway address and remove old gateway
+    Address to set as gateway (remove old gateway)
 .PARAMETER resetGateway
-    Remove gateway and try renew DHCP addresses
+    Address to remove as gateway (and try renew DHCP addresses)
 
 .NOTES
     File Name: labadmin-config-gateway.ps1
@@ -18,14 +16,10 @@
 
 Param(
   [Parameter(Mandatory=$true, ParameterSetName='set')] 
-  [Parameter(Mandatory=$true, ParameterSetName='reset')] 
-  [ipaddress]$address,
-
-  [Parameter(ParameterSetName='set')]
-  [Switch]$setGateway,                      # Set gateway
+  [ipaddress]$setGateway,
   
-  [Parameter(ParameterSetName='reset')]
-  [Switch]$resetGateway                     # Reset gateway
+  [Parameter(Mandatory=$true, ParameterSetName='reset')] 
+  [ipaddress]$resetGateway
 )
 
 
@@ -36,13 +30,13 @@ if($setGateway) {
 
     # Set new gw
     $wmi = Get-WmiObject win32_networkadapterconfiguration -filter "ipenabled = 'true'"
-    $wmi.SetGateways($address, 1) | Out-null
+    $wmi.SetGateways($setGateway, 1) | Out-null
 
     # Show new config
     Get-NetIPConfiguration
 
     # EXIT CODE
-    if($address -eq (Get-NetIPConfiguration).IPv4DefaultGateway.NextHop) { 
+    if($setGateway -eq (Get-NetIPConfiguration).IPv4DefaultGateway.NextHop) { 
         Remove-NetRoute -NextHop $gwCurrent -Confirm:$false -ErrorAction SilentlyContinue | Out-Null    # Remove old gw
         exit 0 
     } else { 
@@ -51,14 +45,10 @@ if($setGateway) {
 
 # RESETGATEWAY
 } elseif($resetGateWay) {
-	Remove-NetRoute -NextHop $address -Confirm:$false
+	Remove-NetRoute -NextHop $resetGateway -Confirm:$false
 	ipconfig /renew 
  	ipconfig
-# HELP
-} else {
-  Get-Help $PSCommandPath -Detailed
-  exit 1
-}
+} 
 
 
 
