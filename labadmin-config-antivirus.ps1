@@ -17,8 +17,11 @@
 #>
 
 Param(
+  [Parameter(Mandatory=$true, ParameterSetName='enable')] 
   [Switch]$Enable,
+  [Parameter(Mandatory=$true, ParameterSetName='disable')]
   [Switch]$Disable,
+  [Parameter(Mandatory=$true, ParameterSetName='status')]
   [Switch]$Status
 )
 
