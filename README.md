@@ -11,6 +11,7 @@ Labadmin Win Tools is a collection of PowerShell scripts to admin Windows 10 sys
   * Set gateway address
   * Enable/disable antivirus realtime protection
   * Force NTP time sync
+  * Deny hostnames from hotss file
 <br>
 
 ## Install
