@@ -21,10 +21,10 @@ Param(
   [Parameter(Mandatory=$true, ParameterSetName='address')] 
   [ipaddress]$address,
 
-  [Parameter(ParameterSetName='address')
+  [Parameter(ParameterSetName='address')]
   [Switch]$setGateway,                      # Set gateway
   
-  [Parameter(ParameterSetName='address')
+  [Parameter(ParameterSetName='address')]
   [Switch]$resetGateway                     # Reset gateway
 )
 
