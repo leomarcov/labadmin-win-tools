@@ -24,15 +24,30 @@
     Author   : Leonardo Marco
 #>
 
-Param( 
+Param(
+  [Parameter(Mandatory=$false), ParameterSetName='help')]
+  [Parameter(Mandatory=$true, ParameterSetName='edit')] 
   [String]$UserName,
+
+  [Parameter(ParameterSetName='edit')]
   [String]$SetPassword,
+
+  [Parameter(ParameterSetName='edit')]
   [Switch]$NoPassword,
+
+  [Parameter(ParameterSetName='edit')]
   [Switch]$Hide,
+  
+  [Parameter(ParameterSetName='edit')]
   [Switch]$Unhide,
+  
+  [Parameter(ParameterSetName='edit')]
   [Switch]$Disable,
+  
+  [Parameter(ParameterSetName='edit')]
   [Switch]$Enable
 )
+
 
 # HELP
 if($args.Count -eq 0) {
