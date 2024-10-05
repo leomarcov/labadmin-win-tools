@@ -4,9 +4,9 @@
 .SYNOPSIS
     Enable/disable Windows antivirus real time protection
     
-.PARAMETER Enabled
+.PARAMETER Enable
     Enable antivirus real time protection
-.PARAMETER Disabled
+.PARAMETER Disable
     Disable antivirus real time protection
 .PARAMETER Status
     Show current status
