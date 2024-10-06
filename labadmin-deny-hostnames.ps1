@@ -36,7 +36,7 @@ function ShowHostsFile {
 
 # DENAYHOSTS
 function DenyHosts {
-  $DenyHosts = $DenyHosts.Split() | foreach { "127.0.0.1".PadRight(20, " ") + $_.PadRight(40, " ") + $hosts_comment +" "+ (Get-Date -format "yyyy-MM-dd HH:MM:ss") }
+  $DenyHosts = $DenyHosts.Split() | foreach { "127.0.0.1".PadRight(20, " ") + $_.PadRight(40, " ") + $hosts_comment +" ("+ (Get-Date -format "yyyy-MM-dd HH:MM:ss")+")" }
   Add-Content -Encoding UTF8  $hosts_path $DenyHosts
 }
 
