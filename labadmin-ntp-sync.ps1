@@ -12,14 +12,28 @@
 #>
 
 Param(
-  [String]$ntpServersList
+  [String]$UpdateServers
+  [Switch]$ForceSync
+  [Switch]$Status
 )
 
-# CONFIG VARIABLES
-$defaultNTPServerList="time.windows.com time.nist.gov 0.pool.ntp.org 1.pool.ntp.org 2.pool.ntp.org 3.pool.ntp.org"
-if(!$ntpServersList) { $ntpServersList=$defaultNTPServerList }
 
 Start-Service w32time
-w32tm /config /syncfromflags:manual /manualpeerlist:"$ntpServersList" /reliable:yes /update
-w32tm /resync /force
-# w32tm /query /status
+
+# CONFIG NTP SERVER LIST
+if($UpdateServers) {
+    $defaultNTPServerList="time.windows.com time.nist.gov 0.pool.ntp.org 1.pool.ntp.org 2.pool.ntp.org 3.pool.ntp.org"
+    if(!$NTPServerList) { $ntpServersList=$defaultNTPServerList }
+    w32tm /config /syncfromflags:manual /manualpeerlist:"$ntpServersList" /reliable:yes /update
+}
+
+# FORCE SYNC
+if($ForceSync) {
+    w32tm /resync /force
+}
+
+# STATUS
+w32tm /query /status
+
+
+
