@@ -27,7 +27,7 @@ Param(
 
 #  CONFIG VARIABLES
 $hosts_path = "$($Env:WinDir)\system32\Drivers\etc\hosts"
-$hosts_comment= "# labadmin-edit-hostsfile"
+$hosts_comment= "# labadmin-edit-hostsfile " + (Get-Date -format "yyyy-MM-dd HH:MM:ss")
 
 # SHOWHOSTSFILE
 function ShowHostsFile {
