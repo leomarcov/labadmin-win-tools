@@ -2,7 +2,8 @@
 
 <#
 .SYNOPSIS
-    Set list of NTP servers and force sync
+    Force NTP sync and update NTP server list
+
 .PARAMETER ntpServersList
     List of NTP servers (space separated)
     
@@ -12,7 +13,9 @@
 #>
 
 Param(
+  [Parameter(Mandatory=$true, ParameterSetName='update')]
   [Switch]$updateServers,
+  [Parameter(Mandatory=$false, ParameterSetName='update')]
   [String]$serverList,
   [Switch]$forceSync,
   [Switch]$status
