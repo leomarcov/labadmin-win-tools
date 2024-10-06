@@ -37,6 +37,7 @@ if($forceSync) {
 }
 
 # STATUS
+Write-Output "`n#### NTP STATUS ############################################################"
 w32tm /query /status
 
 
