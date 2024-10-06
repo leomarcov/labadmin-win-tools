@@ -27,7 +27,7 @@ Param(
 
 #  CONFIG VARIABLES
 $hosts_path = "$($Env:WinDir)\system32\Drivers\etc\hosts"
-$hosts_comment= "# labadmin-edit-hostsfile " + (Get-Date -format "yyyy-MM-dd HH:MM:ss")
+$hosts_comment= "# labadmin-edit-hostsfile "
 
 # SHOWHOSTSFILE
 function ShowHostsFile {
@@ -36,7 +36,7 @@ function ShowHostsFile {
 
 # DENAYHOSTS
 function DenyHosts {
-  $DenyHosts = $DenyHosts.Split() | foreach { "127.0.0.1".PadRight(20, " ") + $_.PadRight(40, " ") + "# labadmin-edit-hostsfile" }
+  $DenyHosts = $DenyHosts.Split() | foreach { "127.0.0.1".PadRight(20, " ") + $_.PadRight(40, " ") + $hosts_comment +" "+ (Get-Date -format "yyyy-MM-dd HH:MM:ss") }
   Add-Content -Encoding UTF8  $hosts_path $DenyHosts
 }
 
