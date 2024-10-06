@@ -12,8 +12,8 @@
 #>
 
 Param(
-  [String]$UpdateServers
-  [Switch]$ForceSync
+  [String]$UpdateServers,
+  [Switch]$ForceSync,
   [Switch]$Status
 )
 
