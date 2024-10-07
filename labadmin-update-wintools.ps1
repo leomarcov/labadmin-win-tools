@@ -21,9 +21,10 @@ Write-Output "Creating folder ${install_path} ..."
 New-Item -ItemType Directory -Force -Path $install_path | Out-Null
 
 # Download repository
-Write-Output "Downloading files ..."
+Write-Output "Downloading main proyect ..."
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 Invoke-WebRequest -Uri ${url} -OutFile "${install_path}\main.zip" -ErrorAction Stop
+Write-Output "Extracting files ..."
 Expand-Archive -LiteralPath "${install_path}\main.zip" -DestinationPath $install_path -Force -ErrorAction Stop
 Move-Item -Path "${install_path}\labadmin-win-tools-main\*.ps1" -Destination $install_path -ErrorAction Stop
 Remove-Item -LiteralPath "${install_path}\main.zip" -Force
