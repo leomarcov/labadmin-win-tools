@@ -30,6 +30,7 @@ if($setGateway) {
 
     # Set new gw
     $wmi = Get-WmiObject win32_networkadapterconfiguration -filter "ipenabled = 'true'"
+    $wmi = $wmi | Where-Object { $_.DefaultIPGateway -eq $gwCurrent }
     $wmi.SetGateways($setGateway, 1) | Out-null
 
     # Show new config
