@@ -26,7 +26,7 @@ Param(
 # SETWATEGAY
 if($setGateway) {
     # Get current gw
-    $gwCurrent=(Get-NetIPConfiguration).IPv4DefaultGateway.NextHop
+    $gwCurrent=(Find-NetRoute -RemoteIPAddress 8.8.8.8)[1].NextHop
 
     # Set new gw
     $wmi = Get-WmiObject win32_networkadapterconfiguration -filter "ipenabled = 'true'"
