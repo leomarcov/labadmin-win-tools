@@ -45,7 +45,7 @@ Param(
 )
 
 # HELP
-if($args.Count -eq 0) {
+if($PSCmdlet.MyInvocation.BoundParameters.Count -eq 0) {
   Get-Help $PSCommandPath -Detailed
   exit 1
 }
