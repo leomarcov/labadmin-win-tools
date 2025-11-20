@@ -110,6 +110,7 @@ function BackupProfiles {
     if(Test-Path $user_backup) { Remove-Item -Recurse -Force $user_backup -ErrorAction SilentlyContinue }
     
     # Copy profile
+	& "${env:SystemRoot}\System32\cmd.exe" /c "rmdir /s /q ${user_profile}\AppData\Local\Microsoft\Windows\SFAP\" *> $null       # Delete this folder first to avoid access denied in Windows 11
     robocopy $user_profile $user_backup /MIR /XJ /COPYALL /NFL /NDL
     Remove-Item -Force -Path "${user_backup}\AppData\Local\Microsoft\Windows\UsrClass.dat"	# Avoid restore UsrClass.dat file to prevent Start button crash (will be deleted on each restore)
     
