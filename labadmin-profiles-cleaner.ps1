@@ -153,7 +153,8 @@ function RestoreProfiles {
       # Scheduled restore
       if($Force -OR (New-TimeSpan -Start ([DateTime]$user_conf.lastClean) -End (Get-Date)).Days -ge $user_conf.cleanAfterDays) {
         Write-Output "Removing user $u profile folder..."
-        Remove-Item -Recurse -Force $user_profile
+        # Remove-Item -Recurse -Force $user_profile
+		& "${env:SystemRoot}\System32\cmd.exe" /c "rmdir /s /q ${user_profile}"
         echo d | robocopy ${user_backup} ${user_profile} /MIR /XJ /COPYALL /NFL /NDL 
         
         # Update lastClean date
