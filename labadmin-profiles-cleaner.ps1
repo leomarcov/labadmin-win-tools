@@ -80,12 +80,57 @@ Param(
 $backups_path="${ENV:SystemDrive}\Users\labadmin-profiles-cleaner"                       # Path to save backups and configs
 $log_path="${backups_path}\log.txt"                                                      # Path to save logs
 $default_config=@{
-    cleanAfterDays=1                                                                     # Days after spend to exec a new profile autoclean
     lastClean=(Get-Date -Format "yyy-MM-dd")                                             # Date of last autoclean executed
     skipUser=$false                                                                      # Skip this user of autoclean
-    cleanAllways=@("\Appdata\Local\Google\Chrome","\Appdata\Local\Mozilla\Firefox")      # Items inside profile user to clean on every call
+	fullCleanDays=1                                                                      # Days after do full profile clean
+	softCleanDays=0																		 # Days after do soft profile clean
+
+	$fullCleanRemovePaths=@(
+		"Downloads\*",
+		"Documents\*",
+		"Desktop\*",
+		"Pictures\*",
+		"Videos\*",
+		"Music\*",
+		"Favorites\*",
+		"AppData\Local\Temp\*",
+		"AppData\Local\Microsoft\Windows\INetCache\*",
+		"AppData\Local\Microsoft\Windows\WebCache\*",
+		"AppData\Local\Microsoft\Windows\Explorer\*",
+		"AppData\LocalLow\*",
+		"AppData\Roaming\Microsoft\Windows\Recent\*",
+		"AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\*",
+		"AppData\Roaming\Microsoft\Windows\Themes\*"
+	)
+	fullCleanRestorePaths=@(
+		"AppData\Local\Google\Chrome\User Data\Default",
+		"AppData\Local\Microsoft\Edge\User Data\Default",
+		"AppData\Roaming\Mozilla\Firefox\Profiles\"
+	)
+	
+	softCleanRemovePaths=@(
+		"\Appdata\Local\Microsoft\Credentials",
+		"\Appdata\Local\Microsoft\IdentityCache",
+		"\Appdata\Local\Microsoft\TokenBroker",
+		"\Appdata\Local\Microsoft\OneAuth",
+		"\Appdata\Local\Packages\Microsoft.Windows.CloudExperienceHost_cw5n1h2txyewy",
+		"\Appdata\Local\ConnectedDevicesPlataform",
+		"\Appdata\Roaming\Microsoft\Crypto\Keys",
+		"\Appdata\Roaming\Microsoft\SystemCertificates",
+		"\Appdata\Local\Packages\Microsoft.AAD.BrokerPlugin_cw5n1h2txyewy",
+
+		"\Appdata\Local\Google\Chrome",
+		"\Appdata\Local\Mozilla\Firefox"
+	)
+
+	softCleanRestorePaths=@(
+
+	)
+
     #cleanAllways=@("\Appdata\Local\Google\Chrome","\Appdata\Local\Mozilla\Firefox","\Appdata\Local\Microsoft\Credentials","\Appdata\Local\Microsoft\IdentityCache","\Appdata\Local\Microsoft\TokenBroker","\Appdata\Local\Microsoft\OneAuth","\Appdata\Local\Packages\Microsoft.Windows.CloudExperienceHost_cw5n1h2txyewy","\Appdata\Local\ConnectedDevicesPlataform","\Appdata\Roaming\Microsoft\Crypto\Keys","\Appdata\Roaming\Microsoft\SystemCertificates","\Appdata\Local\Packages\Microsoft.AAD.BrokerPlugin_cw5n1h2txyewy")
-    }
+
+
+	}
 
 function BackupProfiles {
   # Create backups folder and set Administrator permissions
@@ -119,13 +164,12 @@ function BackupProfiles {
   }
 }
 
-
 function RestoreProfiles {
     # If no users param get all users from each .cfg file in backups dir
     if(!$users) { $users=foreach($f in Get-ChildItem $backups_path -filter *.cfg) {$f.basename } }
 
     foreach($u in $users) {
-      Write-Output "`n`n###############################################################################`n#### CLEAN USER: $u `n###############################################################################"
+      Write-Output "`n`n###############################################################################`n#### RESTORE PROFILE: $u `n##########################################################################"
       $user_profile="${ENV:SystemDrive}\Users\${u}"
       $user_backup="${backups_path}\${u}"
       $user_conf_file="${backups_path}\$u.cfg"
@@ -141,7 +185,7 @@ function RestoreProfiles {
       }
 
       # Skip user if skipUser config true
-      if(!$Force -AND $user_conf.skipUser -eq "true") { Write-Output "Skipping user $u (skipUser config file)"; continue }
+      #if(!$Force -AND $user_conf.skipUser -eq "true") { Write-Output "Skipping user $u (skipUser config file)"; continue }
 
       # Skip if cleanAfterDays=0 and last shutdown was unexpected
       if(!$Force -AND  $user_conf.cleanAfterDays -eq 0) {
@@ -171,6 +215,34 @@ function RestoreProfiles {
       }
     }
 }
+
+
+function CleanProfiles {
+    # If no users param get all users from each .cfg file in backups dir
+    if(!$users) { $users=foreach($f in Get-ChildItem $backups_path -filter *.cfg) {$f.basename } }
+
+    foreach($u in $users) {
+		Write-Output "`n`n###############################################################################`n#### CLEAN PROFILE: $u `n############################################################################"
+      	$user_profile="${ENV:SystemDrive}\Users\${u}"
+      	$user_backup="${backups_path}\${u}"
+      	$user_conf_file="${backups_path}\$u.cfg"		
+
+		# Check backup folder
+		if(!(Test-Path $user_backup))  { Write-Output "WARNING! Folder $user_backup not exists. Skipping user $u"; continue }
+		# Get user config
+		$user_conf=@{}; (Get-Content $user_conf_file | ConvertFrom-Json).psobject.properties | Foreach { $user_conf[$_.Name] = $_.Value }
+		if($user_conf.cleanAfterDays -isnot [int] -OR !$user_conf.lastClean) {
+			Write-Output "WARNING! Invalid config file ${user_conf_file}. Skipping user ${u}"
+			continue
+      }		
+
+      # Skip user if skipUser config true
+      if(!$Force -AND $user_conf.skipUser -eq "true") { Write-Output "Skipping user $u (skipUser config file)"; continue }
+	  
+	}
+}
+
+
 
 
 function ConfigProfiles {
