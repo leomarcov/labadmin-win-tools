@@ -93,19 +93,23 @@ $default_config=@{
 		"Videos\*",
 		"Music\*",
 		"Favorites\*",
+		"Contacts\*",
+		"Searches\*",
+		"Saved Games\*",
+		"Links\*",		
 		"AppData\Local\Temp\*",
+		"AppData\Local\Microsoft\Windows\Caches\*",
 		"AppData\Local\Microsoft\Windows\INetCache\*",
 		"AppData\Local\Microsoft\Windows\WebCache\*",
 		"AppData\Local\Microsoft\Windows\Explorer\*",
 		"AppData\LocalLow\*",
 		"AppData\Roaming\Microsoft\Windows\Recent\*",
 		"AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\*",
+		"AppData\Roaming\Microsoft\Office\Recent\*",
+		"AppData\Roaming\Microsoft\Teams\*",
 		"AppData\Roaming\Microsoft\Windows\Themes\*"
 	)
 	fullCleanRestorePaths=@(
-		"AppData\Local\Google\Chrome\User Data\Default",
-		"AppData\Local\Microsoft\Edge\User Data\Default",
-		"AppData\Roaming\Mozilla\Firefox\Profiles\"
 	)
 	
 	softCleanRemovePaths=@(
@@ -117,20 +121,15 @@ $default_config=@{
 		"\Appdata\Local\ConnectedDevicesPlataform",
 		"\Appdata\Roaming\Microsoft\Crypto\Keys",
 		"\Appdata\Roaming\Microsoft\SystemCertificates",
-		"\Appdata\Local\Packages\Microsoft.AAD.BrokerPlugin_cw5n1h2txyewy",
-
-		"\Appdata\Local\Google\Chrome",
-		"\Appdata\Local\Mozilla\Firefox"
+		"\Appdata\Local\Packages\Microsoft.AAD.BrokerPlugin_cw5n1h2txyewy"
 	)
 
 	softCleanRestorePaths=@(
-
+		"AppData\Local\Google\Chrome\",
+		"AppData\Local\Microsoft\Edge\,
+		"AppData\Roaming\Mozilla\Firefox\Profiles\"
 	)
-
-    #cleanAllways=@("\Appdata\Local\Google\Chrome","\Appdata\Local\Mozilla\Firefox","\Appdata\Local\Microsoft\Credentials","\Appdata\Local\Microsoft\IdentityCache","\Appdata\Local\Microsoft\TokenBroker","\Appdata\Local\Microsoft\OneAuth","\Appdata\Local\Packages\Microsoft.Windows.CloudExperienceHost_cw5n1h2txyewy","\Appdata\Local\ConnectedDevicesPlataform","\Appdata\Roaming\Microsoft\Crypto\Keys","\Appdata\Roaming\Microsoft\SystemCertificates","\Appdata\Local\Packages\Microsoft.AAD.BrokerPlugin_cw5n1h2txyewy")
-
-
-	}
+}
 
 function BackupProfiles {
   # Create backups folder and set Administrator permissions
@@ -238,6 +237,14 @@ function CleanProfiles {
 
       # Skip user if skipUser config true
       if(!$Force -AND $user_conf.skipUser -eq "true") { Write-Output "Skipping user $u (skipUser config file)"; continue }
+
+      # Skip if cleanAfterDays=0 and last shutdown was unexpected
+      if(!$Force -AND  $user_conf.cleanAfterDays -eq 0) {
+	  $lastShutdown=(Get-WinEvent -FilterHashtable @{logname = 'System'; id = 6009})[0].TimeCreated
+  	  $lastUnexpectedShutdown=(Get-WinEvent -FilterHashtable @{logname = 'System'; id = 6008})[0].TimeCreated
+    	 if($lastShutdown -eq $lastUnexpectedShutdown) { Write-Output "Skipping user $u (last shutdown unexpected)"; continue }
+      }
+
 	  
 	}
 }
