@@ -217,10 +217,10 @@ function RestoreProfiles {
 
 
 function CleanProfiles {
-    # If no users param get all users from each .cfg file in backups dir
+	# If no users param get all users from each .cfg file in backups dir
     if(!$users) { $users=foreach($f in Get-ChildItem $backups_path -filter *.cfg) {$f.basename } }
 
-    foreach($u in $users) {
+	foreach($u in $users) {
 		Write-Output "`n`n###############################################################################`n#### CLEAN PROFILE: $u `n############################################################################"
       	$user_profile="${ENV:SystemDrive}\Users\${u}"
       	$user_backup="${backups_path}\${u}"
@@ -233,19 +233,52 @@ function CleanProfiles {
 		if($user_conf.cleanAfterDays -isnot [int] -OR !$user_conf.lastClean) {
 			Write-Output "WARNING! Invalid config file ${user_conf_file}. Skipping user ${u}"
 			continue
-      }		
 
-      # Skip user if skipUser config true
-      if(!$Force -AND $user_conf.skipUser -eq "true") { Write-Output "Skipping user $u (skipUser config file)"; continue }
-
-      # Skip if cleanAfterDays=0 and last shutdown was unexpected
-      if(!$Force -AND  $user_conf.cleanAfterDays -eq 0) {
-	  $lastShutdown=(Get-WinEvent -FilterHashtable @{logname = 'System'; id = 6009})[0].TimeCreated
-  	  $lastUnexpectedShutdown=(Get-WinEvent -FilterHashtable @{logname = 'System'; id = 6008})[0].TimeCreated
-    	 if($lastShutdown -eq $lastUnexpectedShutdown) { Write-Output "Skipping user $u (last shutdown unexpected)"; continue }
-      }
-
-	  
+		# Skip user if skipUser config true
+		if(!$Force -AND $user_conf.skipUser -eq "true") { Write-Output "Skipping user $u (skipUser config file)"; continue }
+	
+		# Skip if cleanAfterDays=0 and last shutdown was unexpected
+		if(!$Force -AND  $user_conf.cleanAfterDays -eq 0) {
+			$lastShutdown=(Get-WinEvent -FilterHashtable @{logname = 'System'; id = 6009})[0].TimeCreated
+			$lastUnexpectedShutdown=(Get-WinEvent -FilterHashtable @{logname = 'System'; id = 6008})[0].TimeCreated
+			if($lastShutdown -eq $lastUnexpectedShutdown) { Write-Output "Skipping user $u (last shutdown unexpected)"; continue }
+		}
+	
+		# Check mode auto: full or soft
+		if($Mode -eq "auto" -AND (New-TimeSpan -Start ([DateTime]$user_conf.lastClean) -End (Get-Date)).Days -ge $user_conf.cleanAfterDays) { mode="full" } 
+		else { $mode="soft" }
+	
+		# FULL CLEAN
+		if($mode -eq "full") {
+			Write-Output "Full cleaning user $u profile folder..."
+			$removePaths=$fullCleanRemovePaths+$softCleanRemovePaths
+			$restorePaths=$fullCleanRestorePaths+$softCleanRestorePaths		
+	        # Update lastClean date
+	        $user_conf.lastClean=Get-Date -Format "yyy-MM-dd"
+	        $user_conf | ConvertTo-Json | Out-File $user_conf_file
+	
+	      # SOFT CLEAN
+	      } else {
+				$removePaths=$softCleanRemovePaths
+				$restorePaths=$softCleanRestorePaths
+	          }
+	      }
+		  
+		# REMOVE PATHS
+		forearch($rp in $removepaths) {
+			$fp=Join-Path $userProfile $rp
+			if(Test-Path $fp -ErrorAction SilentlyContinue){
+				# Remove-Item -Recurse -Force $user_profile
+				& "${env:SystemRoot}\System32\cmd.exe" /c "rmdir /s /q ${fp}"					
+			}
+		}
+		# RESTORE PATHS
+		forearch($rp in $restorepaths) {
+			$fp=Join-Path $userProfile $rp
+			if(Test-Path $fp -ErrorAction SilentlyContinue){
+				echo d | robocopy ${user_backup} ${user_profile} /MIR /XJ /COPYALL /NFL /NDL 
+			}
+		}	
 	}
 }
 
