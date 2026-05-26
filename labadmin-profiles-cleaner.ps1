@@ -7,10 +7,14 @@
     Automated user profiles cleaner for backup and autorestore at startup according scheduled rules
     Each profile folder is backup in c:\users\labadmin-profiles-cleaner\ and a <username>.cfg file is generated
     Profile config <username>.cfg file JSON options are:
-        fullCleanAfterDays: Number of days from last clean to next autoclean (0 clean in each reboot, 1 clean every day, etc)
-        skipUser          : Boolean (true or false) to skip this user from autoclean (skips fullCleanAfterDays)
-        lastFullClean     : Date when last clean was performed
-    
+        fullCleanAfterDays        : Number of days from last full clean to next autoclean (0 clean in each reboot, 1 clean every day, etc)
+        skipUser                  : Boolean (true or false) to skip this user from autoclean (skips fullCleanAfterDays)
+        lastFullClean             : Date when last clean was performed
+		$fullCleanRemovePaths[]   :
+		$fullCleanRestorePaths[]  :
+		$softCleanRemovePaths[]   :
+		$softCleanRestorePaths[]  :
+	
 	INSTALLATION NOTES
 	Once script is installed in Program Files folder, to config autostart script open gpedit.msc and config 2 group policies:
       * Exec script at startup:
@@ -26,9 +30,11 @@
     For new backups default <username>.cfg file is generated
     Parameter -Users must be given with list of users to backup
 .PARAMETER RestoreProfiles
-    Try to restore profiles according user backup profile config
+    Restore full profile from backup
+.PARAMETER CleanProfiles
+	Clean profiles according ...
 .PARAMETER Users
-    List of users to backup/restore/config
+    List of users to backup/restore/clean/config
 .PARAMETER Force
     Force profile clean and ommits skipUser and fullCleanAfterDays config
 .PARAMETER Log
@@ -106,10 +112,10 @@ $default_config=@{
 		"\AppData\Roaming\Microsoft\Teams\*",
 		"\AppData\Roaming\Microsoft\Windows\Themes\*"
 	)
-	fullCleanRestorePaths=@(
+	$fullCleanRestorePaths=@(
 	)
 	
-	softCleanRemovePaths=@(
+	$softCleanRemovePaths=@(
 		"\Appdata\Local\Microsoft\Credentials",
 		"\Appdata\Local\Microsoft\IdentityCache",
 		"\Appdata\Local\Microsoft\TokenBroker",
@@ -121,7 +127,7 @@ $default_config=@{
 		"\Appdata\Local\Packages\Microsoft.AAD.BrokerPlugin_cw5n1h2txyewy"
 	)
 
-	softCleanRestorePaths=@(
+	$softCleanRestorePaths=@(
 		"AppData\Local\Google\Chrome\",
 		"AppData\Local\Microsoft\Edge\,
 		"AppData\Roaming\Mozilla\Firefox\Profiles\"
