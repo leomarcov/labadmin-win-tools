@@ -7,10 +7,9 @@
     Automated user profiles cleaner for backup and autorestore at startup according scheduled rules
     Each profile folder is backup in c:\users\labadmin-profiles-cleaner\ and a <username>.cfg file is generated
     Profile config <username>.cfg file JSON options are:
-        cleanAfterDays: Number of days from last clean to next autoclean (0 clean in each reboot, 1 clean every day, etc)
-        skipUser      : Boolean (true or false) to skip this user from autoclean (skips cleanAfterDays and cleanAllways)
-        cleanAlways   : Array of relative paths to clean on every call
-        lastClean     : Date when last clean was performed
+        fullCleanAfterDays: Number of days from last clean to next autoclean (0 clean in each reboot, 1 clean every day, etc)
+        skipUser          : Boolean (true or false) to skip this user from autoclean (skips fullCleanAfterDays)
+        lastFullClean     : Date when last clean was performed
     
 	INSTALLATION NOTES
 	Once script is installed in Program Files folder, to config autostart script open gpedit.msc and config 2 group policies:
@@ -31,12 +30,12 @@
 .PARAMETER Users
     List of users to backup/restore/config
 .PARAMETER Force
-    Force profile clean and ommits skipUser and cleanAfterDays config
+    Force profile clean and ommits skipUser and fullCleanAfterDays config
 .PARAMETER Log
     Save output to log file in c:\users\labadmin-profiles-cleaner\log.txt
 .PARAMETER ConfigProfiles
 	Modify all (or -users list) users config file 
-	Modified values are given with parameters: CleanAfterDays, SkipUser, CleanAllways and LastClean
+	Modified values are given with parameters: fullCleanAfterDays, SkipUser and LastFullClean
 
 .NOTES
     File Name: labadmin-profiles-cleaner.ps1
@@ -54,13 +53,11 @@ Param(
   [Switch]$ConfigProfiles,
   
   [parameter(Mandatory=$false, ParameterSetName="config")]
-  [Int]$CleanAfterDays,
+  [Int]$FullCleanAfterDays,
   [parameter(Mandatory=$false, ParameterSetName="config")]
   [String]$SkipUser,
   [parameter(Mandatory=$false, ParameterSetName="config")]
-  [String[]]$CleanAllways,
-  [parameter(Mandatory=$false, ParameterSetName="config")]
-  [DateTime]$LastClean,
+  [DateTime]$LastFullClean,
   
   [parameter(Mandatory=$true, ParameterSetName="create")]
   [parameter(Mandatory=$false, ParameterSetName="restore")]
@@ -80,34 +77,34 @@ Param(
 $backups_path="${ENV:SystemDrive}\Users\labadmin-profiles-cleaner"                       # Path to save backups and configs
 $log_path="${backups_path}\log.txt"                                                      # Path to save logs
 $default_config=@{
-    lastClean=(Get-Date -Format "yyy-MM-dd")                                             # Date of last autoclean executed
+    lastFullClean=(Get-Date -Format "yyy-MM-dd")                                             # Date of last autoclean executed
     skipUser=$false                                                                      # Skip this user of autoclean
 	fullCleanDays=1                                                                      # Days after do full profile clean
 	softCleanDays=0																		 # Days after do soft profile clean
 
 	$fullCleanRemovePaths=@(
-		"Downloads\*",
-		"Documents\*",
-		"Desktop\*",
-		"Pictures\*",
-		"Videos\*",
-		"Music\*",
-		"Favorites\*",
-		"Contacts\*",
-		"Searches\*",
-		"Saved Games\*",
-		"Links\*",		
-		"AppData\Local\Temp\*",
-		"AppData\Local\Microsoft\Windows\Caches\*",
-		"AppData\Local\Microsoft\Windows\INetCache\*",
-		"AppData\Local\Microsoft\Windows\WebCache\*",
-		"AppData\Local\Microsoft\Windows\Explorer\*",
-		"AppData\LocalLow\*",
-		"AppData\Roaming\Microsoft\Windows\Recent\*",
-		"AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\*",
-		"AppData\Roaming\Microsoft\Office\Recent\*",
-		"AppData\Roaming\Microsoft\Teams\*",
-		"AppData\Roaming\Microsoft\Windows\Themes\*"
+		"\Downloads\*",
+		"\Documents\*",
+		"\Desktop\*",
+		"\Pictures\*",
+		"\Videos\*",
+		"\Music\*",
+		"\Favorites\*",
+		"\Contacts\*",
+		"\Searches\*",
+		"\Saved Games\*",
+		"\Links\*",		
+		"\AppData\Local\Temp\*",
+		"\AppData\Local\Microsoft\Windows\Caches\*",
+		"\AppData\Local\Microsoft\Windows\INetCache\*",
+		"\AppData\Local\Microsoft\Windows\WebCache\*",
+		"\AppData\Local\Microsoft\Windows\Explorer\*",
+		"\AppData\LocalLow\*",
+		"\AppData\Roaming\Microsoft\Windows\Recent\*",
+		"\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\*",
+		"\AppData\Roaming\Microsoft\Office\Recent\*",
+		"\AppData\Roaming\Microsoft\Teams\*",
+		"\AppData\Roaming\Microsoft\Windows\Themes\*"
 	)
 	fullCleanRestorePaths=@(
 	)
@@ -178,7 +175,7 @@ function RestoreProfiles {
       
       # Get user config
       $user_conf=@{}; (Get-Content $user_conf_file | ConvertFrom-Json).psobject.properties | Foreach { $user_conf[$_.Name] = $_.Value }
-      if($user_conf.cleanAfterDays -isnot [int] -OR !$user_conf.lastClean) {
+      if($user_conf.fullCleanAfterDays -isnot [int] -OR !$user_conf.lastFullClean) {
         Write-Output "WARNING! Invalid config file ${user_conf_file}. Skipping user ${u}"
         continue
       }
@@ -186,22 +183,22 @@ function RestoreProfiles {
       # Skip user if skipUser config true
       #if(!$Force -AND $user_conf.skipUser -eq "true") { Write-Output "Skipping user $u (skipUser config file)"; continue }
 
-      # Skip if cleanAfterDays=0 and last shutdown was unexpected
-      if(!$Force -AND  $user_conf.cleanAfterDays -eq 0) {
+      # Skip if fullCleanAfterDays=0 and last shutdown was unexpected
+      if(!$Force -AND  $user_conf.fullCleanAfterDays -eq 0) {
 	 $lastShutdown=(Get-WinEvent -FilterHashtable @{logname = 'System'; id = 6009})[0].TimeCreated
   	 $lastUnexpectedShutdown=(Get-WinEvent -FilterHashtable @{logname = 'System'; id = 6008})[0].TimeCreated
     	 if($lastShutdown -eq $lastUnexpectedShutdown) { Write-Output "Skipping user $u (last shutdown unexpected)"; continue }
       }
 
       # Scheduled restore
-      if($Force -OR (New-TimeSpan -Start ([DateTime]$user_conf.lastClean) -End (Get-Date)).Days -ge $user_conf.cleanAfterDays) {
+      if($Force -OR (New-TimeSpan -Start ([DateTime]$user_conf.lastFullClean) -End (Get-Date)).Days -ge $user_conf.fullCleanAfterDays) {
         Write-Output "Removing user $u profile folder..."
         # Remove-Item -Recurse -Force $user_profile
 		& "${env:SystemRoot}\System32\cmd.exe" /c "rmdir /s /q ${user_profile}"
         echo d | robocopy ${user_backup} ${user_profile} /MIR /XJ /COPYALL /NFL /NDL 
         
-        # Update lastClean date
-        $user_conf.lastClean=Get-Date -Format "yyy-MM-dd"
+        # Update lastFullClean date
+        $user_conf.lastFullClean=Get-Date -Format "yyy-MM-dd"
         $user_conf | ConvertTo-Json | Out-File $user_conf_file
 
       # Restore on every call
@@ -230,22 +227,22 @@ function CleanProfiles {
 		if(!(Test-Path $user_backup))  { Write-Output "WARNING! Folder $user_backup not exists. Skipping user $u"; continue }
 		# Get user config
 		$user_conf=@{}; (Get-Content $user_conf_file | ConvertFrom-Json).psobject.properties | Foreach { $user_conf[$_.Name] = $_.Value }
-		if($user_conf.cleanAfterDays -isnot [int] -OR !$user_conf.lastClean) {
+		if($user_conf.fullCleanAfterDays -isnot [int] -OR !$user_conf.lastFullClean) {
 			Write-Output "WARNING! Invalid config file ${user_conf_file}. Skipping user ${u}"
 			continue
 
 		# Skip user if skipUser config true
 		if(!$Force -AND $user_conf.skipUser -eq "true") { Write-Output "Skipping user $u (skipUser config file)"; continue }
 	
-		# Skip if cleanAfterDays=0 and last shutdown was unexpected
-		if(!$Force -AND  $user_conf.cleanAfterDays -eq 0) {
+		# Skip if fullCleanAfterDays=0 and last shutdown was unexpected
+		if(!$Force -AND  $user_conf.fullCleanAfterDays -eq 0) {
 			$lastShutdown=(Get-WinEvent -FilterHashtable @{logname = 'System'; id = 6009})[0].TimeCreated
 			$lastUnexpectedShutdown=(Get-WinEvent -FilterHashtable @{logname = 'System'; id = 6008})[0].TimeCreated
 			if($lastShutdown -eq $lastUnexpectedShutdown) { Write-Output "Skipping user $u (last shutdown unexpected)"; continue }
 		}
 	
 		# Check mode auto: full or soft
-		if($Mode -eq "auto" -AND (New-TimeSpan -Start ([DateTime]$user_conf.lastClean) -End (Get-Date)).Days -ge $user_conf.cleanAfterDays) { mode="full" } 
+		if($Mode -eq "auto" -AND (New-TimeSpan -Start ([DateTime]$user_conf.lastFullClean) -End (Get-Date)).Days -ge $user_conf.fullCleanAfterDays) { mode="full" } 
 		else { $mode="soft" }
 	
 		# FULL CLEAN
@@ -253,8 +250,8 @@ function CleanProfiles {
 			Write-Output "Full cleaning user $u profile folder..."
 			$removePaths=$fullCleanRemovePaths+$softCleanRemovePaths
 			$restorePaths=$fullCleanRestorePaths+$softCleanRestorePaths		
-	        # Update lastClean date
-	        $user_conf.lastClean=Get-Date -Format "yyy-MM-dd"
+	        # Update lastFullClean date
+	        $user_conf.lastFullClean=Get-Date -Format "yyy-MM-dd"
 	        $user_conf | ConvertTo-Json | Out-File $user_conf_file
 	
 	      # SOFT CLEAN
@@ -291,16 +288,15 @@ function ConfigProfiles {
 		# Get user config
 		$user_conf_file="${backups_path}\$u.cfg"
 		$user_conf=@{}; (Get-Content $user_conf_file | ConvertFrom-Json).psobject.properties | Foreach { $user_conf[$_.Name] = $_.Value }
-		if($user_conf.cleanAfterDays -isnot [int] -OR !$user_conf.lastClean) {
+		if($user_conf.fullCleanAfterDays -isnot [int] -OR !$user_conf.lastFullClean) {
         	Write-Output "WARNING! Invalid config file ${user_conf_file}. Skipping user ${u}"
         	continue
       	}
 		
 	# Change user config
-	if($CleanAfterDays) { $user_conf.cleanAfterDays=$CleanAfterDays }
+	if($FullCleanAfterDays) { $user_conf.fullCleanAfterDays=$FullCleanAfterDays }
   	if($SkipUser) { if($SkipUser -eq "true") { $user_conf.skipUser=$true } else { $user_conf.skipUser=$false } }
-    	if($CleanAllways) { $user_conf.cleanAllways=$CleanAllways }
-      	if($LastClean) { $user_conf.lastClean=$LastClean.ToString("yyy-MM-dd") }
+      	if($LastFullClean) { $user_conf.lastFullClean=$LastFullClean.ToString("yyy-MM-dd") }
 
 	# Save user config
  	$user_conf | ConvertTo-Json | Out-File $user_conf_file 
