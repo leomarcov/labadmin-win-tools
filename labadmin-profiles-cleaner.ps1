@@ -40,6 +40,10 @@
 	Delete backup profiles saved
 	Parameter -Users must be given with list of users profiles to remove
 
+.PARAMETER ResetConfig
+	Set default config to backup users profiles
+	Parameter -Users can be given to select profiles to set default config (by default all config profiles will be restored)
+
 .PARAMETER CleanProfiles
 	Clean profiles according CleanMode (auto, full or soft)
 	Parameter -Users can be given to select profiles to clean (by default all config profiles will be restored)
@@ -58,6 +62,7 @@
 
 .NOTES
     File Name: labadmin-profiles-cleaner.ps1
+	Version  : 20260913
     Author   : Leonardo Marco
 #>
 
@@ -74,9 +79,13 @@ Param(
 	[parameter(Mandatory=$true, ParameterSetName="remove")]
 	[Switch]$RemoveProfiles,	
 	
+	[parameter(Mandatory=$true, ParameterSetName="resetconfig")]
+	[Switch]$ResetConfig,	
+	
 	[parameter(Mandatory=$true, ParameterSetName="backup")]
 	[parameter(Mandatory=$true, ParameterSetName="remove")]
 	[parameter(Mandatory=$false, ParameterSetName="restore")]
+	[parameter(Mandatory=$false, ParameterSetName="resetconfig")]
 	[parameter(Mandatory=$false, ParameterSetName="clean")]
 	[String[]]$Users,
 	
@@ -84,8 +93,10 @@ Param(
 	[ValidateSet('full','soft','auto')]
 	[string]$CleanMode = 'auto',
 	
-	[parameter(Mandatory=$false, ParameterSetName="create")]
+	[parameter(Mandatory=$false, ParameterSetName="backup")]
+	[parameter(Mandatory=$false, ParameterSetName="remove")]
 	[parameter(Mandatory=$false, ParameterSetName="restore")]
+	[parameter(Mandatory=$false, ParameterSetName="resetconfig")]
 	[parameter(Mandatory=$false, ParameterSetName="clean")]
 	[Switch]$Log
 )
@@ -116,16 +127,16 @@ $default_config=@{
 		"\AppData\Local\Microsoft\Windows\INetCache\*",
 		"\AppData\Local\Microsoft\Windows\WebCache\*",
 		"\AppData\Local\Microsoft\Windows\Explorer\*",
+		"\AppData\Local\Microsoft\Office\UnsavedFiles\*",
 		"\AppData\LocalLow\*",
 		"\AppData\Roaming\Microsoft\Windows\Recent\*",
 		"\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\*",
 		"\AppData\Roaming\Microsoft\Office\Recent\*",
-		"\AppData\Roaming\Microsoft\Office\UnsavedFiles\*",
 		"\AppData\Roaming\Microsoft\Teams\*",
 		"\AppData\Roaming\Microsoft\Windows\Themes\*"
 	)
 	fullCleanRestorePaths=@(
-		"\Desktop\*"
+		"\Desktop\"
 	)
 	
 	softCleanRemovePaths=@(
@@ -150,6 +161,22 @@ $default_config=@{
 }
 
 
+function ResetConfig {
+	# If no users param get all users from each .json file in backups dir
+	if(!$users) { $users=foreach($f in Get-ChildItem $backups_path -filter *.json) {$f.basename } }
+	
+	foreach($u in $users) {
+		Write-Output "`n`n###############################################################################`n#### RESET CONFIG: $u `n###############################################################################"
+		$user_backup="${backups_path}\${u}"
+		$user_config_file="${backups_path}\$u.json"
+		
+		if(!(Test-Path $user_backup)) { Write-Output "WARNING! Folder $user_backup not exists. Skipping user $u"; continue }
+		
+		$default_config | ConvertTo-Json | Out-File $user_config_file 
+	}
+}
+
+
 function RemoveProfiles {
 	foreach($u in $users) {
 		Write-Output "`n`n###############################################################################`n#### REMOVE BACKUP USER: $u `n###############################################################################"
@@ -158,9 +185,12 @@ function RemoveProfiles {
 
 		if(!(Test-Path $user_backup)) { Write-Output "WARNING! Folder $user_backup not exists. Skipping user $u"; continue }
 		
-		& "${env:SystemRoot}\System32\cmd.exe" /c "rmdir /s /q ${user_backup}"
+		& "${env:SystemRoot}\System32\cmd.exe" /c "rmdir /s /q `"${user_backup}`""
 		Remove-Item -Recurse -Force $user_backup -ErrorAction SilentlyContinue
 		Remove-Item -Force $user_config_file -ErrorAction SilentlyContinue
+		
+		if (Test-Path -LiteralPath $user_backup) { Write-Warning "Folder $user_backup cant be removed" }			
+		if (Test-Path -LiteralPath $user_config_file) { Write-Warning "File $user_config_file cant be removed" }
 	}
 }
 	
@@ -190,8 +220,8 @@ function BackupProfiles {
     
     # Copy profile
 	& "${env:SystemRoot}\System32\cmd.exe" /c "rmdir /s /q ${user_profile}\AppData\Local\Microsoft\Windows\SFAP\" *> $null		# Delete this folder first to avoid access denied in Windows 11
-    robocopy $user_profile $user_backup /MIR /XJ /COPYALL /NFL /NDL
-    Remove-Item -Force -Path "${user_backup}\AppData\Local\Microsoft\Windows\UsrClass.dat"	-ErrorAction SilentlyContinue		# Avoid restore UsrClass.dat file to prevent Start button crash (will be deleted on each restore)
+    robocopy $user_profile $user_backup /MIR /XJ /COPYALL /NFL /NDL /R:1 /W:1	
+    #Remove-Item -Force -Path "${user_backup}\AppData\Local\Microsoft\Windows\UsrClass.dat"	-ErrorAction SilentlyContinue		# Avoid restore UsrClass.dat file to prevent Start button crash (will be deleted on each restore)
     
     # Save default user config file in backups path
     if(!(Test-Path $user_config_file)) { $default_config | ConvertTo-Json | Out-File $user_config_file }
@@ -202,12 +232,13 @@ function BackupProfiles {
   }
 }
 
+
 function RestoreProfiles {
 	# If no users param get all users from each .json file in backups dir
 	if(!$users) { $users=foreach($f in Get-ChildItem $backups_path -filter *.json) {$f.basename } }
 	
 	foreach($u in $users) {
-		Write-Output "`n`n###############################################################################`n#### RESTORE PROFILE: $u `n##########################################################################"
+		Write-Output "`n`n###############################################################################`n#### RESTORE PROFILE: $u `n###############################################################################"
 		$user_profile="${ENV:SystemDrive}\Users\${u}"
 		$user_backup="${backups_path}\${u}"
 		$user_config_file="${backups_path}\$u.json"
@@ -218,7 +249,7 @@ function RestoreProfiles {
 		Write-Output "Removing user $u profile folder..."
 		# Remove-Item -Recurse -Force $user_profile
 		& "${env:SystemRoot}\System32\cmd.exe" /c "rmdir /s /q ${user_profile}"
-		echo d | robocopy ${user_backup} ${user_profile} /MIR /XJ /COPYALL /NFL /NDL 
+		echo d | robocopy ${user_backup} ${user_profile} /MIR /XJ /COPYALL /NFL /NDL /R:1 /W:1
 	}
 }
 
@@ -228,7 +259,7 @@ function CleanProfiles {
 	if(!$users) { $users=foreach($f in Get-ChildItem $backups_path -filter *.json) {$f.basename } }
 
 	foreach($u in $users) {
-		Write-Output "`n`n###############################################################################`n#### CLEAN PROFILE: $u `n############################################################################"
+		Write-Output "`n`n###############################################################################`n#### CLEAN PROFILE: $u `n###############################################################################"
 		$user_profile="${ENV:SystemDrive}\Users\${u}"
 		$user_backup="${backups_path}\${u}"
 		$user_config_file="${backups_path}\$u.json"		
@@ -255,13 +286,13 @@ function CleanProfiles {
 		
 		# Check CleanMode auto: full or soft
 		if($CleanMode -eq "auto") {
-			$CleanMode="none"
-			if((New-TimeSpan -Start ([DateTime]$user_conf.lastFullClean) -End (Get-Date)).Days -ge $user_conf.softCleanDays) { $CleanMode="soft" }
-			if((New-TimeSpan -Start ([DateTime]$user_conf.lastFullClean) -End (Get-Date)).Days -ge $user_conf.fullCleanDays) { $CleanMode="full" }
+			$cm="none"
+			if((New-TimeSpan -Start ([DateTime]$user_conf.lastSoftClean) -End (Get-Date)).Days -ge $user_conf.softCleanDays) { $cm="soft" }
+			if((New-TimeSpan -Start ([DateTime]$user_conf.lastFullClean) -End (Get-Date)).Days -ge $user_conf.fullCleanDays) { $cm="full" }
 		}
 		
 		# FULL CLEAN
-		if($CleanMode -eq "full") {
+		if($cm -eq "full") {
 			Write-Output "FULL CLEANING USER PROFILE FOLDER: $user_profile"
 			$removePaths=$user_conf.fullCleanRemovePaths+$user_conf.softCleanRemovePaths
 			$restorePaths=$user_conf.fullCleanRestorePaths+$user_conf.softCleanRestorePaths		
@@ -272,7 +303,7 @@ function CleanProfiles {
 			$user_conf | ConvertTo-Json | Out-File $user_config_file
 		
 		# SOFT CLEAN
-		} elseif($CleanMode -eq "soft") {
+		} elseif($cm -eq "soft") {
 			Write-Output "SOFT CLEANING USER PROFILE FOLDER: $user_profile"
 			$removePaths=$user_conf.softCleanRemovePaths
 			$restorePaths=$user_conf.softCleanRestorePaths
@@ -286,6 +317,7 @@ function CleanProfiles {
 		
 		# REMOVE PATHS
 		foreach($rp in $removepaths) {
+			if($rp -isnot [string] -or [string]::IsNullOrWhiteSpace($rp)) { continue }
 			$fp=Join-Path $user_profile $rp
 			if(Test-Path $fp -ErrorAction SilentlyContinue){
 				Write-Output "Removing: $fp"
@@ -294,6 +326,7 @@ function CleanProfiles {
 		}
 		# RESTORE PATHS
 		foreach($rp in $restorepaths) {
+			if($rp -isnot [string] -or [string]::IsNullOrWhiteSpace($rp)) { continue }
 			$fp_dest=Join-Path $user_profile $rp
 			$fp_src=Join-Path $user_backup $rp
 			if(Test-Path $fp_src -ErrorAction SilentlyContinue){
@@ -305,10 +338,11 @@ function CleanProfiles {
 }
 
 function main {
-	if($BackupProfiles)      	{ BackupProfiles  	}
-	elseif($RestoreProfiles) 	{ RestoreProfiles 	}
- 	elseif($CleanProfiles)		{ CleanProfiles		}
-	elseif($RemoveProfiles)		{ RemoveProfiles	}
+	if($BackupProfiles)      			{ BackupProfiles  	}
+	elseif($RestoreProfiles) 			{ RestoreProfiles 	}
+ 	elseif($CleanProfiles)				{ CleanProfiles		}
+	elseif($RemoveProfiles)				{ RemoveProfiles	}
+	elseif($ResetConfig)				{ ResetConfig		}	
 }
 
 # EXEC no log
