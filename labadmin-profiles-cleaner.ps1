@@ -4,9 +4,9 @@
 .SYNOPSIS
     Automated user profiles cleaner
 .DESCRIPTION
-    Automated user profiles cleaner for backup and autorestore at startup according scheduled rules
-    Each profile folder is backup in c:\users\labadmin-profiles-cleaner\ and a <username>.cfg file is generated
-    Profile config <username>.cfg file JSON options are:
+    Automated user profiles cleaner for backup and autoclean at startup according scheduled rules
+    Each profile folder is backup in c:\users\labadmin-profiles-cleaner\ and a <username>.json file is generated
+    Profile config <username>.json file JSON options are:
         skipUser                  : Boolean (true or false) to skip this user from autoclean (skips fullCleanDays)
 		fullCleanDays             : Number of days from last full clean to next autoclean (0 clean in each reboot, 1 clean every day, etc)
 		softCleanDays             : Number of days from last soft clean to next autoclean (0 clean in each reboot, 1 clean every day, etc)
@@ -29,16 +29,30 @@
 
 .PARAMETER BackupProfiles
     Backup (or update backup if previos backup exists) users profiles to c:\users\labadmin-profiles-cleaner\
-    For new backups default <username>.cfg file is generated
+    For new backups default <username>.json file is generated
     Parameter -Users must be given with list of users to backup
+
 .PARAMETER RestoreProfiles
     Restore full profile from backup
+	Parameter -Users can be given to select profiles to restore (by default all config profiles will be restored)
+
+.PARAMETER RemoveProfiles
+	Delete backup profiles saved
+	Parameter -Users must be given with list of users profiles to remove
+
 .PARAMETER CleanProfiles
-	Clean profiles according CleanMode
+	Clean profiles according CleanMode (auto, full or soft)
+	Parameter -Users can be given to select profiles to clean (by default all config profiles will be restored)
+
 .PARAMETER CleanMode
-    Mode to perform clean: full or soft (clean full/soft and skips schedule config and skipuser) and auto (performs full, soft o none according schedule config and skipuser)
+    Mode to perform clean: 
+	  auto: performs full, soft or none according schedule config and skipuser
+	  full: force full clean
+	  soft: force soft clean
+
 .PARAMETER Users
-    List of users to backup/restore/clean
+    List of users to backup/restore/remove/clean
+
 .PARAMETER Log
     Save output to log file in c:\users\labadmin-profiles-cleaner\log.txt
 
@@ -57,12 +71,16 @@ Param(
 	[parameter(Mandatory=$true, ParameterSetName="clean")]
 	[Switch]$CleanProfiles,
 	
+	[parameter(Mandatory=$true, ParameterSetName="remove")]
+	[Switch]$RemoveProfiles,	
+	
 	[parameter(Mandatory=$true, ParameterSetName="backup")]
+	[parameter(Mandatory=$true, ParameterSetName="remove")]
 	[parameter(Mandatory=$false, ParameterSetName="restore")]
 	[parameter(Mandatory=$false, ParameterSetName="clean")]
 	[String[]]$Users,
 	
-	[parameter(Mandatory=$true, ParameterSetName="clean")]
+	[parameter(Mandatory=$false, ParameterSetName="clean")]
 	[ValidateSet('full','soft','auto')]
 	[string]$CleanMode = 'auto',
 	
@@ -86,7 +104,6 @@ $default_config=@{
 	fullCleanRemovePaths=@(
 		"\Downloads\*",
 		"\Documents\*",
-		"\Desktop\*",
 		"\Pictures\*",
 		"\Videos\*",
 		"\Music\*",
@@ -95,7 +112,6 @@ $default_config=@{
 		"\Searches\*",
 		"\Saved Games\*",
 		"\Links\*",		
-		"\AppData\Local\Temp\*",
 		"\AppData\Local\Microsoft\Windows\Caches\*",
 		"\AppData\Local\Microsoft\Windows\INetCache\*",
 		"\AppData\Local\Microsoft\Windows\WebCache\*",
@@ -104,13 +120,16 @@ $default_config=@{
 		"\AppData\Roaming\Microsoft\Windows\Recent\*",
 		"\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\*",
 		"\AppData\Roaming\Microsoft\Office\Recent\*",
+		"\AppData\Roaming\Microsoft\Office\UnsavedFiles\*",
 		"\AppData\Roaming\Microsoft\Teams\*",
 		"\AppData\Roaming\Microsoft\Windows\Themes\*"
 	)
 	fullCleanRestorePaths=@(
+		"\Desktop\*"
 	)
 	
 	softCleanRemovePaths=@(
+		"\AppData\Local\Temp\*",	
 		"\Appdata\Local\Microsoft\Credentials",
 		"\Appdata\Local\Microsoft\IdentityCache",
 		"\Appdata\Local\Microsoft\TokenBroker",
@@ -123,11 +142,29 @@ $default_config=@{
 	)
 
 	softCleanRestorePaths=@(
-		"AppData\Local\Google\Chrome\",
-		"AppData\Local\Microsoft\Edge\",
-		"AppData\Roaming\Mozilla\Firefox\Profiles\"
+		"\AppData\Local\Google\Chrome\User data\",
+		"\AppData\Local\Microsoft\Edge\User data\",
+		"\AppData\Roaming\Mozilla\Firefox\",
+		"\AppData\Roaming\Code\"
 	)
 }
+
+
+function RemoveProfiles {
+	foreach($u in $users) {
+		Write-Output "`n`n###############################################################################`n#### REMOVE BACKUP USER: $u `n###############################################################################"
+		$user_backup="${backups_path}\${u}"
+		$user_config_file="${backups_path}\$u.json"
+
+		if(!(Test-Path $user_backup)) { Write-Output "WARNING! Folder $user_backup not exists. Skipping user $u"; continue }
+		
+		& "${env:SystemRoot}\System32\cmd.exe" /c "rmdir /s /q ${user_backup}"
+		Remove-Item -Recurse -Force $user_backup -ErrorAction SilentlyContinue
+		Remove-Item -Force $user_config_file -ErrorAction SilentlyContinue
+	}
+}
+	
+
 
 function BackupProfiles {
   # Create backups folder and set Administrator permissions
@@ -146,30 +183,34 @@ function BackupProfiles {
     Write-Output "`n`n###############################################################################`n#### BACKUP USER: $u `n###############################################################################"
     $user_profile="${ENV:SystemDrive}\Users\${u}"
     $user_backup="${backups_path}\${u}"
-    $user_config_file="${backups_path}\$u.cfg"
+    $user_config_file="${backups_path}\$u.json"
 
     if(!(Test-Path $user_profile)) { Write-Output "WARNING! Folder $user_profile not exists. Skipping user $u"; continue }
     if(Test-Path $user_backup) { Remove-Item -Recurse -Force $user_backup -ErrorAction SilentlyContinue }
     
     # Copy profile
-	& "${env:SystemRoot}\System32\cmd.exe" /c "rmdir /s /q ${user_profile}\AppData\Local\Microsoft\Windows\SFAP\" *> $null       # Delete this folder first to avoid access denied in Windows 11
+	& "${env:SystemRoot}\System32\cmd.exe" /c "rmdir /s /q ${user_profile}\AppData\Local\Microsoft\Windows\SFAP\" *> $null		# Delete this folder first to avoid access denied in Windows 11
     robocopy $user_profile $user_backup /MIR /XJ /COPYALL /NFL /NDL
-    Remove-Item -Force -Path "${user_backup}\AppData\Local\Microsoft\Windows\UsrClass.dat"	# Avoid restore UsrClass.dat file to prevent Start button crash (will be deleted on each restore)
+    Remove-Item -Force -Path "${user_backup}\AppData\Local\Microsoft\Windows\UsrClass.dat"	-ErrorAction SilentlyContinue		# Avoid restore UsrClass.dat file to prevent Start button crash (will be deleted on each restore)
     
     # Save default user config file in backups path
     if(!(Test-Path $user_config_file)) { $default_config | ConvertTo-Json | Out-File $user_config_file }
+	
+	# Show profile size
+	$bytes = [long](Get-ChildItem $user_backup -Recurse -File -Force | Measure-Object Length -Sum).Sum
+	Write-Output ("PROFILE $u SIZE: " + $(if ($bytes -ge 1TB) { "{0:N2} TB" -f ($bytes / 1TB) } elseif ($bytes -ge 1GB) { "{0:N2} GB" -f ($bytes / 1GB) } elseif ($bytes -ge 1MB) { "{0:N2} MB" -f ($bytes / 1MB) } elseif ($bytes -ge 1KB) { "{0:N2} KB" -f ($bytes / 1KB) } else { "$bytes B" }))
   }
 }
 
 function RestoreProfiles {
-	# If no users param get all users from each .cfg file in backups dir
-	if(!$users) { $users=foreach($f in Get-ChildItem $backups_path -filter *.cfg) {$f.basename } }
+	# If no users param get all users from each .json file in backups dir
+	if(!$users) { $users=foreach($f in Get-ChildItem $backups_path -filter *.json) {$f.basename } }
 	
 	foreach($u in $users) {
 		Write-Output "`n`n###############################################################################`n#### RESTORE PROFILE: $u `n##########################################################################"
 		$user_profile="${ENV:SystemDrive}\Users\${u}"
 		$user_backup="${backups_path}\${u}"
-		$user_config_file="${backups_path}\$u.cfg"
+		$user_config_file="${backups_path}\$u.json"
 		
 		# Check backup folder
 		if(!(Test-Path $user_backup))  { Write-Output "WARNING! Folder $user_backup not exists. Skipping user $u"; continue }
@@ -183,14 +224,14 @@ function RestoreProfiles {
 
 
 function CleanProfiles {
-	# If no users param get all users from each .cfg file in backups dir
-	if(!$users) { $users=foreach($f in Get-ChildItem $backups_path -filter *.cfg) {$f.basename } }
+	# If no users param get all users from each .json file in backups dir
+	if(!$users) { $users=foreach($f in Get-ChildItem $backups_path -filter *.json) {$f.basename } }
 
 	foreach($u in $users) {
 		Write-Output "`n`n###############################################################################`n#### CLEAN PROFILE: $u `n############################################################################"
 		$user_profile="${ENV:SystemDrive}\Users\${u}"
 		$user_backup="${backups_path}\${u}"
-		$user_config_file="${backups_path}\$u.cfg"		
+		$user_config_file="${backups_path}\$u.json"		
 		
 		# Check backup folder
 		if(!(Test-Path $user_backup))  { Write-Output "WARNING! Folder $user_backup not exists. Skipping user $u"; continue }
@@ -221,7 +262,7 @@ function CleanProfiles {
 		
 		# FULL CLEAN
 		if($CleanMode -eq "full") {
-			Write-Output "Full cleaning user profile folder: $user_profile"
+			Write-Output "FULL CLEANING USER PROFILE FOLDER: $user_profile"
 			$removePaths=$user_conf.fullCleanRemovePaths+$user_conf.softCleanRemovePaths
 			$restorePaths=$user_conf.fullCleanRestorePaths+$user_conf.softCleanRestorePaths		
 
@@ -232,7 +273,7 @@ function CleanProfiles {
 		
 		# SOFT CLEAN
 		} elseif($CleanMode -eq "soft") {
-			Write-Output "Soft cleaning user profile folder: $user_profile"
+			Write-Output "SOFT CLEANING USER PROFILE FOLDER: $user_profile"
 			$removePaths=$user_conf.softCleanRemovePaths
 			$restorePaths=$user_conf.softCleanRestorePaths
 			# Update lastSoftClean date 		
@@ -247,6 +288,7 @@ function CleanProfiles {
 		foreach($rp in $removepaths) {
 			$fp=Join-Path $user_profile $rp
 			if(Test-Path $fp -ErrorAction SilentlyContinue){
+				Write-Output "Removing: $fp"
 				Remove-Item -Recurse -Force $fp
 			}
 		}
@@ -254,27 +296,26 @@ function CleanProfiles {
 		foreach($rp in $restorepaths) {
 			$fp_dest=Join-Path $user_profile $rp
 			$fp_src=Join-Path $user_backup $rp
-			if(Test-Path $fp -ErrorAction SilentlyContinue){
-				echo d | robocopy ${fp_src} ${fp_dest} /MIR /XJ /COPYALL /NFL /NDL 
+			if(Test-Path $fp_src -ErrorAction SilentlyContinue){
+				Write-Output "Restoring: $fp_src"
+				echo d | robocopy ${fp_src} ${fp_dest} /MIR /XJ /COPYALL /NFL /NDL > $null
 			}
 		}	
 	}
 }
 
-
-
-
 function main {
 	if($BackupProfiles)      	{ BackupProfiles  	}
 	elseif($RestoreProfiles) 	{ RestoreProfiles 	}
- 	elseif($CleanProfiles)		{ CleanProfiles	}
+ 	elseif($CleanProfiles)		{ CleanProfiles		}
+	elseif($RemoveProfiles)		{ RemoveProfiles	}
 }
 
-# EXEC 
+# EXEC no log
 if(!$Log) { main }
 
-# EXEC > log.txt
+# EXEC log
 else {
-    if((Get-ChildItem $log_path | % {[int]($_.length / 1kb)}) -gt 8) { Remove-Item -Path $log_path }  # Delete log if size > 8kb
+    if((Get-ChildItem $log_path -ErrorAction SilentlyContinue | % {[int]($_.length / 1kb)}) -gt 8) { Remove-Item -Path $log_path }		# Delete log if size > 8kb
     &{ Write-Output "`n`n#########################################################################################################"(Get-Date).toString()"#########################################################################################################"; main } 2>&1 | Out-File -FilePath $log_path -Append 
 }
