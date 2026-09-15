@@ -136,6 +136,7 @@ $default_config=@{
 		"\AppData\Roaming\Microsoft\Windows\Themes\*"
 	)
 	fullCleanRestorePaths=@(
+		"\NTUSER.DAT",
 		"\Desktop\"
 	)
 	
@@ -153,6 +154,7 @@ $default_config=@{
 	)
 
 	softCleanRestorePaths=@(
+		"\NTUSER.DAT",
 		"\AppData\Local\Google\Chrome\User data\",
 		"\AppData\Local\Microsoft\Edge\User data\",
 		"\AppData\Roaming\Mozilla\Firefox\",
@@ -331,9 +333,14 @@ function CleanProfiles {
 			$fp_dest=Join-Path $user_profile $rp
 			$fp_src=Join-Path $user_backup $rp
 			if(Test-Path $fp_src -ErrorAction SilentlyContinue){
-				Remove-Item -Recurse -Force $fp_dest -ErrorAction SilentlyContinue
-				echo d | robocopy ${fp_src} ${fp_dest} /MIR /XJ /COPYALL /NFL /NDL /R:1 /W:1 *>$null
-				Write-Output " Restoring: $fp_src -> $(if($LASTEXITCODE -lt 8){Write-Output "[OK]"}else{Write-Output "[ERROR]"})"
+				if (Test-Path -LiteralPath $fp_src -PathType Leaf) {
+					Copy-Item -LiteralPath $fp_src -Destination $fp_dest 
+					Write-Output " Restoring: $fp_src -> $(if($?){Write-Output "[OK]"}else{Write-Output "[ERROR]"})"
+				} else {
+					Remove-Item -Recurse -Force $fp_dest -ErrorAction SilentlyContinue
+					echo d | robocopy ${fp_src} ${fp_dest} /MIR /XJ /COPYALL /NFL /NDL /R:1 /W:1 *>$null
+					Write-Output " Restoring: $fp_src -> $(if($LASTEXITCODE -lt 8){Write-Output "[OK]"}else{Write-Output "[ERROR]"})"
+				}
 			}
 		}	
 		
