@@ -166,7 +166,7 @@ function ResetConfig {
 	if(!$users) { $users=foreach($f in Get-ChildItem $backups_path -filter *.json) {$f.basename } }
 	
 	foreach($u in $users) {
-		Write-Output "`n`n###############################################################################`n#### RESET CONFIG: $u `n###############################################################################"
+		Write-Output "---------------------------------------------------------------------------------------------------------`nRESET CONFIG: $u`n---------------------------------------------------------------------------------------------------------"
 		$user_backup="${backups_path}\${u}"
 		$user_config_file="${backups_path}\$u.json"
 		
@@ -179,7 +179,7 @@ function ResetConfig {
 
 function RemoveProfiles {
 	foreach($u in $users) {
-		Write-Output "`n`n###############################################################################`n#### REMOVE BACKUP USER: $u `n###############################################################################"
+		Write-Output "---------------------------------------------------------------------------------------------------------`nREMOVE BACKUP USER: $u`n---------------------------------------------------------------------------------------------------------"
 		$user_backup="${backups_path}\${u}"
 		$user_config_file="${backups_path}\$u.json"
 
@@ -210,7 +210,7 @@ function BackupProfiles {
   }
 
   foreach($u in $users) {
-    Write-Output "`n`n###############################################################################`n#### BACKUP USER: $u `n###############################################################################"
+    Write-Output "---------------------------------------------------------------------------------------------------------`nBACKUP USER: $u`n---------------------------------------------------------------------------------------------------------"
     $user_profile="${ENV:SystemDrive}\Users\${u}"
     $user_backup="${backups_path}\${u}"
     $user_config_file="${backups_path}\$u.json"
@@ -238,7 +238,7 @@ function RestoreProfiles {
 	if(!$users) { $users=foreach($f in Get-ChildItem $backups_path -filter *.json) {$f.basename } }
 	
 	foreach($u in $users) {
-		Write-Output "`n`n###############################################################################`n#### RESTORE PROFILE: $u `n###############################################################################"
+		Write-Output "---------------------------------------------------------------------------------------------------------`nRESTORE PROFILE: $u`n---------------------------------------------------------------------------------------------------------"
 		$user_profile="${ENV:SystemDrive}\Users\${u}"
 		$user_backup="${backups_path}\${u}"
 		$user_config_file="${backups_path}\$u.json"
@@ -259,7 +259,7 @@ function CleanProfiles {
 	if(!$users) { $users=foreach($f in Get-ChildItem $backups_path -filter *.json) {$f.basename } }
 
 	foreach($u in $users) {
-		Write-Output "`n`n###############################################################################`n#### CLEAN PROFILE: $u `n###############################################################################"
+		Write-Output "---------------------------------------------------------------------------------------------------------`nCLEAN PROFILE: $u"
 		$user_profile="${ENV:SystemDrive}\Users\${u}"
 		$user_backup="${backups_path}\${u}"
 		$user_config_file="${backups_path}\$u.json"		
@@ -293,7 +293,7 @@ function CleanProfiles {
 		
 		# FULL CLEAN
 		if($cm -eq "full") {
-			Write-Output "FULL CLEANING USER PROFILE FOLDER: $user_profile"
+			Write-Output "FULL CLEANING: $user_profile"
 			$removePaths=$user_conf.fullCleanRemovePaths+$user_conf.softCleanRemovePaths
 			$restorePaths=$user_conf.fullCleanRestorePaths+$user_conf.softCleanRestorePaths		
 
@@ -304,7 +304,7 @@ function CleanProfiles {
 		
 		# SOFT CLEAN
 		} elseif($cm -eq "soft") {
-			Write-Output "SOFT CLEANING USER PROFILE FOLDER: $user_profile"
+			Write-Output "SOFT CLEANING: $user_profile"
 			$removePaths=$user_conf.softCleanRemovePaths
 			$restorePaths=$user_conf.softCleanRestorePaths
 			# Update lastSoftClean date 		
@@ -320,20 +320,24 @@ function CleanProfiles {
 			if($rp -isnot [string] -or [string]::IsNullOrWhiteSpace($rp)) { continue }
 			$fp=Join-Path $user_profile $rp
 			if(Test-Path $fp -ErrorAction SilentlyContinue){
-				Write-Output "Removing: $fp"
 				Remove-Item -Recurse -Force $fp
+				Write-Output " Removing: $fp -> $(if($?){Write-Output "[OK]"}else{Write-Output "[ERROR]"})"
 			}
 		}
 		# RESTORE PATHS
 		foreach($rp in $restorepaths) {
 			if($rp -isnot [string] -or [string]::IsNullOrWhiteSpace($rp)) { continue }
+			$rp=$rp.TrimEnd('*').TrimEnd('\')
 			$fp_dest=Join-Path $user_profile $rp
 			$fp_src=Join-Path $user_backup $rp
 			if(Test-Path $fp_src -ErrorAction SilentlyContinue){
-				Write-Output "Restoring: $fp_src"
-				echo d | robocopy ${fp_src} ${fp_dest} /MIR /XJ /COPYALL /NFL /NDL > $null
+				Remove-Item -Recurse -Force $fp_dest -ErrorAction SilentlyContinue
+				echo d | robocopy ${fp_src} ${fp_dest} /MIR /XJ /COPYALL /NFL /NDL /R:1 /W:1 *>$null
+				Write-Output " Restoring: $fp_src -> $(if($LASTEXITCODE -lt 8){Write-Output "[OK]"}else{Write-Output "[ERROR]"})"
 			}
 		}	
+		
+		Write-Output "---------------------------------------------------------------------------------------------------------"
 	}
 }
 
@@ -351,5 +355,5 @@ if(!$Log) { main }
 # EXEC log
 else {
     if((Get-ChildItem $log_path -ErrorAction SilentlyContinue | % {[int]($_.length / 1kb)}) -gt 8) { Remove-Item -Path $log_path }		# Delete log if size > 8kb
-    &{ Write-Output "`n`n#########################################################################################################"(Get-Date).toString()"#########################################################################################################"; main } 2>&1 | Out-File -FilePath $log_path -Append 
+    &{ Write-Output "`n`n#########################################################################################################`nLABADMIN-PROFILE-CLEANER $((Get-Date).toString())`n#########################################################################################################"; main } 2>&1 | Out-File -FilePath $log_path -Append 
 }
