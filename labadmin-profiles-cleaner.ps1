@@ -67,6 +67,9 @@
 #>
 
 Param(
+	[parameter(Mandatory=$true, ParameterSetName="backupreg")]
+	[Switch]$BackupRegistries,
+
 	[parameter(Mandatory=$true, ParameterSetName="backup")]
 	[Switch]$BackupProfiles,
 	
@@ -82,6 +85,7 @@ Param(
 	[parameter(Mandatory=$true, ParameterSetName="resetconfig")]
 	[Switch]$ResetConfig,	
 	
+	[parameter(Mandatory=$false, ParameterSetName="backupreg")]
 	[parameter(Mandatory=$true, ParameterSetName="backup")]
 	[parameter(Mandatory=$true, ParameterSetName="remove")]
 	[parameter(Mandatory=$false, ParameterSetName="restore")]
@@ -93,6 +97,7 @@ Param(
 	[ValidateSet('full','soft','auto')]
 	[string]$CleanMode = 'auto',
 	
+	[parameter(Mandatory=$false, ParameterSetName="backupreg")]
 	[parameter(Mandatory=$false, ParameterSetName="backup")]
 	[parameter(Mandatory=$false, ParameterSetName="remove")]
 	[parameter(Mandatory=$false, ParameterSetName="restore")]
@@ -235,6 +240,37 @@ function BackupProfiles {
 }
 
 
+function BackupRegistries {
+	# If no users param get all users from each .json file in backups dir
+	if(!$users) { $users=foreach($f in Get-ChildItem $backups_path -filter *.json) {$f.basename } }	
+	
+	foreach($u in $users) {
+		Write-Output "---------------------------------------------------------------------------------------------------------`nBACKUP NTUSER.DAT USER: $u`n---------------------------------------------------------------------------------------------------------"
+		$user_profile="${ENV:SystemDrive}\Users\${u}"
+		$user_backup="${backups_path}\${u}"
+
+		if(!(Test-Path $user_profile)) { Write-Output "WARNING! Folder $user_profile not exists. Skipping user $u"; continue }
+		if(!(Test-Path $user_backup)) { Write-Output "WARNING! Folder $user_backup not exists. Skipping user $u"; continue }
+
+		Write-Output "Saving: ${user_profile}\NTUSER.DAT -> ${user_backup}\NTUSER.DAT"
+		$f=$(Get-Date -Format 'yyyyMMdd-HHmmss')
+		Copy-Item -LiteralPath "${user_backup}\NTUSER.DAT" -Destination "${user_backup}\_NTUSER.DAT_backup_${f}" -Force
+		Remove-Item "${user_backup}\NTUSER.DAT" -Force
+
+		# USER PROFILE CONNECTED
+		$sid = (Get-LocalUser -Name $u).SID.Value
+		if (Get-CimInstance Win32_UserProfile | Where-Object { $_.SID -eq $sid -and $_.Loaded }) {
+			reg save "HKU\${sid}" "${user_backup}\NTUSER.DAT" /y
+			if($LASTEXITCODE -ne 0) { Copy-Item -LiteralPath "${user_backup}\_NTUSER.DAT_backup_${f}" -Destination "${user_backup}\NTUSER.DAT" }
+		} else {
+			Copy-Item -LiteralPath "${user_profile}\NTUSER.DAT" -Destination "${user_backup}" -Force
+			if(-not $?) { Copy-Item -LiteralPath "${user_backup}\_NTUSER.DAT_backup_${f}" -Destination "${user_backup}\NTUSER.DAT" }
+		}
+		Get-ChildItem -LiteralPath ${user_backup} -Filter 'ntuser.dat*' -File -Force | Where-Object Name -ne 'ntuser.dat' | Remove-Item -Force
+	}	
+}
+
+
 function RestoreProfiles {
 	# If no users param get all users from each .json file in backups dir
 	if(!$users) { $users=foreach($f in Get-ChildItem $backups_path -filter *.json) {$f.basename } }
@@ -332,6 +368,7 @@ function CleanProfiles {
 			$rp=$rp.TrimEnd('*').TrimEnd('\')
 			$fp_dest=Join-Path $user_profile $rp
 			$fp_src=Join-Path $user_backup $rp
+			
 			if(Test-Path $fp_src -ErrorAction SilentlyContinue){
 				if (Test-Path -LiteralPath $fp_src -PathType Leaf) {
 					Copy-Item -LiteralPath $fp_src -Destination $fp_dest 
@@ -350,6 +387,7 @@ function CleanProfiles {
 
 function main {
 	if($BackupProfiles)      			{ BackupProfiles  	}
+	elseif($BackupRegistries) 			{ BackupRegistries 	}
 	elseif($RestoreProfiles) 			{ RestoreProfiles 	}
  	elseif($CleanProfiles)				{ CleanProfiles		}
 	elseif($RemoveProfiles)				{ RemoveProfiles	}
