@@ -240,35 +240,64 @@ function BackupProfiles {
 }
 
 
+
 function BackupRegistries {
 	# If no users param get all users from each .json file in backups dir
 	if(!$users) { $users=foreach($f in Get-ChildItem $backups_path -filter *.json) {$f.basename } }	
 	
 	foreach($u in $users) {
-		Write-Output "---------------------------------------------------------------------------------------------------------`nBACKUP NTUSER.DAT USER: $u`n---------------------------------------------------------------------------------------------------------"
+		Write-Output "---------------------------------------------------------------------------------------------------------`nBACKUP NTUSER.DAT: $u`n---------------------------------------------------------------------------------------------------------"
 		$user_profile="${ENV:SystemDrive}\Users\${u}"
 		$user_backup="${backups_path}\${u}"
 
+		# Check profile and backup profile exists
 		if(!(Test-Path $user_profile)) { Write-Output "WARNING! Folder $user_profile not exists. Skipping user $u"; continue }
 		if(!(Test-Path $user_backup)) { Write-Output "WARNING! Folder $user_backup not exists. Skipping user $u"; continue }
 
 		Write-Output "Saving: ${user_profile}\NTUSER.DAT -> ${user_backup}\NTUSER.DAT"
+		# Backup previus ntuser.dat 
 		$f=$(Get-Date -Format 'yyyyMMdd-HHmmss')
 		Copy-Item -LiteralPath "${user_backup}\NTUSER.DAT" -Destination "${user_backup}\_NTUSER.DAT_backup_${f}" -Force
-		Remove-Item "${user_backup}\NTUSER.DAT" -Force
+		Remove-Item -LiteralPath "${user_backup}\NTUSER.DAT" -Force
 
-		# USER PROFILE CONNECTED
+		# USER CONNECTED -> get ntuser.data from registry
 		$sid = (Get-LocalUser -Name $u).SID.Value
 		if (Get-CimInstance Win32_UserProfile | Where-Object { $_.SID -eq $sid -and $_.Loaded }) {
 			reg save "HKU\${sid}" "${user_backup}\NTUSER.DAT" /y
-			if($LASTEXITCODE -ne 0) { Copy-Item -LiteralPath "${user_backup}\_NTUSER.DAT_backup_${f}" -Destination "${user_backup}\NTUSER.DAT" }
+			if($LASTEXITCODE -ne 0) { 
+				Copy-Item -LiteralPath "${user_backup}\_NTUSER.DAT_backup_${f}" -Destination "${user_backup}\NTUSER.DAT" 
+				continue
+			}
+		# USER DICONNECTED -> copy ntuser.dat from profile
 		} else {
 			Copy-Item -LiteralPath "${user_profile}\NTUSER.DAT" -Destination "${user_backup}" -Force
-			if(-not $?) { Copy-Item -LiteralPath "${user_backup}\_NTUSER.DAT_backup_${f}" -Destination "${user_backup}\NTUSER.DAT" }
+			if(-not $?) { 
+				Copy-Item -LiteralPath "${user_backup}\_NTUSER.DAT_backup_${f}" -Destination "${user_backup}\NTUSER.DAT"
+				continue				
+			}
 		}
 		Get-ChildItem -LiteralPath ${user_backup} -Filter 'ntuser.dat*' -File -Force | Where-Object Name -ne 'ntuser.dat' | Remove-Item -Force
 	}	
 }
+
+
+
+function RestoreRegistries {
+	# If no users param get all users from each .json file in backups dir
+	if(!$users) { $users=foreach($f in Get-ChildItem $backups_path -filter *.json) {$f.basename } }
+	foreach($u in $users) {
+		Write-Output "---------------------------------------------------------------------------------------------------------`nRESTORE NTUSER.DAT: $u`n---------------------------------------------------------------------------------------------------------"
+		$user_profile="${ENV:SystemDrive}\Users\${u}"
+		$user_backup="${backups_path}\${u}"
+		
+		# Check backup folder
+		if(!(Test-Path $user_profile)) { Write-Output "WARNING! Folder $user_profile not exists. Skipping user $u"; continue }
+		if(!(Test-Path $user_backup)) { Write-Output "WARNING! Folder $user_backup not exists. Skipping user $u"; continue }
+		
+
+	}	
+}
+
 
 
 function RestoreProfiles {
@@ -290,6 +319,7 @@ function RestoreProfiles {
 		echo d | robocopy ${user_backup} ${user_profile} /MIR /XJ /COPYALL /NFL /NDL /R:1 /W:1
 	}
 }
+
 
 
 function CleanProfiles {
