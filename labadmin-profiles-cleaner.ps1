@@ -255,7 +255,7 @@ function BackupRegistries {
 		if(!(Test-Path $user_backup)) { Write-Output "WARNING! Folder $user_backup not exists. Skipping user $u"; continue }
 
 		Write-Output "Saving: ${user_profile}\NTUSER.DAT -> ${user_backup}\NTUSER.DAT"
-		# Backup previus ntuser.dat 
+		# Backup previous ntuser.dat 
 		$f=$(Get-Date -Format 'yyyyMMdd-HHmmss')
 		Copy-Item -LiteralPath "${user_backup}\NTUSER.DAT" -Destination "${user_backup}\_NTUSER.DAT_backup_${f}" -Force
 		Remove-Item -LiteralPath "${user_backup}\NTUSER.DAT" -Force
@@ -291,10 +291,23 @@ function RestoreRegistries {
 		$user_backup="${backups_path}\${u}"
 		
 		# Check backup folder
-		if(!(Test-Path $user_profile)) { Write-Output "WARNING! Folder $user_profile not exists. Skipping user $u"; continue }
-		if(!(Test-Path $user_backup)) { Write-Output "WARNING! Folder $user_backup not exists. Skipping user $u"; continue }
+		if(!(Test-Path "${user_profile}\NTUSER.DAT")) { Write-Output "WARNING! File ${user_profile}\NTUSER.DAT not exists. Skipping user $u"; continue }
+		if(!(Test-Path "${user_backup}\NTUSER.DAT")) { Write-Output "WARNING! File ${user_backup}\NTUSER.DAT not exists. Skipping user $u"; continue }
 		
-
+		Write-Output "Restoring: ${user_backup}\NTUSER.DAT -> ${user_profile}\NTUSER.DAT"
+		# Check user connected
+		$sid = (Get-LocalUser -Name $u).SID.Value
+		if (Get-CimInstance Win32_UserProfile | Where-Object { $_.SID -eq $sid -and $_.Loaded }) {
+			Write-Output "WARNING! Profile $u in use. Skipping user $u"; continue
+		}
+		
+		# Backup previous ntuser.dat 
+		$f=$(Get-Date -Format 'yyyyMMdd-HHmmss')
+		Copy-Item -LiteralPath "${user_profile}\NTUSER.DAT" -Destination "${user_profile}\_NTUSER.DAT_backup_${f}" -Force
+		Remove-Item -LiteralPath "${user_profile}\NTUSER.DAT" -Force
+		Copy-Item -LiteralPath "${user_backup}\NTUSER.DAT" -Destination "${user_profile}" -Force
+		if(-not $?) { Copy-Item -LiteralPath "${user_profile}\_NTUSER.DAT_backup_${f}" -Destination "${user_profile}\NTUSER.DAT"; continue; }
+		Get-ChildItem -LiteralPath ${user_profile} -Filter 'ntuser.dat*' -File -Force | Where-Object Name -ne 'ntuser.dat' | Remove-Item -Force
 	}	
 }
 
