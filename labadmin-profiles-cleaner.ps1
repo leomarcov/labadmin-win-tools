@@ -36,11 +36,11 @@
     Restore full profile from backup
 	Parameter -Users can be given to select profiles to restore (by default all config profiles will be restored)
 
-.PARAMETER RemoveProfiles
-	Delete backup profiles saved
+.PARAMETER RemoveBackupProfiles
+	Remove backup profiles
 	Parameter -Users must be given with list of users profiles to remove
 
-.PARAMETER ResetConfig
+.PARAMETER ResetUserConfig
 	Set default config to backup users profiles
 	Parameter -Users can be given to select profiles to set default config (by default all config profiles will be restored)
 
@@ -67,8 +67,11 @@
 #>
 
 Param(
-	[parameter(Mandatory=$true, ParameterSetName="backupreg")]
-	[Switch]$BackupRegistries,
+	[parameter(Mandatory=$true, ParameterSetName="backupntuser")]
+	[Switch]$BackupNTUSER.DAT,
+
+	[parameter(Mandatory=$true, ParameterSetName="restorentuser")]
+	[Switch]$RestoreNTUSER.DAT,
 
 	[parameter(Mandatory=$true, ParameterSetName="backup")]
 	[Switch]$BackupProfiles,
@@ -80,16 +83,17 @@ Param(
 	[Switch]$CleanProfiles,
 	
 	[parameter(Mandatory=$true, ParameterSetName="remove")]
-	[Switch]$RemoveProfiles,	
+	[Switch]$RemoveBackupProfiles,	
 	
-	[parameter(Mandatory=$true, ParameterSetName="resetconfig")]
-	[Switch]$ResetConfig,	
+	[parameter(Mandatory=$true, ParameterSetName="resetuserconfig")]
+	[Switch]$ResetUserConfig,	
 	
-	[parameter(Mandatory=$false, ParameterSetName="backupreg")]
+	[parameter(Mandatory=$false, ParameterSetName="backupntuser")]
+	[parameter(Mandatory=$false, ParameterSetName="restorentuser")]
 	[parameter(Mandatory=$true, ParameterSetName="backup")]
 	[parameter(Mandatory=$true, ParameterSetName="remove")]
 	[parameter(Mandatory=$false, ParameterSetName="restore")]
-	[parameter(Mandatory=$false, ParameterSetName="resetconfig")]
+	[parameter(Mandatory=$false, ParameterSetName="resetuserconfig")]
 	[parameter(Mandatory=$false, ParameterSetName="clean")]
 	[String[]]$Users,
 	
@@ -97,11 +101,12 @@ Param(
 	[ValidateSet('full','soft','auto')]
 	[string]$CleanMode = 'auto',
 	
-	[parameter(Mandatory=$false, ParameterSetName="backupreg")]
+	[parameter(Mandatory=$false, ParameterSetName="backupntuser")]
+	[parameter(Mandatory=$false, ParameterSetName="restorentuser")]
 	[parameter(Mandatory=$false, ParameterSetName="backup")]
 	[parameter(Mandatory=$false, ParameterSetName="remove")]
 	[parameter(Mandatory=$false, ParameterSetName="restore")]
-	[parameter(Mandatory=$false, ParameterSetName="resetconfig")]
+	[parameter(Mandatory=$false, ParameterSetName="resetuserconfig")]
 	[parameter(Mandatory=$false, ParameterSetName="clean")]
 	[Switch]$Log
 )
@@ -168,7 +173,7 @@ $default_config=@{
 }
 
 
-function ResetConfig {
+function ResetUserConfig {
 	# If no users param get all users from each .json file in backups dir
 	if(!$users) { $users=foreach($f in Get-ChildItem $backups_path -filter *.json) {$f.basename } }
 	
@@ -184,9 +189,9 @@ function ResetConfig {
 }
 
 
-function RemoveProfiles {
+function RemoveBackupProfiles {
 	foreach($u in $users) {
-		Write-Output "---------------------------------------------------------------------------------------------------------`nREMOVE BACKUP USER: $u`n---------------------------------------------------------------------------------------------------------"
+		Write-Output "---------------------------------------------------------------------------------------------------------`nREMOVE BACKUP PROFILE: $u`n---------------------------------------------------------------------------------------------------------"
 		$user_backup="${backups_path}\${u}"
 		$user_config_file="${backups_path}\$u.json"
 
@@ -241,7 +246,7 @@ function BackupProfiles {
 
 
 
-function BackupRegistries {
+function BackupNTUSER.DAT {
 	# If no users param get all users from each .json file in backups dir
 	if(!$users) { $users=foreach($f in Get-ChildItem $backups_path -filter *.json) {$f.basename } }	
 	
@@ -282,7 +287,7 @@ function BackupRegistries {
 
 
 
-function RestoreRegistries {
+function RestoreNTUSER.DAT {
 	# If no users param get all users from each .json file in backups dir
 	if(!$users) { $users=foreach($f in Get-ChildItem $backups_path -filter *.json) {$f.basename } }
 	foreach($u in $users) {
@@ -430,11 +435,12 @@ function CleanProfiles {
 
 function main {
 	if($BackupProfiles)      			{ BackupProfiles  	}
-	elseif($BackupRegistries) 			{ BackupRegistries 	}
+	elseif($BackupNTUSER.DAT) 			{ BackupNTUSER.DAT 	}
+	elseif($RestoreNTUSER.DAT) 			{ RestoreNTUSER.DAT 	}
 	elseif($RestoreProfiles) 			{ RestoreProfiles 	}
  	elseif($CleanProfiles)				{ CleanProfiles		}
-	elseif($RemoveProfiles)				{ RemoveProfiles	}
-	elseif($ResetConfig)				{ ResetConfig		}	
+	elseif($RemoveBackupProfiles)		{ RemoveBackupProfiles	}
+	elseif($ResetUserConfig)			{ ResetUserConfig		}	
 }
 
 # EXEC no log
