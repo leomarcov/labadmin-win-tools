@@ -68,10 +68,10 @@
 
 Param(
 	[parameter(Mandatory=$true, ParameterSetName="backupntuser")]
-	[Switch]$BackupNTUSER.DAT,
+	[Switch]$BackupNTUSERDAT,
 
 	[parameter(Mandatory=$true, ParameterSetName="restorentuser")]
-	[Switch]$RestoreNTUSER.DAT,
+	[Switch]$RestoreNTUSERDAT,
 
 	[parameter(Mandatory=$true, ParameterSetName="backup")]
 	[Switch]$BackupProfiles,
@@ -165,7 +165,6 @@ $default_config=@{
 	)
 
 	softCleanRestorePaths=@(
-		"\NTUSER.DAT",
 		"\AppData\Local\Google\Chrome\User data\",
 		"\AppData\Local\Microsoft\Edge\User data\",
 		"\AppData\Roaming\Mozilla\Firefox\",
@@ -197,6 +196,11 @@ function RemoveBackupProfiles {
 		$user_config_file="${backups_path}\$u.json"
 
 		if(!(Test-Path $user_backup)) { Write-Output "WARNING! Folder $user_backup not exists. Skipping user $u"; continue }
+		
+		# Skip user if profile is loaded
+		if (Get-CimInstance Win32_UserProfile | Where-Object { $_.SID -eq (Get-LocalUser -Name $u).SID.Value -and $_.Loaded }) {
+			Write-Output "WARNING! User profile $u is loaded. Skipping user $u"; continue
+		}		
 		
 		& "${env:SystemRoot}\System32\cmd.exe" /c "rmdir /s /q `"${user_backup}`""
 		Remove-Item -Recurse -Force $user_backup -ErrorAction SilentlyContinue
@@ -247,7 +251,7 @@ function BackupProfiles {
 
 
 
-function BackupNTUSER.DAT {
+function BackupNTUSERDAT {
 	# If no users param get all users from each .json file in backups dir
 	if(!$users) { $users=foreach($f in Get-ChildItem $backups_path -filter *.json) {$f.basename } }	
 	
@@ -288,7 +292,7 @@ function BackupNTUSER.DAT {
 
 
 
-function RestoreNTUSER.DAT {
+function RestoreNTUSERDAT {
 	# If no users param get all users from each .json file in backups dir
 	if(!$users) { $users=foreach($f in Get-ChildItem $backups_path -filter *.json) {$f.basename } }
 	foreach($u in $users) {
@@ -332,6 +336,11 @@ function RestoreProfiles {
 		# Check backup folder
 		if(!(Test-Path $user_backup))  { Write-Output "WARNING! Folder $user_backup not exists. Skipping user $u"; continue }
 		
+		# Skip user if profile is loaded
+		if (Get-CimInstance Win32_UserProfile | Where-Object { $_.SID -eq (Get-LocalUser -Name $u).SID.Value -and $_.Loaded }) {
+			Write-Output "WARNING! User profile $u is loaded. Skipping user $u"; continue
+		}
+		
 		Write-Output "Removing user $u profile folder..."
 		# Remove-Item -Recurse -Force $user_profile
 		& "${env:SystemRoot}\System32\cmd.exe" /c "rmdir /s /q ${user_profile}"
@@ -370,6 +379,11 @@ function CleanProfiles {
 			$lastUnexpectedShutdown=(Get-WinEvent -FilterHashtable @{logname = 'System'; id = 6008})[0].TimeCreated
 			if($lastShutdown -eq $lastUnexpectedShutdown) { Write-Output "Skipping user $u (last shutdown unexpected)"; continue }
 		}
+		
+		# Skip user if profile is loaded
+		if (Get-CimInstance Win32_UserProfile | Where-Object { $_.SID -eq (Get-LocalUser -Name $u).SID.Value -and $_.Loaded }) {
+			Write-Output "WARNING! User profile $u is loaded. Skipping user $u"; continue
+		}		
 		
 		# Check CleanMode auto: full or soft
 		if($CleanMode -eq "auto") {
@@ -436,8 +450,8 @@ function CleanProfiles {
 
 function main {
 	if($BackupProfiles)      			{ BackupProfiles  	}
-	elseif($BackupNTUSER.DAT) 			{ BackupNTUSER.DAT 	}
-	elseif($RestoreNTUSER.DAT) 			{ RestoreNTUSER.DAT 	}
+	elseif($BackupNTUSERDAT) 			{ BackupNTUSERDAT 	}
+	elseif($RestoreNTUSERDAT) 			{ RestoreNTUSERDAT 	}
 	elseif($RestoreProfiles) 			{ RestoreProfiles 	}
  	elseif($CleanProfiles)				{ CleanProfiles		}
 	elseif($RemoveBackupProfiles)		{ RemoveBackupProfiles	}
