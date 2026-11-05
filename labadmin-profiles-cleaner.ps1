@@ -147,7 +147,7 @@ $default_config=@{
 		"\AppData\Roaming\Microsoft\Windows\Themes\*"
 	)
 	fullCleanRestorePaths=@(
-		"\NTUSER.DAT",
+		#"\NTUSER.DAT",
 		"\Desktop\"
 	)
 	
