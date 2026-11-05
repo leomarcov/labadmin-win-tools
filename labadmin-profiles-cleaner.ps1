@@ -133,7 +133,7 @@ $default_config=@{
 		"\Searches\*",
 		"\Saved Games\*",
 		"\Links\*",
-		"\AppData\Local\Microsoft\Windows\UsrClass.dat",
+		#"\AppData\Local\Microsoft\Windows\UsrClass.dat",
 		"\AppData\Local\Microsoft\Windows\Caches\*",
 		"\AppData\Local\Microsoft\Windows\INetCache\*",
 		"\AppData\Local\Microsoft\Windows\WebCache\*",
